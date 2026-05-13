@@ -2,1307 +2,627 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>MTG IRL</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
-/* ── TOKENS ─────────────────────────────────────────────── */
 :root {
-  --bg:          #060810;
-  --surface:     #0d1119;
-  --surface2:    #111620;
-  --surface3:    #161d2a;
-  --mat:         #0f1520;
-  --border:      #1e2535;
-  --border2:     #2a3045;
-  --gold:        #c8a44a;
-  --gold-lo:     #7a5e1e;
-  --gold-hi:     #f0ce78;
-  --gold-glow:   rgba(200,164,74,0.18);
-  --ruby:        #c0302a;
-  --emerald:     #1a7a42;
-  --sapphire:    #1560a8;
-  --text:        #c8c0a8;
-  --text-hi:     #ede8d8;
-  --text-lo:     #5a5548;
-  --text-dim:    #3a3830;
-  --card-bg:     #f0ece0;
-  --card-border: #b8aa88;
-  --card-text:   #1e1c16;
-  --ff-display:  'Cinzel', serif;
-  --ff-body:     'Crimson Text', Georgia, serif;
-  --ff-mono:     'Courier Prime', monospace;
-  --r:           3px;
-  --r2:          6px;
-  --trans:       cubic-bezier(0.22,1,0.36,1);
+  --bg:#06080d; --s1:#0c0f18; --s2:#111520; --s3:#181e2c;
+  --bdr:#1c2232; --bdr2:#2a3248;
+  --gold:#c8a44a; --glo:#78581c; --ghi:#f0d070;
+  --red:#be2c2c; --grn:#1e7a42; --blu:#1a5a9a;
+  --text:#b0a898; --thi:#ece0c8; --tlo:#42403a;
+  --ff1:'Cinzel',serif; --ff2:'Crimson Text',Georgia,serif;
 }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { font-size: 15px; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--ff-body);
-  min-height: 100vh;
-  overflow: hidden;
-  /* Subtle arcane grid */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--ff2);
   background-image:
-    linear-gradient(rgba(200,164,74,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(200,164,74,0.025) 1px, transparent 1px);
-  background-size: 40px 40px;
+    radial-gradient(ellipse at 50% 0%,rgba(200,164,74,.05) 0%,transparent 55%),
+    linear-gradient(rgba(200,164,74,.013) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(200,164,74,.013) 1px,transparent 1px);
+  background-size:100% 100%,32px 32px,32px 32px;
+}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px;}
+
+/* ─── OVERLAYS ─── */
+.ov{position:fixed;inset:0;z-index:800;background:rgba(3,5,10,.94);
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);animation:fi .18s ease;}
+.ov.hidden{display:none;}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.panel{
+  background:var(--s1);border:1px solid var(--bdr2);border-top:2px solid var(--gold);
+  width:min(540px,96vw);max-height:91vh;overflow-y:auto;
+  box-shadow:0 40px 100px rgba(0,0,0,.98);
+  animation:su .22s cubic-bezier(.22,1,.36,1);
+}
+.panel.wide{width:min(820px,97vw);}
+.panel.narrow{width:min(360px,95vw);}
+@keyframes su{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.ph{padding:20px 24px 14px;border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:space-between;}
+.pt{font-family:var(--ff1);font-size:.95rem;font-weight:700;color:var(--gold);letter-spacing:.08em;}
+.pb{padding:18px 24px;}
+.pf{padding:12px 24px 18px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--bdr);}
+.xbtn{background:none;border:none;color:var(--tlo);cursor:pointer;font-size:1.3rem;line-height:1;padding:0 4px;}
+.xbtn:hover{color:var(--thi);}
+
+/* ─── BUTTONS ─── */
+.btn{
+  font-family:var(--ff1);font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:8px 16px;border:1px solid var(--bdr2);border-top:2px solid var(--glo);
+  background:var(--s2);color:var(--text);cursor:pointer;border-radius:2px 3px 0 3px;
+  transition:all .12s;white-space:nowrap;user-select:none;touch-action:manipulation;
+}
+.btn:hover{background:var(--s3);border-top-color:var(--gold);color:var(--ghi);}
+.btn:active{transform:translateY(1px);}
+.btn.gold{background:#1a1204;border-top-color:var(--gold);color:var(--ghi);}
+.btn.gold:hover{background:#221a06;}
+.btn.grn{background:#081a0c;border-top-color:#30a060;color:#70e898;}
+.btn.grn:hover{background:#0c2214;}
+.btn.red{background:#160606;border-top-color:var(--red);color:#ff8070;}
+.btn.red:hover{background:#1e0a0a;}
+.btn.blu{background:#060e1c;border-top-color:#2070c0;color:#80b8ff;}
+.btn.sm{padding:5px 10px;font-size:.57rem;}
+.btn.w100{width:100%;text-align:center;margin-bottom:6px;}
+
+/* ─── INPUTS ─── */
+.inp{
+  width:100%;background:var(--s2);border:1px solid var(--bdr);border-bottom:2px solid var(--glo);
+  color:var(--thi);font-family:var(--ff2);font-size:.9rem;padding:8px 12px;outline:none;
+  border-radius:2px 2px 0 0;transition:border-color .15s;
+}
+.inp:focus{border-bottom-color:var(--gold);}
+.inp::placeholder{color:var(--tlo);font-style:italic;}
+select.inp{cursor:pointer;}
+.fl{display:flex;flex-direction:column;gap:5px;margin-bottom:13px;}
+.fl label{font-family:var(--ff1);font-size:.56rem;letter-spacing:.15em;text-transform:uppercase;color:var(--tlo);}
+.row2{display:flex;gap:10px;}
+.row2 .fl{flex:1;margin-bottom:0;}
+
+/* ═══════════════════════════════════════
+   LOGIN
+═══════════════════════════════════════ */
+#login{
+  position:fixed;inset:0;z-index:900;
+  background:radial-gradient(ellipse at 50% 25%,#161008 0%,#06080d 70%);
+  display:flex;align-items:center;justify-content:center;
+  background-image:linear-gradient(rgba(200,164,74,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(200,164,74,.025) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+#login.hidden{display:none;}
+.lbox{
+  background:var(--s1);border:1px solid var(--bdr2);border-top:3px solid var(--gold);
+  padding:50px 42px;width:min(400px,94vw);text-align:center;
+  box-shadow:0 60px 140px rgba(0,0,0,1),0 0 60px rgba(200,164,74,.06);
+}
+.llogo{font-family:var(--ff1);font-size:2.8rem;font-weight:900;color:var(--gold);
+  letter-spacing:.22em;text-shadow:0 0 40px rgba(200,164,74,.4);margin-bottom:5px;}
+.lsub{font-family:var(--ff1);font-size:.52rem;letter-spacing:.36em;color:var(--tlo);margin-bottom:38px;}
+.orn{width:44px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 32px;}
+
+/* ═══════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════ */
+#app{display:none;height:100vh;flex-direction:column;}
+#app.on{display:flex;}
+
+#topbar{
+  height:50px;background:var(--s1);border-bottom:2px solid var(--glo);
+  display:flex;align-items:center;padding:0 12px;gap:9px;flex-shrink:0;
+  box-shadow:0 3px 20px rgba(0,0,0,.75);
+}
+.tb-logo{font-family:var(--ff1);font-size:1rem;font-weight:900;letter-spacing:.18em;
+  color:var(--gold);text-shadow:0 0 20px rgba(200,164,74,.3);flex-shrink:0;}
+.tb-div{width:1px;height:26px;background:var(--bdr2);flex-shrink:0;}
+.tb-mode{
+  font-family:var(--ff1);font-size:.56rem;letter-spacing:.1em;
+  padding:3px 9px;border:1px solid var(--glo);color:var(--gold);
+  background:rgba(200,164,74,.08);cursor:pointer;border-radius:2px;flex-shrink:0;
+}
+.tb-mode:hover{border-color:var(--gold);background:rgba(200,164,74,.16);}
+
+/* TURN DISPLAY in topbar */
+#turn-display{
+  display:flex;align-items:center;gap:8px;flex-shrink:0;
+}
+.turn-arrow{
+  font-family:var(--ff1);font-size:.6rem;letter-spacing:.08em;color:var(--tlo);
+}
+#active-player-name{
+  font-family:var(--ff1);font-size:.72rem;font-weight:700;
+  color:var(--gold);letter-spacing:.06em;
+  background:rgba(200,164,74,.1);border:1px solid var(--glo);
+  padding:3px 10px;border-radius:2px;
+}
+#turn-num{font-family:var(--ff1);font-size:.56rem;color:var(--tlo);}
+.tb-sp{flex:1;}
+
+/* END TURN BUTTON — prominent in topbar */
+#end-turn-btn{
+  font-family:var(--ff1);font-size:.65rem;font-weight:700;letter-spacing:.1em;
+  padding:8px 18px;
+  background:linear-gradient(180deg,#1a2a0a,#0e1806);
+  border:1px solid #306020;border-top:2px solid #50c030;
+  color:#80f060;cursor:pointer;border-radius:2px 3px 0 3px;
+  transition:all .15s;touch-action:manipulation;flex-shrink:0;
+}
+#end-turn-btn:hover{background:linear-gradient(180deg,#223a0c,#142008);border-top-color:#70e040;color:#a0ff80;}
+#end-turn-btn:active{transform:translateY(1px);}
+
+/* ═══════════════════════════════════════
+   PLAYER PANELS GRID
+═══════════════════════════════════════ */
+#players-area{
+  flex:1;overflow:auto;padding:10px;
+  display:grid;
+  gap:10px;
+  align-content:start;
+}
+/* Layouts based on player count — set by JS */
+#players-area.p1{grid-template-columns:1fr;}
+#players-area.p2{grid-template-columns:1fr 1fr;}
+#players-area.p3{grid-template-columns:1fr 1fr 1fr;}
+#players-area.p4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;}
+#players-area.p5{grid-template-columns:repeat(3,1fr);}
+#players-area.p6{grid-template-columns:repeat(3,1fr);}
+@media(max-width:700px){
+  #players-area.p3,#players-area.p4,#players-area.p5,#players-area.p6{grid-template-columns:1fr 1fr;}
+  #players-area.p2{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  #players-area{grid-template-columns:1fr!important;}
 }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-lo); }
-
-/* ── OVERLAYS ────────────────────────────────────────────── */
-.overlay {
-  position: fixed; inset: 0; z-index: 900;
-  background: rgba(4,6,12,0.88);
-  display: flex; align-items: center; justify-content: center;
-  backdrop-filter: blur(6px);
-  animation: fadeIn 0.2s var(--trans);
+/* ─── PLAYER PANEL ─── */
+.pp{
+  background:var(--s1);border:1px solid var(--bdr2);
+  display:flex;flex-direction:column;
+  transition:border-color .25s,box-shadow .25s;
+  min-height:280px;position:relative;overflow:hidden;
 }
-.overlay.hidden { display: none; }
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
-.modal {
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-top: 2px solid var(--gold);
-  width: min(560px, 95vw);
-  max-height: 92vh;
-  overflow-y: auto;
-  box-shadow: 0 40px 120px rgba(0,0,0,0.9), inset 0 1px 0 rgba(200,164,74,0.1);
-  animation: slideUp 0.25s var(--trans);
+/* Active player glow */
+.pp.active{
+  border-color:var(--gold);
+  box-shadow:0 0 0 1px var(--glo),0 0 30px rgba(200,164,74,.15);
 }
-.modal.wide  { width: min(860px,97vw); }
-.modal.narrow{ width: min(380px,95vw); }
-@keyframes slideUp {
-  from { opacity:0; transform: translateY(20px); }
-  to   { opacity:1; transform: translateY(0); }
+.pp.active::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
 }
 
-.modal-head {
-  padding: 28px 32px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
+/* Player header */
+.pp-head{
+  padding:8px 12px;background:var(--s2);border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
 }
-.modal-title {
-  font-family: var(--ff-display);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--gold);
-  letter-spacing: 0.08em;
+.pp-name{
+  font-family:var(--ff1);font-size:.72rem;font-weight:700;
+  color:var(--thi);letter-spacing:.06em;flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.modal-body { padding: 24px 32px; }
-.modal-foot {
-  padding: 16px 32px 24px;
-  display: flex; gap: 8px; justify-content: flex-end;
-  border-top: 1px solid var(--border);
+.pp.active .pp-name{color:var(--ghi);}
+.pp-turn-badge{
+  font-family:var(--ff1);font-size:.5rem;letter-spacing:.12em;
+  background:var(--gold);color:#1a1000;padding:2px 7px;border-radius:1px;
+  flex-shrink:0;margin-left:6px;display:none;
 }
-.modal-close {
-  background: none; border: none; color: var(--text-lo); cursor: pointer;
-  font-size: 1.2rem; line-height: 1; padding: 2px 6px;
-  transition: color 0.15s;
-}
-.modal-close:hover { color: var(--text); }
-
-/* ── BUTTONS ─────────────────────────────────────────────── */
-.btn {
-  font-family: var(--ff-display);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 8px 16px;
-  border: 1px solid var(--border2);
-  border-top-color: var(--gold-lo);
-  background: var(--surface2);
-  color: var(--text);
-  cursor: pointer;
-  border-radius: var(--r) var(--r) 0 var(--r);
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
-  white-space: nowrap;
-  user-select: none;
-}
-.btn:hover  { background: var(--surface3); border-top-color: var(--gold); color: var(--gold-hi); }
-.btn:active { transform: translateY(1px); }
-
-.btn-gold {
-  background: linear-gradient(180deg, #3a2a08 0%, #251c06 100%);
-  border-color: var(--gold-lo); border-top-color: var(--gold);
-  color: var(--gold-hi);
-}
-.btn-gold:hover { background: linear-gradient(180deg, #4a3610 0%, #332508 100%); border-color: var(--gold); }
-
-.btn-green {
-  background: #0b2018; border-color: #1a5030; border-top-color: #27a060;
-  color: #70e8a0;
-}
-.btn-green:hover { background: #102818; }
-
-.btn-red {
-  background: #200c0c; border-color: #501010; border-top-color: var(--ruby);
-  color: #ff8070;
-}
-.btn-red:hover { background: #2c1010; }
-
-.btn-sm   { padding: 5px 10px; font-size: 0.62rem; }
-.btn-full { width: 100%; text-align: left; margin-bottom: 5px; }
-.btn-icon { padding: 6px 9px; min-width: 30px; text-align: center; border-radius: var(--r); }
-
-/* ── FORMS ───────────────────────────────────────────────── */
-.field {
-  display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px;
-}
-.field label {
-  font-family: var(--ff-display);
-  font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--text-lo);
-}
-.inp {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-bottom: 2px solid var(--gold-lo);
-  color: var(--text-hi);
-  font-family: var(--ff-body);
-  font-size: 0.92rem;
-  padding: 9px 12px;
-  outline: none;
-  border-radius: var(--r) var(--r) 0 0;
-  transition: border-color 0.18s;
-  width: 100%;
-}
-.inp:focus { border-bottom-color: var(--gold); }
-.inp::placeholder { color: var(--text-dim); font-style: italic; }
-select.inp { cursor: pointer; }
-
-.row { display: flex; gap: 10px; align-items: flex-end; }
-.row .field { flex: 1; margin-bottom: 0; }
-
-/* ── LOGIN ───────────────────────────────────────────────── */
-#login-screen {
-  position: fixed; inset: 0; z-index: 1000;
-  background: radial-gradient(ellipse at 50% 30%, #1a1208 0%, #060810 70%);
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column;
-  background-image:
-    linear-gradient(rgba(200,164,74,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(200,164,74,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-#login-screen.hidden { display: none; }
-
-.login-card {
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-top: 3px solid var(--gold);
-  padding: 52px 48px;
-  width: min(420px, 94vw);
-  text-align: center;
-  box-shadow: 0 60px 140px rgba(0,0,0,0.95), 0 0 80px rgba(200,164,74,0.08);
-}
-.login-logo {
-  font-family: var(--ff-display);
-  font-size: 3rem; font-weight: 900;
-  color: var(--gold);
-  letter-spacing: 0.2em;
-  text-shadow: 0 0 40px rgba(200,164,74,0.4), 0 4px 20px rgba(0,0,0,0.8);
-  margin-bottom: 6px;
-}
-.login-sub {
-  font-family: var(--ff-display);
-  font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase;
-  color: var(--text-lo);
-  margin-bottom: 44px;
-}
-.login-ornament {
-  width: 60px; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  margin: 0 auto 40px;
+.pp.active .pp-turn-badge{display:block;}
+.pp-format-badge{
+  font-family:var(--ff1);font-size:.5rem;color:var(--glo);
+  letter-spacing:.08em;flex-shrink:0;margin-left:4px;
 }
 
-/* ── NEW GAME MODAL ──────────────────────────────────────── */
-.player-entry {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-left: 2px solid var(--gold-lo);
-  padding: 12px 14px;
-  margin-bottom: 8px;
-  display: flex; gap: 10px; align-items: center;
+/* Life section */
+.pp-life{
+  padding:12px 12px 8px;text-align:center;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;gap:8px;
 }
-.player-entry .inp { flex: 1; margin: 0; }
-.player-entry .pnum {
-  font-family: var(--ff-display);
-  font-size: 0.65rem; color: var(--gold); min-width: 20px;
+.pp-life-adj{
+  width:40px;height:40px;background:var(--s2);border:1px solid var(--bdr2);
+  color:var(--tlo);font-size:1.4rem;font-weight:300;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border-radius:2px;transition:all .1s;touch-action:manipulation;
+  flex-shrink:0;
+}
+.pp-life-adj:hover{background:var(--s3);color:var(--gold);border-color:var(--glo);}
+.pp-life-adj:active{transform:scale(.92);}
+.pp-life-num{
+  font-family:var(--ff1);font-size:2.8rem;font-weight:900;
+  color:var(--thi);min-width:64px;text-align:center;line-height:1;
+  cursor:pointer;transition:color .25s;flex:1;
+}
+.pp-life-num.lo{color:#ff8040;}
+.pp-life-num.crit{color:#ff2828;text-shadow:0 0 18px rgba(255,30,30,.5);animation:throb 1.3s ease-in-out infinite;}
+@keyframes throb{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* Quick life buttons */
+.pp-quick{
+  display:flex;gap:3px;padding:0 10px 8px;justify-content:center;flex-wrap:wrap;flex-shrink:0;
+}
+.qlb{
+  font-family:var(--ff1);font-size:.55rem;letter-spacing:.06em;
+  padding:3px 7px;cursor:pointer;border-radius:2px;transition:all .1s;
+  touch-action:manipulation;user-select:none;border:1px solid var(--bdr);background:var(--s2);
+  color:var(--tlo);
+}
+.qlb.pos{color:#50c870;border-color:#1a4820;}
+.qlb.neg{color:#e06858;border-color:#401414;}
+.qlb:hover{background:var(--s3);color:var(--thi);}
+.qlb:active{transform:scale(.92);}
+
+/* Counters in player panel */
+.pp-ctrs{
+  padding:4px 10px 6px;display:flex;flex-direction:column;gap:4px;
+  border-top:1px solid var(--bdr);flex:1;overflow:hidden;
+}
+.pc-row{display:flex;align-items:center;gap:5px;}
+.pc-lbl{font-size:.66rem;color:var(--tlo);flex:1;display:flex;align-items:center;gap:4px;}
+.pc-ico{font-size:.78rem;width:16px;text-align:center;}
+.pc-val{
+  font-family:var(--ff1);font-size:.8rem;color:var(--thi);
+  min-width:26px;text-align:center;
+}
+.pc-val.warn{color:#ff8040;}
+.pc-val.dead{color:#ff2828;animation:throb 1.3s ease-in-out infinite;}
+.pca{display:flex;gap:2px;}
+.pca-btn{
+  background:var(--s2);border:1px solid var(--bdr);color:var(--tlo);
+  font-size:.72rem;width:22px;height:22px;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;border-radius:2px;touch-action:manipulation;
+  transition:all .1s;
+}
+.pca-btn:hover{background:var(--s3);color:var(--thi);}
+.pca-btn:active{transform:scale(.9);}
+
+/* Commander damage */
+.cdmg-section{padding:4px 10px 6px;border-top:1px solid var(--bdr);flex-shrink:0;}
+.cdmg-title{font-family:var(--ff1);font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tlo);margin-bottom:5px;}
+.cdmg-row{display:flex;align-items:center;gap:4px;margin-bottom:4px;}
+.cdmg-from{font-size:.64rem;color:var(--tlo);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cdmg-val{font-family:var(--ff1);font-size:.78rem;color:var(--thi);min-width:22px;text-align:center;}
+.cdmg-val.warn{color:#ff8040;}
+.cdmg-val.dead{color:#ff2828;font-weight:700;}
+
+/* Status toggles in panel */
+.pp-status{
+  padding:4px 10px 8px;display:flex;gap:5px;flex-wrap:wrap;
+  border-top:1px solid var(--bdr);flex-shrink:0;
+}
+.status-chip{
+  font-family:var(--ff1);font-size:.52rem;letter-spacing:.08em;
+  padding:3px 8px;border:1px solid var(--bdr);background:var(--s2);
+  cursor:pointer;border-radius:2px;color:var(--tlo);transition:all .12s;
+  touch-action:manipulation;
+}
+.status-chip.on{background:#1a1006;border-color:var(--glo);color:var(--ghi);}
+.status-chip:hover{background:var(--s3);color:var(--thi);}
+
+/* ═══════════════════════════════════════
+   BOTTOM BAR
+═══════════════════════════════════════ */
+#bottom-bar{
+  height:52px;background:var(--s1);border-top:1px solid var(--bdr);
+  display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0;
+}
+#bottom-bar .bb-sp{flex:1;}
+
+/* ═══════════════════════════════════════
+   CAMERA SCAN OVERLAY
+═══════════════════════════════════════ */
+#cam-ov{
+  position:fixed;inset:0;z-index:900;
+  background:#000;display:flex;flex-direction:column;
+}
+#cam-ov.hidden{display:none;}
+#cam-video{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+}
+/* Dark vignette with hole for scan zone */
+.cam-vignette{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+}
+/* Scan guide */
+.cam-guide-wrap{
+  position:absolute;inset:0;z-index:3;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;
+}
+/* Card name is at the TOP of the card — we guide user to align top of card here */
+.cam-guide{
+  width:min(320px,85vw);
+  border:2px solid var(--gold);
+  aspect-ratio:7/1;
+  box-shadow:0 0 0 4000px rgba(0,0,0,.68);
+  position:relative;border-radius:2px;
+  background:rgba(200,164,74,.04);
+}
+.cam-guide-corner{position:absolute;width:14px;height:14px;}
+.cam-guide-corner.tl{top:-3px;left:-3px;border-top:3px solid var(--ghi);border-left:3px solid var(--ghi);}
+.cam-guide-corner.tr{top:-3px;right:-3px;border-top:3px solid var(--ghi);border-right:3px solid var(--ghi);}
+.cam-guide-corner.bl{bottom:-3px;left:-3px;border-bottom:3px solid var(--ghi);border-left:3px solid var(--ghi);}
+.cam-guide-corner.br{bottom:-3px;right:-3px;border-bottom:3px solid var(--ghi);border-right:3px solid var(--ghi);}
+
+/* Animated scan line when scanning */
+.cam-scan-line{
+  position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  top:0;display:none;animation:scanmove 1.6s ease-in-out infinite;
+}
+.scanning .cam-scan-line{display:block;}
+@keyframes scanmove{0%{top:0;opacity:1}100%{top:100%;opacity:0}}
+
+.cam-hint{
+  font-family:var(--ff1);font-size:.66rem;letter-spacing:.1em;
+  color:rgba(255,255,255,.9);text-align:center;padding:0 20px;
+  text-shadow:0 1px 6px rgba(0,0,0,1);
+}
+#cam-status{
+  font-family:var(--ff1);font-size:.6rem;letter-spacing:.1em;
+  color:var(--gold);background:rgba(0,0,0,.8);padding:5px 14px;border-radius:2px;
+  min-height:26px;text-align:center;
 }
 
-/* ── MODE GRID ───────────────────────────────────────────── */
-.mode-category {
-  font-family: var(--ff-display);
-  font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
-  padding: 10px 0 6px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 8px;
+/* Camera controls */
+.cam-controls{
+  position:absolute;bottom:28px;left:0;right:0;
+  display:flex;justify-content:center;gap:12px;z-index:4;
 }
-.mode-category.arena    { color: #a78bfa; }
-.mode-category.paper    { color: #5eead4; }
-.mode-category.edh      { color: var(--gold); }
-.mode-category.limited  { color: #93c5fd; }
-
-.mode-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-  gap: 6px; margin-bottom: 16px;
+.cam-cap-btn{
+  background:linear-gradient(180deg,#2a1c08,#160e04);
+  border:2px solid var(--gold);color:var(--ghi);
+  font-family:var(--ff1);font-size:.68rem;letter-spacing:.1em;
+  padding:13px 28px;cursor:pointer;border-radius:2px;touch-action:manipulation;
+  box-shadow:0 4px 20px rgba(0,0,0,.9);transition:all .15s;
 }
-.mode-tile {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  padding: 10px 12px;
-  cursor: pointer;
-  border-radius: var(--r);
-  transition: background 0.12s, border-color 0.12s;
-}
-.mode-tile:hover { background: var(--surface3); border-color: var(--gold-lo); }
-.mode-tile.sel   { background: #1e1608; border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold-lo); }
-.mode-tile .mt-name { font-family: var(--ff-display); font-size: 0.72rem; font-weight: 600; color: var(--text-hi); margin-bottom: 3px; }
-.mode-tile .mt-life { font-size: 0.66rem; color: var(--gold); }
-.mode-tile .mt-deck { font-size: 0.6rem; color: var(--text-lo); }
-
-/* ── TOPBAR ──────────────────────────────────────────────── */
-#topbar {
-  position: fixed; top: 0; left: 0; right: 0; height: 54px; z-index: 200;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  border-bottom: 2px solid var(--gold-lo);
-  display: flex; align-items: center;
-  padding: 0 14px; gap: 10px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.7);
-}
-.tb-logo {
-  font-family: var(--ff-display);
-  font-size: 1.1rem; font-weight: 900; letter-spacing: 0.16em;
-  color: var(--gold);
-  text-shadow: 0 0 20px rgba(200,164,74,0.3);
-  flex-shrink: 0;
-}
-.tb-sep { width: 1px; height: 28px; background: var(--border2); flex-shrink: 0; }
-.tb-user {
-  font-family: var(--ff-display);
-  font-size: 0.6rem; letter-spacing: 0.1em; color: var(--text-lo);
-  flex-shrink: 0;
-}
-.tb-user strong { color: var(--text); }
-.tb-mode {
-  font-family: var(--ff-display);
-  font-size: 0.6rem; letter-spacing: 0.1em;
-  padding: 3px 10px;
-  border: 1px solid var(--gold-lo);
-  color: var(--gold);
-  background: var(--gold-glow);
-  cursor: pointer;
-  border-radius: 2px;
-  flex-shrink: 0;
-  transition: border-color 0.15s, background 0.15s;
-}
-.tb-mode:hover { border-color: var(--gold); background: rgba(200,164,74,0.22); }
-.tb-turn {
-  font-family: var(--ff-display);
-  font-size: 0.6rem; letter-spacing: 0.08em;
-  color: var(--text-lo); flex-shrink: 0;
-}
-.tb-turn span { color: var(--gold); }
-.tb-spacer { flex: 1; }
-.life-block { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
-.life-adj {
-  width: 30px; height: 30px;
-  background: var(--surface2); border: 1px solid var(--border2);
-  color: var(--text-lo); font-size: 1.1rem; font-weight: 300;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; border-radius: var(--r);
-  transition: all 0.12s; user-select: none;
-}
-.life-adj:hover { background: var(--surface3); color: var(--gold); border-color: var(--gold-lo); }
-#life-num {
-  font-family: var(--ff-display);
-  font-size: 1.8rem; font-weight: 700;
-  color: var(--text-hi); min-width: 56px; text-align: center;
-  cursor: pointer; line-height: 1; letter-spacing: 0.05em;
-  transition: color 0.3s;
-}
-#life-num.lo   { color: #ff8040; }
-#life-num.crit { color: #ff3030; text-shadow: 0 0 16px rgba(255,40,40,0.5); animation: throb 1.4s ease-in-out infinite; }
-@keyframes throb { 0%,100%{opacity:1} 50%{opacity:0.55} }
-
-/* ── MAIN LAYOUT ─────────────────────────────────────────── */
-#app { display: none; padding-top: 54px; height: 100vh; flex-direction: column; }
-#app.on { display: flex; }
-#layout { display: grid; grid-template-columns: 238px 1fr 272px; flex: 1; min-height: 0; }
-
-/* ── LEFT: DECK ──────────────────────────────────────────── */
-#left {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column; overflow: hidden;
-}
-.panel-head {
-  padding: 12px 14px 10px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.panel-label {
-  font-family: var(--ff-display);
-  font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--text-lo); margin-bottom: 8px;
-}
-.search-wrap { position: relative; }
-.search-inp {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-bottom: 2px solid var(--border2);
-  color: var(--text);
-  font-family: var(--ff-body);
-  font-size: 0.82rem; padding: 6px 10px;
-  outline: none; border-radius: var(--r) var(--r) 0 0;
-  transition: border-color 0.15s;
-}
-.search-inp:focus { border-bottom-color: var(--gold-lo); }
-.search-inp::placeholder { color: var(--text-dim); font-style: italic; }
-
-#deck-list { flex: 1; overflow-y: auto; }
-.deck-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 5px 12px 5px 10px;
-  cursor: pointer;
-  border-left: 2px solid transparent;
-  transition: background 0.1s, border-color 0.12s;
-}
-.deck-item:hover { background: var(--surface2); border-left-color: var(--gold-lo); }
-.deck-item-img {
-  width: 34px; height: 48px; object-fit: cover;
-  border: 1px solid var(--border2); flex-shrink: 0; background: var(--surface3);
-}
-.deck-item-ph {
-  width: 34px; height: 48px; background: var(--surface3);
-  border: 1px solid var(--border); flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--ff-display); font-size: 0.7rem; color: var(--text-dim);
-}
-.deck-item-info { flex: 1; min-width: 0; }
-.deck-item-name {
-  font-size: 0.76rem; color: var(--text);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  line-height: 1.3;
-}
-.deck-item-type { font-size: 0.62rem; color: var(--text-lo); font-style: italic; }
-.deck-item-cost { font-size: 0.6rem; color: var(--gold-lo); flex-shrink: 0; }
-
-.left-foot {
-  padding: 10px 12px;
-  border-top: 1px solid var(--border);
-  display: flex; flex-direction: column; gap: 5px; flex-shrink: 0;
+.cam-cap-btn:hover{background:linear-gradient(180deg,#381e0a,#201408);}
+.cam-cap-btn:active{transform:scale(.97);}
+.cam-close-btn{
+  background:rgba(16,16,16,.9);border:1px solid #3a3a3a;color:#aaa;
+  font-family:var(--ff1);font-size:.65rem;letter-spacing:.1em;
+  padding:13px 20px;cursor:pointer;border-radius:2px;touch-action:manipulation;
 }
 
-/* ── CENTER: BATTLEFIELD ─────────────────────────────────── */
-#center {
-  background: var(--mat);
-  display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: inset 0 0 120px rgba(0,0,0,0.5);
-  position: relative;
+/* Results panel */
+#cam-results{
+  position:absolute;inset:0;z-index:5;
+  background:rgba(3,5,10,.97);
+  display:flex;flex-direction:column;padding:18px;overflow-y:auto;
 }
-/* Subtle felt texture */
-#center::before {
-  content: '';
-  position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-  opacity: 0.4;
+#cam-results.hidden{display:none;}
+.cr-title{font-family:var(--ff1);font-size:.8rem;color:var(--gold);margin-bottom:12px;letter-spacing:.08em;}
+.cr-match{
+  display:flex;gap:12px;padding:10px;background:var(--s1);border:1px solid var(--bdr2);
+  margin-bottom:7px;cursor:pointer;border-left:3px solid transparent;
+  border-radius:2px;transition:all .12s;
 }
+.cr-match:hover{background:var(--s2);border-left-color:var(--gold);}
+.cr-match img{width:54px;height:76px;object-fit:cover;border:1px solid var(--bdr2);flex-shrink:0;}
+.cr-match .cr-name{font-family:var(--ff1);font-size:.75rem;color:var(--thi);margin-bottom:3px;}
+.cr-match .cr-type{font-size:.63rem;color:var(--tlo);font-style:italic;margin-bottom:4px;}
+.cr-match .cr-text{font-size:.63rem;color:var(--text);line-height:1.4;}
+.cr-ph{width:54px;height:76px;background:var(--s2);border:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-family:var(--ff1);font-size:.55rem;color:var(--tlo);text-align:center;}
+.cr-no-results{color:var(--tlo);font-size:.78rem;font-style:italic;padding:14px 0;}
+.cr-manual{
+  background:var(--s2);border:1px solid var(--bdr);padding:14px;
+  margin-top:8px;border-radius:2px;
+}
+.cr-manual-lbl{font-family:var(--ff1);font-size:.6rem;color:var(--tlo);letter-spacing:.12em;margin-bottom:8px;}
+.cr-inp-row{display:flex;gap:8px;}
 
-#cmd-bar {
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 7px 14px; display: none; align-items: center; gap: 10px;
-  flex-shrink: 0; z-index: 1;
+/* ═══════════════════════════════════════
+   MODALS — NEW GAME
+═══════════════════════════════════════ */
+.player-row{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  background:var(--s2);border:1px solid var(--bdr);border-left:2px solid var(--glo);
+  margin-bottom:6px;border-radius:2px;
 }
-#cmd-bar.on { display: flex; }
-.cmd-zone-label {
-  font-family: var(--ff-display);
-  font-size: 0.56rem; letter-spacing: 0.2em; color: var(--gold-lo); flex-shrink: 0;
+.player-row .pnum{font-family:var(--ff1);font-size:.6rem;color:var(--gold);min-width:20px;}
+.player-row-rm{
+  background:none;border:none;color:var(--tlo);cursor:pointer;
+  font-size:1rem;line-height:1;padding:2px 5px;transition:color .1s;
 }
-#cmd-cards { display: flex; gap: 7px; align-items: center; flex: 1; overflow-x: auto; }
-.cmd-chip {
-  background: #18130a; border: 1px solid var(--gold-lo); border-top: 2px solid var(--gold);
-  padding: 4px 10px; cursor: pointer; flex-shrink: 0;
-  transition: border-color 0.12s, background 0.12s;
-}
-.cmd-chip:hover { background: #201a0c; border-color: var(--gold); }
-.cmd-chip-name { font-family: var(--ff-display); font-size: 0.7rem; color: var(--gold-hi); }
-.cmd-chip-info { font-size: 0.6rem; color: var(--text-lo); }
+.player-row-rm:hover{color:var(--red);}
 
-#bf-scroll { flex: 1; overflow-y: auto; padding: 14px; position: relative; z-index: 1; }
-#bf-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
-  gap: 10px; align-content: start;
-}
-.bf-empty {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--ff-display); font-size: 0.82rem; letter-spacing: 0.1em;
-  color: var(--text-dim); text-align: center; line-height: 2;
-}
+/* ─── MODE GRID ─── */
+.mc{font-family:var(--ff1);font-size:.54rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:10px 0 5px;border-bottom:1px solid var(--bdr);margin-bottom:7px;}
+.mc.arena{color:#a78bfa;} .mc.paper{color:#5eead4;} .mc.edh{color:var(--gold);} .mc.limited{color:#93c5fd;}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:5px;margin-bottom:14px;}
+.mt{background:var(--s2);border:1px solid var(--bdr);padding:9px 11px;cursor:pointer;border-radius:2px;transition:all .12s;}
+.mt:hover{background:var(--s3);border-color:var(--glo);}
+.mt.sel{background:#161004;border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--glo);}
+.mt .mn{font-family:var(--ff1);font-size:.66rem;font-weight:700;color:var(--thi);margin-bottom:3px;}
+.mt .ml{font-size:.6rem;color:var(--gold);}
+.mt .md{font-size:.56rem;color:var(--tlo);}
 
-/* ── CARD COMPONENT ──────────────────────────────────────── */
-.bfc {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  color: var(--card-text);
-  display: flex; flex-direction: column;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.15);
-  transition: transform 0.2s var(--trans), box-shadow 0.2s, filter 0.2s;
-  position: relative; user-select: none;
-  transform-origin: center 60%;
-}
-.bfc:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.7); }
-.bfc.tapped {
-  transform: rotate(90deg) scale(0.86);
-  filter: brightness(0.75) saturate(0.6);
-  box-shadow: 3px 3px 14px rgba(0,0,0,0.6);
-}
-.bfc.tok  { border-color: #90b870; border-style: dashed; }
-.bfc.cmdr { border: 2px solid var(--gold); }
-.bfc.selected { outline: 2px solid var(--gold); outline-offset: 2px; }
+/* ─── STATS MODAL ─── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:16px;}
+.stat-tile{background:var(--s2);border:1px solid var(--bdr);padding:14px;text-align:center;border-radius:2px;}
+.stat-big{font-family:var(--ff1);font-size:1.8rem;font-weight:900;line-height:1;color:var(--thi);}
+.stat-big.w{color:#60d880;} .stat-big.l{color:#f07060;}
+.stat-lbl{font-family:var(--ff1);font-size:.52rem;letter-spacing:.1em;color:var(--tlo);margin-top:4px;}
+.hist-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bdr);}
+.hist-res{font-family:var(--ff1);font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:2px;flex-shrink:0;}
+.hist-res.W{background:#081a0a;color:#60d880;border:1px solid #1a4020;}
+.hist-res.L{background:#1a0606;color:#f07060;border:1px solid #481010;}
+.hist-detail{flex:1;min-width:0;}
+.hist-fmt{font-size:.7rem;color:var(--thi);}
+.hist-meta{font-size:.6rem;color:var(--tlo);}
 
-.bfc-art {
-  width: 100%; aspect-ratio: 4/3;
-  overflow: hidden; position: relative;
-  background: #141820; border-bottom: 2px solid var(--card-border);
-}
-.bfc-art img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-  transition: filter 0.4s;
-}
-.bfc-art img.blur { filter: blur(10px) saturate(0); }
-.bfc-art .art-ph {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(145deg, #1e2530 0%, #111820 100%);
-  font-family: var(--ff-display); font-size: 0.6rem;
-  color: var(--border2); letter-spacing: 0.08em; text-align: center; padding: 8px;
-}
-.bfc-badge {
-  position: absolute; top: 4px; left: 5px;
-  background: rgba(0,0,0,0.78); color: #90b870;
-  font-family: var(--ff-display); font-size: 0.5rem; letter-spacing: 0.1em;
-  padding: 1px 5px; text-transform: uppercase;
-}
-.bfc-crown {
-  position: absolute; top: 4px; right: 5px;
-  color: var(--gold); font-size: 0.8rem;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
-}
-
-.bfc-body { padding: 5px 6px 3px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.bfc-name-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 3px; }
-.bfc-name {
-  font-family: var(--ff-display);
-  font-size: 0.64rem; font-weight: 700;
-  color: #161410; line-height: 1.2; flex: 1;
-}
-.bfc-cost { display: flex; gap: 1px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; }
-.ms {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 13px; height: 13px; border-radius: 50%;
-  font-size: 7px; font-weight: 700; font-family: var(--ff-display); flex-shrink: 0;
-}
-.ms-W { background: #f4f0da; color: #7a5e18; border: 1px solid #c8a44a; }
-.ms-U { background: #1560a8; color: #fff; }
-.ms-B { background: #2a2a2a; color: #bbb; border: 1px solid #555; }
-.ms-R { background: #c02020; color: #fff; }
-.ms-G { background: #0a6030; color: #fff; }
-.ms-C { background: #b8b0a8; color: #333; border: 1px solid #888; }
-.ms-n { background: #777; color: #fff; }
-.ms-X { background: #555; color: #fff; }
-
-.bfc-type {
-  font-size: 0.58rem; color: #4a4030; font-style: italic;
-  border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1);
-  padding: 2px 0;
-}
-.bfc-text {
-  font-size: 0.58rem; color: #2e2820; line-height: 1.4;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-  flex: 1;
-}
-.bfc-pt-row { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
-.bfc-pt {
-  font-family: var(--ff-display);
-  font-size: 0.65rem; font-weight: 700;
-  background: var(--card-border); padding: 1px 6px;
-  border: 1px solid #a09070; color: #1e1c14;
-}
-.bfc-ctrs {
-  background: #1c1a14; color: var(--gold-hi); border: 1.5px solid var(--gold-lo);
-  width: 20px; height: 20px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--ff-display); font-size: 0.62rem; font-weight: 700;
-  transition: opacity 0.2s;
-}
-.bfc-ctrs.zero { opacity: 0.25; }
-.bfc-notes { font-size: 0.56rem; color: #7a6040; font-style: italic; }
-
-.bfc-btns {
-  display: flex; gap: 2px; padding: 3px 4px;
-  background: rgba(0,0,0,0.07); border-top: 1px solid rgba(0,0,0,0.1);
-}
-.bfc-btn {
-  flex: 1; background: rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.14);
-  color: #4a4030; font-family: var(--ff-display); font-size: 0.58rem;
-  padding: 3px 0; cursor: pointer; text-align: center;
-  transition: background 0.1s, color 0.1s;
-}
-.bfc-btn:hover      { background: rgba(0,0,0,0.28); color: #1e1608; }
-.bfc-btn.tap-btn    { color: #1a3870; }
-.bfc-btn.tap-btn:hover { background: #dde8ff; }
-.bfc-btn.rm-btn     { color: #801818; }
-.bfc-btn.rm-btn:hover  { background: #ffe8e8; color: #500808; }
-.bfc-btn.cz-btn     { color: #806018; font-size: 0.54rem; }
-.bfc-btn.cz-btn:hover  { background: #fff0cc; }
-
-/* ── ZONE STRIPS ─────────────────────────────────────────── */
-#zones-bar {
-  display: flex; border-top: 1px solid var(--border);
-  flex-shrink: 0; z-index: 1;
-}
-.zone-tab {
-  flex: 1; padding: 7px 12px; cursor: pointer;
-  display: flex; align-items: center; gap: 8px;
-  background: var(--surface2);
-  border-right: 1px solid var(--border);
-  transition: background 0.12s;
-}
-.zone-tab:last-child { border-right: none; flex: 0.7; }
-.zone-tab:hover { background: var(--surface3); }
-.zone-tab-label {
-  font-family: var(--ff-display);
-  font-size: 0.58rem; letter-spacing: 0.14em; color: var(--text-lo);
-}
-.zone-tab-count {
-  font-family: var(--ff-display);
-  font-size: 0.8rem; color: var(--text-hi);
-  background: var(--border2); padding: 1px 7px; border-radius: 2px;
-}
-.zone-panel {
-  display: none; flex-direction: column;
-  background: var(--surface); border-top: 1px solid var(--border);
-  max-height: 210px; flex-shrink: 0; z-index: 1;
-}
-.zone-panel.open { display: flex; }
-.zone-panel-head {
-  padding: 7px 14px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  flex-shrink: 0;
-}
-.zone-panel-body { display: flex; gap: 6px; padding: 8px 12px; overflow-x: auto; flex: 1; }
-.zcard {
-  background: var(--surface2); border: 1px solid var(--border2);
-  padding: 5px 9px; font-size: 0.7rem; color: var(--text);
-  cursor: pointer; white-space: nowrap; flex-shrink: 0;
-  display: flex; flex-direction: column; gap: 3px;
-  border-radius: var(--r);
-  transition: background 0.1s;
-}
-.zcard:hover { background: var(--surface3); }
-.zcard.exile { filter: grayscale(45%); opacity: 0.8; }
-.zcard-name { font-size: 0.72rem; color: var(--text-hi); }
-.zcard-type { font-size: 0.6rem; color: var(--text-lo); font-style: italic; }
-.zcard-acts { display: flex; gap: 3px; margin-top: 2px; }
-
-/* ── RIGHT: CONTROLS ─────────────────────────────────────── */
-#right {
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;
-}
-.rpanel { padding: 12px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-.rpanel-label {
-  font-family: var(--ff-display);
-  font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--text-lo); margin-bottom: 10px;
-}
-
-/* Mana */
-.mana-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; margin-bottom: 8px; }
-.mana-cell {
-  background: var(--surface2); border: 1px solid var(--border);
-  display: flex; flex-direction: column; align-items: center;
-  gap: 4px; padding: 7px 4px; border-radius: var(--r);
-}
-.mc-sym {
-  width: 22px; height: 22px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--ff-display); font-size: 11px; font-weight: 700;
-  cursor: pointer; transition: transform 0.12s, filter 0.12s;
-  flex-shrink: 0;
-}
-.mc-sym:hover { transform: scale(1.15); filter: brightness(1.25); }
-.mc-W { background: #f4f0da; color: #7a5e18; border: 1.5px solid #c8a44a; }
-.mc-U { background: #1560a8; color: #fff; }
-.mc-B { background: #2a2a2a; color: #bbb; border: 1.5px solid #555; }
-.mc-R { background: #c02020; color: #fff; }
-.mc-G { background: #0a6030; color: #fff; }
-.mc-C { background: #b0a898; color: #333; border: 1.5px solid #888; }
-.mc-count {
-  font-family: var(--ff-display); font-size: 1rem; color: var(--text-hi);
-  min-width: 22px; text-align: center;
-}
-.mc-adj { display: flex; gap: 2px; }
-.mc-btn {
-  background: var(--border); border: none; color: var(--text-lo);
-  font-size: 0.72rem; width: 19px; height: 17px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; border-radius: 2px; transition: background 0.1s;
-}
-.mc-btn:hover { background: var(--border2); color: var(--text-hi); }
-
-/* Counters */
-.ctr-row {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 7px;
-}
-.ctr-label {
-  font-size: 0.72rem; color: var(--text-lo); flex: 1;
-  display: flex; align-items: center; gap: 5px;
-}
-.ctr-icon { font-size: 0.82rem; }
-.ctr-val {
-  font-family: var(--ff-display); font-size: 0.95rem; color: var(--text-hi);
-  min-width: 28px; text-align: center;
-}
-.ctr-val.warn  { color: #ff8040; }
-.ctr-val.lethal { color: #ff3030; animation: throb 1.4s ease-in-out infinite; }
-.ctr-btns { display: flex; gap: 3px; }
-.ctr-btn {
-  background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text-lo); font-size: 0.75rem; width: 22px; height: 22px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; border-radius: 2px; transition: background 0.1s;
-}
-.ctr-btn:hover { background: var(--surface3); color: var(--text-hi); }
-
-/* Cmd dmg */
-.cdmg-row { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
-.cdmg-opp {
-  background: var(--surface2); border: none;
-  border-bottom: 1px solid var(--border2);
-  color: var(--text); font-family: var(--ff-body);
-  font-size: 0.72rem; padding: 3px 5px; width: 76px; outline: none;
-}
-.cdmg-opp:focus { border-bottom-color: var(--gold-lo); }
-.cdmg-val {
-  font-family: var(--ff-display); font-size: 0.9rem;
-  color: var(--text-hi); min-width: 24px; text-align: center;
-}
-.cdmg-val.warn   { color: #ff8040; }
-.cdmg-val.lethal { color: #ff3030; font-weight: 700; }
-
-/* Toggles */
-.toggle-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 7px 10px; background: var(--surface2); border: 1px solid var(--border);
-  cursor: pointer; margin-bottom: 5px; border-radius: var(--r);
-  transition: background 0.12s;
-}
-.toggle-row:hover { background: var(--surface3); }
-.toggle-row.on { background: #181208; border-color: var(--gold-lo); }
-.toggle-row .tl { font-family: var(--ff-display); font-size: 0.68rem; color: var(--text-lo); letter-spacing: 0.06em; }
-.toggle-row.on .tl { color: var(--gold); }
-.toggle-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--border2); border: 1px solid var(--border2);
-  transition: background 0.15s, box-shadow 0.15s;
-}
-.toggle-row.on .toggle-dot { background: var(--gold); box-shadow: 0 0 8px rgba(200,164,74,0.6); }
-
-/* Stats */
-.stat-row {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 6px;
-}
-.stat-label { font-size: 0.7rem; color: var(--text-lo); }
-.stat-val {
-  font-family: var(--ff-display); font-size: 0.85rem; color: var(--text-hi);
-  padding: 1px 8px; background: var(--surface2);
-  border: 1px solid var(--border); border-radius: 2px;
-}
-.stat-val.wins   { color: #70e8a0; border-color: #1a5030; }
-.stat-val.losses { color: #ff8070; border-color: #501010; }
-
-/* Log */
-#log-scroll { flex: 1; overflow-y: auto; }
-.log-line {
-  font-size: 0.64rem; color: var(--text-lo);
-  padding: 3px 14px;
-  border-bottom: 1px solid var(--border);
-  line-height: 1.35;
-}
-.log-line:first-child { color: var(--text); }
-
-/* ── HELPER DRAWER ───────────────────────────────────────── */
-#helper-drawer {
-  position: fixed; right: 0; top: 54px; bottom: 0;
-  width: 320px; z-index: 500;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  border-left: 2px solid var(--gold-lo);
-  display: flex; flex-direction: column;
-  transform: translateX(100%);
-  transition: transform 0.3s var(--trans);
-  box-shadow: -8px 0 40px rgba(0,0,0,0.7);
-}
-#helper-drawer.open { transform: translateX(0); }
-.drawer-head {
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  flex-shrink: 0;
-}
-.drawer-title {
-  font-family: var(--ff-display);
-  font-size: 0.78rem; letter-spacing: 0.12em; color: var(--gold);
-}
-.drawer-body { flex: 1; overflow-y: auto; padding: 14px 18px; }
-
-.phase-bar {
-  display: flex; flex-direction: column; gap: 3px; margin-bottom: 18px;
-}
-.phase-step {
-  display: flex; align-items: center; gap: 9px;
-  padding: 7px 10px; background: var(--surface2);
-  border: 1px solid var(--border); border-radius: var(--r);
-}
-.phase-step.active { background: #181208; border-color: var(--gold-lo); }
-.phase-num {
-  font-family: var(--ff-display); font-size: 0.6rem;
-  color: var(--text-dim); min-width: 16px;
-}
-.phase-step.active .phase-num { color: var(--gold); }
-.phase-name {
-  font-family: var(--ff-display); font-size: 0.7rem;
-  color: var(--text-lo); letter-spacing: 0.06em;
-}
-.phase-step.active .phase-name { color: var(--gold-hi); }
-.phase-desc { font-size: 0.62rem; color: var(--text-dim); line-height: 1.35; margin-top: 1px; }
-
-.help-section { margin-bottom: 16px; }
-.help-section-title {
-  font-family: var(--ff-display);
-  font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--gold-lo); margin-bottom: 8px;
-  padding-bottom: 4px; border-bottom: 1px solid var(--border);
-}
-.help-rule {
-  font-size: 0.72rem; color: var(--text-lo); line-height: 1.5;
-  padding: 5px 0; border-bottom: 1px solid var(--border);
-}
-.help-rule strong { color: var(--text); }
-
-.card-lookup-inp {
-  width: 100%; background: var(--surface2);
-  border: 1px solid var(--border); border-bottom: 2px solid var(--gold-lo);
-  color: var(--text-hi); font-family: var(--ff-body); font-size: 0.85rem;
-  padding: 8px 10px; outline: none; border-radius: var(--r) var(--r) 0 0;
-  margin-bottom: 8px; transition: border-color 0.15s;
-}
-.card-lookup-inp:focus { border-bottom-color: var(--gold); }
-#lookup-result {
-  font-size: 0.72rem; color: var(--text); line-height: 1.6;
-  background: var(--surface2); border: 1px solid var(--border);
-  padding: 10px 12px; border-radius: var(--r); display: none;
-}
-#lookup-result .lr-name { font-family: var(--ff-display); font-size: 0.85rem; color: var(--gold); margin-bottom: 4px; }
-#lookup-result .lr-type { font-size: 0.65rem; color: var(--text-lo); font-style: italic; margin-bottom: 6px; }
-
-/* ── HELPER BUTTON ───────────────────────────────────────── */
-#helper-btn {
-  position: fixed; right: 18px; bottom: 22px; z-index: 600;
-  width: 42px; height: 42px;
-  background: linear-gradient(180deg, #2a1e08, #1a1408);
-  border: 1px solid var(--gold-lo); border-top: 2px solid var(--gold);
-  border-radius: 50%; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--ff-display); font-size: 1rem; color: var(--gold);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.7), 0 0 16px rgba(200,164,74,0.15);
-  transition: box-shadow 0.2s, transform 0.15s;
-}
-#helper-btn:hover {
-  box-shadow: 0 6px 30px rgba(0,0,0,0.8), 0 0 24px rgba(200,164,74,0.3);
-  transform: scale(1.08);
-}
-
-/* ── STATS MODAL ─────────────────────────────────────────── */
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-.stat-card {
-  background: var(--surface2); border: 1px solid var(--border);
-  padding: 14px 16px; text-align: center;
-  border-radius: var(--r);
-}
-.stat-card-val {
-  font-family: var(--ff-display); font-size: 1.8rem; font-weight: 700;
-  color: var(--gold-hi); line-height: 1;
-}
-.stat-card-val.w { color: #70e8a0; }
-.stat-card-val.l { color: #ff8070; }
-.stat-card-label { font-size: 0.65rem; color: var(--text-lo); margin-top: 4px; letter-spacing: 0.06em; }
-
-.game-hist-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 0; border-bottom: 1px solid var(--border);
-  font-size: 0.7rem; color: var(--text-lo);
-}
-.gh-result {
-  font-family: var(--ff-display); font-size: 0.68rem; font-weight: 700;
-  padding: 2px 8px; border-radius: 2px;
-}
-.gh-result.W { background: #0a2018; color: #70e8a0; border: 1px solid #1a5030; }
-.gh-result.L { background: #200a0a; color: #ff8070; border: 1px solid #501010; }
-.gh-details { flex: 1; }
-.gh-meta { font-size: 0.6rem; color: var(--text-dim); margin-top: 1px; }
-
-/* ── MISC ────────────────────────────────────────────────── */
-.hidden { display: none !important; }
-.drag-over { outline: 2px dashed var(--gold); opacity: 0.65; }
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
-
-@media (max-width: 1000px) {
-  #layout { grid-template-columns: 200px 1fr; }
-  #right  { display: none; }
-}
-@media (max-width: 660px) {
-  #layout { grid-template-columns: 1fr; }
-  #left   { display: none; }
-}
-
-/* Phase highlight cycling */
-.phase-bar .phase-step { cursor: pointer; }
+/* ─── HELPERS ─── */
+.hidden{display:none!important;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+canvas#ocr-canvas{display:none;}
 </style>
 </head>
 <body>
+<canvas id="ocr-canvas"></canvas>
 
-<!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">MTG IRL</div>
-    <div class="login-sub">Real-World Card Tracker</div>
-    <div class="login-ornament"></div>
-    <div class="field">
-      <label>Player Name</label>
-      <input class="inp" id="login-name" placeholder="Enter your name..." maxlength="32" autocomplete="off" autofocus>
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="login">
+  <div class="lbox">
+    <div class="llogo">MTG IRL</div>
+    <div class="lsub">In-Person Game Tracker</div>
+    <div class="orn"></div>
+    <div class="fl"><label>Your Name</label>
+      <input class="inp" id="l-name" placeholder="Enter your name..." maxlength="28" autocomplete="off" autofocus>
     </div>
-    <button class="btn btn-gold" style="width:100%;padding:12px;font-size:0.8rem;margin-top:8px;" onclick="doLogin()">
-      Enter the Arena
-    </button>
-    <div style="margin-top:14px;font-size:0.65rem;color:var(--text-dim);">Progress saved between sessions.</div>
+    <button class="btn gold w100" style="padding:12px;font-size:.72rem;margin-top:4px;" onclick="doLogin()">Enter the Arena</button>
+    <div style="margin-top:12px;font-size:.62rem;color:var(--tlo);">Stats saved between sessions.</div>
   </div>
 </div>
 
-<!-- ═══════════════ NEW GAME MODAL ═══════════════ -->
-<div class="overlay hidden" id="new-game-overlay">
-  <div class="modal wide">
-    <div class="modal-head">
-      <div class="modal-title">New Game Setup</div>
-      <button class="modal-close" onclick="closeOverlay('new-game-overlay')">&times;</button>
+<!-- ══════════════ CAMERA SCAN ══════════════ -->
+<div id="cam-ov" class="hidden">
+  <video id="cam-video" autoplay playsinline muted></video>
+  <div class="cam-guide-wrap">
+    <div class="cam-hint">Align the card's <strong style="color:var(--ghi)">name bar</strong> inside the box</div>
+    <div class="cam-guide" id="cam-guide">
+      <div class="cam-guide-corner tl"></div>
+      <div class="cam-guide-corner tr"></div>
+      <div class="cam-guide-corner bl"></div>
+      <div class="cam-guide-corner br"></div>
+      <div class="cam-scan-line" id="scan-line"></div>
     </div>
-    <div class="modal-body">
-
-      <!-- FORMAT -->
-      <div class="field" style="margin-bottom:18px;">
-        <label>Game Format</label>
+    <div id="cam-status">Ready — press Capture to scan</div>
+  </div>
+  <div class="cam-controls">
+    <button class="cam-cap-btn" id="cam-cap-btn" onclick="captureAndScan()">Capture &amp; Identify</button>
+    <button class="cam-close-btn" onclick="closeCamera()">Cancel</button>
+  </div>
+  <div id="cam-results" class="hidden">
+    <div class="cr-title" id="cr-title">Results</div>
+    <div id="cr-list"></div>
+    <div class="cr-manual">
+      <div class="cr-manual-lbl">Or type the card name manually:</div>
+      <div class="cr-inp-row">
+        <input class="inp" id="cr-manual-inp" placeholder="Card name..." style="flex:1;">
+        <button class="btn gold sm" onclick="manualSearch()">Search</button>
       </div>
-      <div id="ng-mode-container"></div>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn sm" onclick="retryCapture()">Try Again</button>
+      <button class="btn sm" style="margin-left:6px;" onclick="closeCamera()">Close</button>
+    </div>
+  </div>
+</div>
 
-      <!-- PLAYERS -->
-      <div class="field" style="margin-top:4px;">
-        <label>Players in this game</label>
-      </div>
-      <div id="ng-players"></div>
-      <button class="btn btn-sm" onclick="addNgPlayer()" style="margin-bottom:14px;">+ Add Player</button>
-
-      <!-- LIFE OVERRIDE -->
-      <div class="row">
-        <div class="field">
-          <label>Starting Life (auto-set by format)</label>
+<!-- ══════════════ NEW GAME MODAL ══════════════ -->
+<div class="ov hidden" id="ng-ov">
+  <div class="panel wide">
+    <div class="ph"><div class="pt">New Game</div><button class="xbtn" onclick="closeOv('ng-ov')">&times;</button></div>
+    <div class="pb">
+      <div class="fl" style="margin-bottom:18px;"><label>Format</label></div>
+      <div id="ng-mode-cont"></div>
+      <div class="fl" style="margin-top:6px;"><label>Players</label></div>
+      <div id="ng-players-list"></div>
+      <button class="btn sm" onclick="addNgPlayer()" style="margin-bottom:16px;">+ Add Player</button>
+      <div class="row2">
+        <div class="fl"><label>Starting Life (auto from format)</label>
           <input class="inp" type="number" id="ng-life" value="40" min="1" max="999">
         </div>
-        <div class="field">
-          <label>Additional Notes</label>
-          <input class="inp" id="ng-notes" placeholder="e.g. no infinites">
+        <div class="fl"><label>Notes (optional)</label>
+          <input class="inp" id="ng-notes" placeholder="House rules...">
         </div>
       </div>
     </div>
-    <div class="modal-foot">
-      <button class="btn" onclick="closeOverlay('new-game-overlay')">Cancel</button>
-      <button class="btn btn-gold" onclick="startNewGame()">Start Game</button>
+    <div class="pf">
+      <button class="btn" onclick="closeOv('ng-ov')">Cancel</button>
+      <button class="btn gold" onclick="startGame()">Start Game</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ MODE MODAL ═══════════════ -->
-<div class="overlay hidden" id="mode-overlay">
-  <div class="modal wide">
-    <div class="modal-head">
-      <div class="modal-title">Select Format</div>
-      <button class="modal-close" onclick="closeOverlay('mode-overlay')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div id="mode-grid-cont"></div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn" onclick="closeOverlay('mode-overlay')">Cancel</button>
-      <button class="btn btn-gold" onclick="confirmMode()">Confirm Format</button>
+<!-- ══════════════ MODE MODAL ══════════════ -->
+<div class="ov hidden" id="mode-ov">
+  <div class="panel wide">
+    <div class="ph"><div class="pt">Select Format</div><button class="xbtn" onclick="closeOv('mode-ov')">&times;</button></div>
+    <div class="pb"><div id="mode-grid-cont"></div></div>
+    <div class="pf">
+      <button class="btn" onclick="closeOv('mode-ov')">Cancel</button>
+      <button class="btn gold" onclick="confirmMode()">Confirm</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ TOKEN MODAL ═══════════════ -->
-<div class="overlay hidden" id="token-overlay">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">Create Token</div><button class="modal-close" onclick="closeOverlay('token-overlay')">&times;</button></div>
-    <div class="modal-body">
-      <div class="row"><div class="field"><label>Name</label><input class="inp" id="tok-name" value="Goblin"></div><div class="field"><label>Type Line</label><input class="inp" id="tok-type" value="Token Creature - Goblin"></div></div>
-      <div class="row">
-        <div class="field"><label>Power</label><input class="inp" type="number" id="tok-pow" value="1" min="0" max="99"></div>
-        <div class="field"><label>Toughness</label><input class="inp" type="number" id="tok-tgh" value="1" min="0" max="99"></div>
-        <div class="field"><label>Count</label><input class="inp" type="number" id="tok-cnt" value="1" min="1" max="30"></div>
-      </div>
-      <div class="row">
-        <div class="field"><label>Color</label>
-          <select class="inp" id="tok-clr">
-            <option value="">Colorless</option><option value="W">White</option><option value="U">Blue</option>
-            <option value="B">Black</option><option value="R">Red</option><option value="G">Green</option>
-            <option value="WU">Azorius</option><option value="WB">Orzhov</option><option value="UB">Dimir</option>
-            <option value="UR">Izzet</option><option value="BR">Rakdos</option><option value="BG">Golgari</option>
-            <option value="RG">Gruul</option><option value="RW">Boros</option><option value="GW">Selesnya</option>
-            <option value="GU">Simic</option>
-          </select>
-        </div>
-        <div class="field"><label>Abilities</label><input class="inp" id="tok-txt" placeholder="Flying, Haste..."></div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn" onclick="closeOverlay('token-overlay')">Cancel</button>
-      <button class="btn btn-gold" onclick="submitToken()">Create</button>
+<!-- ══════════════ STATS MODAL ══════════════ -->
+<div class="ov hidden" id="stats-ov">
+  <div class="panel wide">
+    <div class="ph"><div class="pt">Player Stats &mdash; <span id="stats-name" style="color:var(--thi);"></span></div><button class="xbtn" onclick="closeOv('stats-ov')">&times;</button></div>
+    <div class="pb" id="stats-body"></div>
+    <div class="pf">
+      <button class="btn red sm" onclick="clearStats()">Clear All Stats</button>
+      <button class="btn" onclick="closeOv('stats-ov')">Close</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ SCAN MODAL ═══════════════ -->
-<div class="overlay hidden" id="scan-overlay">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">Scan Card</div><button class="modal-close" onclick="closeOverlay('scan-overlay')">&times;</button></div>
-    <div class="modal-body">
-      <div class="field"><label>Card ID from QR Code</label><input class="inp" id="scan-inp" placeholder="Scan or type card ID..." style="font-family:var(--ff-mono);letter-spacing:0.08em;"></div>
-      <button class="btn btn-gold" style="width:100%;padding:10px;" onclick="doScan()">Look Up Card</button>
-      <div id="scan-result" style="margin-top:14px;"></div>
+<!-- ══════════════ LIFE EDIT MODAL ══════════════ -->
+<div class="ov hidden" id="life-ov">
+  <div class="panel narrow">
+    <div class="ph"><div class="pt" id="life-ov-title">Set Life</div><button class="xbtn" onclick="closeOv('life-ov')">&times;</button></div>
+    <div class="pb">
+      <input class="inp" type="number" id="life-ov-inp" style="font-size:1.5rem;text-align:center;font-family:var(--ff1);" min="-999" max="999">
+    </div>
+    <div class="pf">
+      <button class="btn" onclick="closeOv('life-ov')">Cancel</button>
+      <button class="btn gold" onclick="confirmSetLife()">Set Life</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ CARD DETAIL / MOVE MODAL ═══════════════ -->
-<div class="overlay hidden" id="detail-overlay">
-  <div class="modal wide">
-    <div class="modal-head"><div class="modal-title" id="detail-title">Card</div><button class="modal-close" onclick="closeOverlay('detail-overlay')">&times;</button></div>
-    <div class="modal-body" id="detail-body"></div>
-    <div class="modal-foot" id="detail-foot"></div>
-  </div>
-</div>
-
-<!-- ═══════════════ LIFE MODAL ═══════════════ -->
-<div class="overlay hidden" id="life-overlay">
-  <div class="modal narrow">
-    <div class="modal-head"><div class="modal-title">Set Life Total</div><button class="modal-close" onclick="closeOverlay('life-overlay')">&times;</button></div>
-    <div class="modal-body">
-      <input class="inp" type="number" id="life-inp" style="font-size:1.4rem;text-align:center;font-family:var(--ff-display);">
-    </div>
-    <div class="modal-foot">
-      <button class="btn" onclick="closeOverlay('life-overlay')">Cancel</button>
-      <button class="btn btn-gold" onclick="confirmSetLife()">Set Life</button>
+<!-- ══════════════ CARD LOOKUP MODAL ══════════════ -->
+<div class="ov hidden" id="card-ov">
+  <div class="panel wide">
+    <div class="ph"><div class="pt" id="card-ov-title">Card Lookup</div><button class="xbtn" onclick="closeOv('card-ov')">&times;</button></div>
+    <div class="pb" id="card-ov-body"></div>
+    <div class="pf" id="card-ov-foot">
+      <button class="btn" onclick="closeOv('card-ov')">Close</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ RESET MODAL ═══════════════ -->
-<div class="overlay hidden" id="reset-overlay">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">Reset Game</div><button class="modal-close" onclick="closeOverlay('reset-overlay')">&times;</button></div>
-    <div class="modal-body">
-      <p style="color:var(--text);font-size:0.88rem;margin-bottom:10px;line-height:1.6;">
-        Clears the battlefield, graveyard, exile, and resets all counters.
-        Your deck and commanders are preserved.
-      </p>
-      <p style="color:var(--text-lo);font-size:0.75rem;font-style:italic;margin-bottom:18px;">
-        To record this game in your stats, use Win or Loss buttons first.
-      </p>
-      <div class="field"><label>Change Format (optional)</label>
-        <select class="inp" id="reset-mode-sel"></select>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-green" onclick="recordResult('W')">Record Win</button>
-      <button class="btn btn-red"   onclick="recordResult('L')">Record Loss</button>
-      <button class="btn"           onclick="closeOverlay('reset-overlay')">Cancel</button>
-      <button class="btn btn-red"   onclick="confirmReset()">Reset</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ STATS MODAL ═══════════════ -->
-<div class="overlay hidden" id="stats-overlay">
-  <div class="modal wide">
-    <div class="modal-head"><div class="modal-title">Player Stats</div><button class="modal-close" onclick="closeOverlay('stats-overlay')">&times;</button></div>
-    <div class="modal-body" id="stats-body"></div>
-    <div class="modal-foot">
-      <button class="btn btn-red btn-sm" onclick="clearStats()">Clear Stats</button>
-      <button class="btn" onclick="closeOverlay('stats-overlay')">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ SET COMMANDER MODAL ═══════════════ -->
-<div class="overlay hidden" id="setcmd-overlay">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">Set Commander</div><button class="modal-close" onclick="closeOverlay('setcmd-overlay')">&times;</button></div>
-    <div class="modal-body" id="setcmd-body"></div>
-  </div>
-</div>
-
-<!-- ═══════════════ MAIN APP ═══════════════ -->
+<!-- ══════════════ MAIN APP ══════════════ -->
 <div id="app">
-
-  <!-- TOPBAR -->
   <div id="topbar">
     <div class="tb-logo">MTG IRL</div>
-    <div class="tb-sep"></div>
-    <div class="tb-user">Playing as <strong id="tb-name">—</strong></div>
-    <div class="tb-mode" id="tb-mode" onclick="openModeOverlay()">Commander / EDH</div>
-    <div class="tb-sep"></div>
-    <div class="tb-turn" id="tb-turn"></div>
-    <div class="tb-spacer"></div>
-    <div class="life-block">
-      <div class="life-adj" onclick="adjLife(-1)">−</div>
-      <div id="life-num" onclick="openLifeOverlay()">40</div>
-      <div class="life-adj" onclick="adjLife(+1)">+</div>
+    <div class="tb-div"></div>
+    <div class="tb-mode" id="tb-mode" onclick="openOv('mode-ov');buildModeGrid('mode-grid-cont')">Commander / EDH</div>
+    <div class="tb-div"></div>
+    <div id="turn-display">
+      <span class="turn-arrow">Turn</span>
+      <span id="active-player-name">—</span>
+      <span id="turn-num">1</span>
     </div>
-    <div class="tb-sep"></div>
-    <button class="btn btn-sm" onclick="openNewGame()">New Game</button>
-    <button class="btn btn-sm" onclick="openOverlay('reset-overlay');populateResetModal()">Reset</button>
-    <button class="btn btn-sm" onclick="openScanOverlay()">Scan</button>
-    <button class="btn btn-sm" onclick="openStatsOverlay()">Stats</button>
+    <div class="tb-sp"></div>
+    <button id="end-turn-btn" onclick="endTurn()">End Turn &#8594;</button>
   </div>
 
-  <div id="layout">
+  <div id="players-area" class="p2"></div>
 
-    <!-- LEFT -->
-    <div id="left">
-      <div class="panel-head">
-        <div class="panel-label">Deck</div>
-        <div class="search-wrap">
-          <input class="search-inp" id="deck-search" placeholder="Filter cards..." oninput="filterDeck(this.value)">
-        </div>
-      </div>
-      <div id="deck-list">
-        <div style="padding:24px 14px;color:var(--text-dim);font-size:0.78rem;font-style:italic;text-align:center;">No deck loaded.</div>
-      </div>
-      <div class="left-foot">
-        <label class="btn btn-full" style="cursor:pointer;">
-          Upload Deck JSON
-          <input type="file" accept=".json" style="display:none;" onchange="handleUpload(this)">
-        </label>
-        <button class="btn btn-full" onclick="loadStarter()">Load Starter Deck</button>
-        <button class="btn btn-full btn-sm" onclick="resolveAllArt()" id="resolve-btn" style="display:none;">Re-fetch All Art</button>
-      </div>
-    </div>
-
-    <!-- CENTER -->
-    <div id="center">
-      <div id="cmd-bar">
-        <span class="cmd-zone-label">Command Zone</span>
-        <div id="cmd-cards"></div>
-        <button class="btn btn-sm" onclick="openSetCmdOverlay()">+ Set Cmdr</button>
-      </div>
-      <div id="bf-scroll">
-        <div id="bf-grid"></div>
-        <div class="bf-empty" id="bf-empty">No permanents in play.<br><span style="font-size:0.65rem;letter-spacing:0.06em;color:var(--text-dim);">Click a card in the deck list to add it.</span></div>
-      </div>
-      <div id="zones-bar">
-        <div class="zone-tab" onclick="toggleZone('gy')">
-          <span class="zone-tab-label">Graveyard</span>
-          <span class="zone-tab-count" id="gy-n">0</span>
-        </div>
-        <div class="zone-tab" onclick="toggleZone('exile')">
-          <span class="zone-tab-label">Exile</span>
-          <span class="zone-tab-count" id="exile-n">0</span>
-        </div>
-        <div class="zone-tab" onclick="toggleZone('hand')" style="flex:0.65;">
-          <span class="zone-tab-label">Hand</span>
-          <span class="zone-tab-count" id="hand-n">0</span>
-        </div>
-      </div>
-      <div class="zone-panel" id="zp-gy">
-        <div class="zone-panel-head">
-          <span class="panel-label" style="margin:0;">Graveyard</span>
-          <button class="btn btn-sm" onclick="closeZones()">Close</button>
-        </div>
-        <div class="zone-panel-body" id="gy-cards"></div>
-      </div>
-      <div class="zone-panel" id="zp-exile">
-        <div class="zone-panel-head">
-          <span class="panel-label" style="margin:0;">Exile</span>
-          <button class="btn btn-sm" onclick="closeZones()">Close</button>
-        </div>
-        <div class="zone-panel-body" id="exile-cards"></div>
-      </div>
-      <div class="zone-panel" id="zp-hand">
-        <div class="zone-panel-head">
-          <span class="panel-label" style="margin:0;">Hand</span>
-          <button class="btn btn-sm" onclick="closeZones()">Close</button>
-        </div>
-        <div class="zone-panel-body" id="hand-cards"></div>
-      </div>
-    </div>
-
-    <!-- RIGHT -->
-    <div id="right">
-
-      <!-- MANA -->
-      <div class="rpanel">
-        <div class="rpanel-label">Mana Pool</div>
-        <div class="mana-grid" id="mana-grid"></div>
-        <button class="btn btn-sm btn-full" onclick="doApi('POST','/clear_mana',{username}).then(r=>r&&(S.mana_pool=r.mana_pool,renderMana()))">Clear Mana</button>
-      </div>
-
-      <!-- COUNTERS -->
-      <div class="rpanel">
-        <div class="rpanel-label">Counters</div>
-        <div id="ctr-panel"></div>
-      </div>
-
-      <!-- COMMANDER DAMAGE -->
-      <div class="rpanel" id="cdmg-panel" style="display:none;">
-        <div class="rpanel-label" style="display:flex;align-items:center;justify-content:space-between;">
-          <span>Commander Damage</span>
-          <button class="btn btn-sm" onclick="addCdmgRow()" style="padding:2px 7px;">+ Opp</button>
-        </div>
-        <div id="cdmg-rows"></div>
-        <div id="cmd-tax" style="font-size:0.64rem;color:var(--gold-lo);margin-top:4px;"></div>
-      </div>
-
-      <!-- STATUS -->
-      <div class="rpanel">
-        <div class="rpanel-label">Status</div>
-        <div class="toggle-row" id="monarch-tog" onclick="toggleMonarch()">
-          <span class="tl">Monarch</span>
-          <div class="toggle-dot"></div>
-        </div>
-        <div class="toggle-row" id="initiative-tog" onclick="toggleInitiative()">
-          <span class="tl">Initiative</span>
-          <div class="toggle-dot"></div>
-        </div>
-      </div>
-
-      <!-- ACTIONS -->
-      <div class="rpanel">
-        <div class="rpanel-label">Actions</div>
-        <button class="btn btn-green btn-full" onclick="doEndTurn()">End Turn</button>
-        <button class="btn btn-full" onclick="doUntapAll()">Untap All</button>
-        <button class="btn btn-full" onclick="openOverlay('token-overlay')">Create Token</button>
-        <button class="btn btn-full" onclick="doClearTokens()">Clear Tokens</button>
-        <button class="btn btn-full" onclick="openScanOverlay()">Scan Card</button>
-      </div>
-
-      <!-- QUICK STATS -->
-      <div class="rpanel">
-        <div class="rpanel-label">Session Stats</div>
-        <div class="stat-row">
-          <span class="stat-label">Wins</span>
-          <span class="stat-val wins" id="stat-wins">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Losses</span>
-          <span class="stat-val losses" id="stat-losses">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Games</span>
-          <span class="stat-val" id="stat-games">0</span>
-        </div>
-        <button class="btn btn-sm btn-full" onclick="openStatsOverlay()" style="margin-top:4px;">Full Stats</button>
-      </div>
-
-      <!-- LOG -->
-      <div class="rpanel" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:80px;">
-        <div class="rpanel-label">Activity Log</div>
-        <div id="log-scroll" style="flex:1;overflow-y:auto;"></div>
-      </div>
-
-    </div><!-- end right -->
-  </div><!-- end layout -->
-</div><!-- end app -->
-
-<!-- HELPER DRAWER -->
-<div id="helper-drawer">
-  <div class="drawer-head">
-    <span class="drawer-title">Game Helper</span>
-    <button class="modal-close" onclick="toggleHelper()">&times;</button>
-  </div>
-  <div class="drawer-body">
-
-    <!-- Phase guide -->
-    <div class="help-section">
-      <div class="help-section-title">Turn Phases</div>
-      <div class="phase-bar" id="phase-bar"></div>
-    </div>
-
-    <!-- Format rules -->
-    <div class="help-section" id="format-rules"></div>
-
-    <!-- Card lookup -->
-    <div class="help-section">
-      <div class="help-section-title">Card Lookup</div>
-      <input class="card-lookup-inp" id="lookup-inp" placeholder="Search any card name...">
-      <button class="btn btn-sm btn-gold" style="width:100%;margin-bottom:8px;" onclick="doCardLookup()">Look Up</button>
-      <div id="lookup-result"></div>
-    </div>
-
-    <!-- General rules -->
-    <div class="help-section">
-      <div class="help-section-title">Common Rules</div>
-      <div class="help-rule"><strong>Priority</strong> — Active player gets priority first each step/phase. Both players must pass for anything to resolve.</div>
-      <div class="help-rule"><strong>State-Based Actions</strong> — Checked constantly. Creatures at 0 toughness die, legendary rule, etc.</div>
-      <div class="help-rule"><strong>Stack</strong> — Spells and abilities resolve last-in, first-out. Respond before resolution.</div>
-      <div class="help-rule"><strong>Haste</strong> — Can attack and use tap abilities the turn it enters.</div>
-      <div class="help-rule"><strong>Summoning Sickness</strong> — Creatures that entered this turn can't attack or tap (unless they have Haste).</div>
-      <div class="help-rule"><strong>Deathtouch</strong> — Any damage dealt by this creature destroys the damaged creature.</div>
-      <div class="help-rule"><strong>Lifelink</strong> — Damage dealt gains you that much life.</div>
-      <div class="help-rule"><strong>Trample</strong> — Excess combat damage is dealt to defending player.</div>
-      <div class="help-rule"><strong>First Strike</strong> — Deals combat damage before normal creatures.</div>
-      <div class="help-rule"><strong>Double Strike</strong> — Deals both first-strike and normal combat damage.</div>
-    </div>
-
+  <div id="bottom-bar">
+    <button class="btn gold" onclick="openNewGame()">New Game</button>
+    <button class="btn" onclick="openCamera()">&#9654; Scan Card</button>
+    <div class="bb-sp"></div>
+    <button class="btn sm" onclick="openOv('stats-ov');renderStats()">Stats</button>
+    <button class="btn sm" onclick="untapAllPlayers()">Untap All</button>
   </div>
 </div>
 
-<button id="helper-btn" onclick="toggleHelper()" title="Game Helper">?</button>
-
 <script>
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
 // CONSTANTS
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
 const MODES = {
   standard:        {name:'Standard',        life:20, deck:60,  cmd:false},
   historic:        {name:'Historic',         life:20, deck:60,  cmd:false},
@@ -1321,968 +641,722 @@ const MODES = {
   draft:           {name:'Draft / Sealed',   life:20, deck:40,  cmd:false},
   two_headed_giant:{name:'Two-Headed Giant', life:30, deck:60,  cmd:false},
 };
-
 const MODE_CATS = [
-  {label:'Arena',    cls:'arena',   keys:['standard','historic','timeless','explorer']},
-  {label:'Paper',    cls:'paper',   keys:['pioneer','modern','legacy','vintage','pauper']},
-  {label:'Commander',cls:'edh',     keys:['commander','brawl','historic_brawl','oathbreaker','duel_commander']},
-  {label:'Limited',  cls:'limited', keys:['draft','two_headed_giant']},
+  {l:'Arena',    c:'arena',   k:['standard','historic','timeless','explorer']},
+  {l:'Paper',    c:'paper',   k:['pioneer','modern','legacy','vintage','pauper']},
+  {l:'Commander',c:'edh',     k:['commander','brawl','historic_brawl','oathbreaker','duel_commander']},
+  {l:'Limited',  c:'limited', k:['draft','two_headed_giant']},
 ];
 
-const PHASES = [
-  {name:'Untap',    desc:'Untap all permanents you control. No priority.'},
-  {name:'Upkeep',   desc:'Upkeep triggers go on the stack. Priority given.'},
-  {name:'Draw',     desc:'Draw a card. Active player draws first.'},
-  {name:'Main 1',   desc:'Cast spells and activate abilities. No combat yet.'},
-  {name:'Combat',   desc:'Declare attackers, blockers, resolve combat damage.'},
-  {name:'Main 2',   desc:'Cast spells and activate abilities after combat.'},
-  {name:'End Step', desc:'End triggers. Discard to hand size (7 by default).'},
-];
+// ════════════════════════════════════════
+// GAME STATE
+// ════════════════════════════════════════
+let myName = '';
+let G = null; // game state
 
-const DEFAULT_DECK = {
-  name:"Starter Deck",
-  cards:[
-    {id:"goblin_guide",     name:"Goblin Guide",       mana_cost:"R",   type:"Creature - Goblin Scout",  text:"Haste. Whenever Goblin Guide attacks, defending player reveals the top card of their library. If it's a land, that player puts it into their hand.", art_url:"", power:2, toughness:2},
-    {id:"llanowar_elves",   name:"Llanowar Elves",     mana_cost:"G",   type:"Creature - Elf Druid",     text:"{T}: Add {G}.", art_url:"", power:1, toughness:1},
-    {id:"counterspell",     name:"Counterspell",        mana_cost:"UU",  type:"Instant",                  text:"Counter target spell.", art_url:"", power:null, toughness:null},
-    {id:"serra_angel",      name:"Serra Angel",         mana_cost:"3WW", type:"Creature - Angel",         text:"Flying, vigilance.", art_url:"", power:4, toughness:4},
-    {id:"lightning_bolt",   name:"Lightning Bolt",      mana_cost:"R",   type:"Instant",                  text:"Lightning Bolt deals 3 damage to any target.", art_url:"", power:null, toughness:null},
-    {id:"wrath_of_god",     name:"Wrath of God",        mana_cost:"2WW", type:"Sorcery",                  text:"Destroy all creatures. They can't be regenerated.", art_url:"", power:null, toughness:null},
-    {id:"sol_ring",         name:"Sol Ring",            mana_cost:"1",   type:"Artifact",                 text:"{T}: Add {C}{C}.", art_url:"", power:null, toughness:null},
-    {id:"birds_of_paradise",name:"Birds of Paradise",  mana_cost:"G",   type:"Creature - Bird",          text:"Flying. {T}: Add one mana of any color.", art_url:"", power:0, toughness:1},
-    {id:"dark_ritual",      name:"Dark Ritual",         mana_cost:"B",   type:"Instant",                  text:"Add {B}{B}{B}.", art_url:"", power:null, toughness:null},
-    {id:"giant_growth",     name:"Giant Growth",        mana_cost:"G",   type:"Instant",                  text:"Target creature gets +3/+3 until end of turn.", art_url:"", power:null, toughness:null},
-  ]
-};
+function defaultGame(mode, players, lifeOverride) {
+  const m = MODES[mode] || MODES.commander;
+  const life = lifeOverride || m.life;
+  return {
+    mode,
+    turn: 0,          // index into players array
+    turnNum: 1,
+    players: players.map(name => ({
+      name,
+      life,
+      poison: 0,
+      energy: 0,
+      experience: 0,
+      storm: 0,
+      cmdDmg: {},     // { fromPlayerName: number }
+      monarch: false,
+      initiative: false,
+    })),
+    startedAt: Date.now(),
+    notes: '',
+  };
+}
 
-// ════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════
-let username = '';
-let S = {};
-let selMode = 'commander';
-let ngMode  = 'commander';
-let focusedId = null;
-let dragSrc   = null;
-let cdmgOpps  = ['Opponent 1'];
-let activePhase = 0;
-
-// Stats stored locally
+// ════════════════════════════════════════
+// STATS (localStorage)
+// ════════════════════════════════════════
 function loadStats() {
-  try { return JSON.parse(localStorage.getItem('mtg_stats_' + username) || 'null') || {wins:0,losses:0,history:[]}; }
+  try { return JSON.parse(localStorage.getItem('mtgirl_stats_' + myName) || 'null') || {wins:0,losses:0,history:[]}; }
   catch { return {wins:0,losses:0,history:[]}; }
 }
-function saveStats(stats) {
-  localStorage.setItem('mtg_stats_' + username, JSON.stringify(stats));
+function saveStats(st) {
+  localStorage.setItem('mtgirl_stats_' + myName, JSON.stringify(st));
 }
-function renderQuickStats() {
+function recordResult(result) {
+  if (!G) return;
   const st = loadStats();
-  document.getElementById('stat-wins').textContent    = st.wins;
-  document.getElementById('stat-losses').textContent  = st.losses;
-  document.getElementById('stat-games').textContent   = st.wins + st.losses;
+  if (result === 'W') st.wins++; else st.losses++;
+  const m = MODES[G.mode] || MODES.commander;
+  const me = G.players.find(p => p.name === myName) || G.players[0];
+  st.history.unshift({
+    result,
+    format: m.name,
+    life: me.life,
+    players: G.players.map(p=>p.name).join(', '),
+    date: new Date().toLocaleDateString(),
+    turns: G.turnNum,
+  });
+  st.history = st.history.slice(0,50);
+  saveStats(st);
+  renderBottomStats();
 }
 
-// ════════════════════════════════════════════════
-// API
-// ════════════════════════════════════════════════
-async function doApi(method, path, body) {
-  try {
-    const o = { method, headers:{'Content-Type':'application/json'} };
-    if (body && method !== 'GET') o.body = JSON.stringify(body);
-    const r = await fetch(path, o);
-    if (!r.ok) { const e = await r.json().catch(()=>({detail:r.statusText})); console.error(path, e); return null; }
-    return await r.json();
-  } catch(e) { console.warn('API error:', e); return null; }
+function renderBottomStats() {
+  // no bottom stats needed — handled in stats modal
 }
 
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
 // LOGIN
-// ════════════════════════════════════════════════
-document.getElementById('login-name').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+// ════════════════════════════════════════
+document.getElementById('l-name').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 
-async function doLogin() {
-  const u = document.getElementById('login-name').value.trim();
-  if (!u) return;
-  const r = await doApi('POST','/login',{username:u});
-  if (!r) return alert('Cannot reach server. Make sure the backend is running:\nuvicorn main:app --port 10000');
-  username = r.username;
-  selMode  = r.game_mode || 'commander';
-  document.getElementById('login-screen').classList.add('hidden');
+function doLogin() {
+  const n = document.getElementById('l-name').value.trim();
+  if (!n) return;
+  myName = n;
+  document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.add('on');
-  document.getElementById('tb-name').textContent = username;
-  await loadState();
-  renderHelper();
-  renderQuickStats();
+  // Check for saved game
+  const saved = localStorage.getItem('mtgirl_game_' + myName);
+  if (saved) {
+    try {
+      G = JSON.parse(saved);
+      renderAll();
+      return;
+    } catch {}
+  }
+  // Start new game setup
+  openNewGame();
 }
 
-// ════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════
-async function loadState() {
-  const d = await doApi('GET', `/get_state/${username}`);
-  if (!d) return;
-  S = d;
-  selMode = S.game_mode || 'commander';
-  renderAll();
+function saveGame() {
+  if (G) localStorage.setItem('mtgirl_game_' + myName, JSON.stringify(G));
 }
 
+// ════════════════════════════════════════
+// RENDER ALL
+// ════════════════════════════════════════
 function renderAll() {
+  if (!G) return;
   renderTopbar();
-  renderBattlefield();
-  renderDeckList();
-  renderMana();
-  renderCounters();
-  renderCmdZone();
-  renderCmdDmg();
-  renderZoneCounts();
-  renderZonePanels();
-  renderToggles();
-  renderLog();
-  renderQuickStats();
+  renderPlayers();
 }
 
-// ════════════════════════════════════════════════
-// TOPBAR
-// ════════════════════════════════════════════════
 function renderTopbar() {
-  document.getElementById('tb-name').textContent = username;
-  const m = MODES[S.game_mode] || MODES.commander;
+  const m = MODES[G.mode] || MODES.commander;
   document.getElementById('tb-mode').textContent = m.name;
-  const life = S.life_total || 0;
-  const el = document.getElementById('life-num');
-  el.textContent = life;
-  el.className = life <= 5 ? 'crit' : life <= 10 ? 'lo' : '';
-  const t = S.turn_player;
-  document.getElementById('tb-turn').innerHTML = t ? `Turn: <span>${t}</span>` : '';
+  const ap = G.players[G.turn];
+  document.getElementById('active-player-name').textContent = ap ? ap.name : '—';
+  document.getElementById('turn-num').textContent = `#${G.turnNum}`;
 }
 
-// ════════════════════════════════════════════════
-// MANA SYMBOLS
-// ════════════════════════════════════════════════
-function manaHtml(cost) {
-  if (!cost) return '';
-  return String(cost).replace(/([WUBRGC]|\d+|X)/g, tok => {
-    const t = tok.toUpperCase();
-    const c = ['W','U','B','R','G','C'].includes(t) ? `ms-${t}` : isNaN(t) ? 'ms-X' : 'ms-n';
-    return `<span class="ms ${c}">${tok}</span>`;
+// ════════════════════════════════════════
+// RENDER PLAYER PANELS
+// ════════════════════════════════════════
+function renderPlayers() {
+  const area = document.getElementById('players-area');
+  const n = G.players.length;
+  // Set grid class
+  area.className = `p${Math.min(n,6)}`;
+  area.innerHTML = G.players.map((p,i) => buildPlayerPanel(p, i)).join('');
+
+  // Attach all events via delegation
+  area.querySelectorAll('[data-pact]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      const {pact, pidx, delta, key, from} = el.dataset;
+      const idx = parseInt(pidx);
+      if (pact === 'life-adj')    adjLife(idx, parseInt(delta));
+      if (pact === 'life-open')   openLifeModal(idx);
+      if (pact === 'quick-life')  adjLife(idx, parseInt(delta));
+      if (pact === 'ctr-adj')     adjCounter(idx, key, parseInt(delta));
+      if (pact === 'cdmg-adj')    adjCmdDmg(idx, from, parseInt(delta));
+      if (pact === 'status-tog')  toggleStatus(idx, key);
+    });
   });
 }
 
-// ════════════════════════════════════════════════
-// DECK LIST
-// ════════════════════════════════════════════════
-function renderDeckList(filter) {
-  const el = document.getElementById('deck-list');
-  const deck = S.deck;
-  if (!deck?.cards?.length) {
-    el.innerHTML = '<div style="padding:24px 14px;color:var(--text-dim);font-size:0.75rem;font-style:italic;text-align:center;">No deck loaded.<br>Upload a JSON deck or load the starter.</div>';
-    return;
+function buildPlayerPanel(p, i) {
+  const isActive = i === G.turn;
+  const m = MODES[G.mode] || MODES.commander;
+  const poisonMax = G.mode === 'two_headed_giant' ? 15 : 10;
+
+  const lifeCls = p.life <= 5 ? 'crit' : p.life <= 10 ? 'lo' : '';
+
+  // Commander damage rows (only in commander formats, only from other players)
+  let cdmgHtml = '';
+  if (m.cmd && G.players.length > 1) {
+    const others = G.players.filter((_,j) => j !== i);
+    cdmgHtml = `
+    <div class="cdmg-section">
+      <div class="cdmg-title">Commander Damage Received</div>
+      ${others.map(op => {
+        const v = p.cmdDmg[op.name] || 0;
+        const cls = v >= 21 ? 'dead' : v >= 18 ? 'warn' : '';
+        return `<div class="cdmg-row">
+          <span class="cdmg-from">${op.name}</span>
+          <span class="cdmg-val ${cls}">${v}</span>
+          <div class="pca">
+            <div class="pca-btn" data-pact="cdmg-adj" data-pidx="${i}" data-from="${op.name}" data-delta="-1">-</div>
+            <div class="pca-btn" data-pact="cdmg-adj" data-pidx="${i}" data-from="${op.name}" data-delta="1">+</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
   }
-  let cards = deck.cards;
-  if (filter) { const f = filter.toLowerCase(); cards = cards.filter(c => c.name.toLowerCase().includes(f) || (c.type||'').toLowerCase().includes(f)); }
-  el.innerHTML = cards.map(c => `
-    <div class="deck-item" data-cid="${c.id}" title="Add ${c.name} to battlefield">
-      ${c.art_url
-        ? `<img class="deck-item-img" src="${c.art_url}" alt="" loading="lazy" onerror="this.style.display='none'">`
-        : `<div class="deck-item-ph">${c.name[0]}</div>`}
-      <div class="deck-item-info">
-        <div class="deck-item-name">${c.name}</div>
-        <div class="deck-item-type">${c.type||''}</div>
-      </div>
-      <div class="deck-item-cost">${c.mana_cost||''}</div>
-    </div>`).join('');
 
-  // Event delegation — ONE listener, no inline handlers
-  el.querySelectorAll('.deck-item').forEach(el2 => {
-    el2.addEventListener('click', () => addToBf(el2.dataset.cid));
-  });
+  // Counter rows
+  const ctrs = [
+    {key:'poison',   label:'Poison',     icon:'&#9760;', val:p.poison,     warn:poisonMax-3, dead:poisonMax},
+    {key:'energy',   label:'Energy',     icon:'&#9889;', val:p.energy,     warn:999, dead:999},
+    {key:'experience',label:'Experience',icon:'&#11052;',val:p.experience, warn:999, dead:999},
+    {key:'storm',    label:'Storm',      icon:'&#9928;', val:p.storm,      warn:999, dead:999},
+  ];
 
-  document.getElementById('resolve-btn').style.display = 'block';
-}
-
-function filterDeck(v) { renderDeckList(v); }
-
-// ════════════════════════════════════════════════
-// MANA
-// ════════════════════════════════════════════════
-const MANA_KEYS = ['W','U','B','R','G','C'];
-const MANA_NAMES = {W:'White',U:'Blue',B:'Black',R:'Red',G:'Green',C:'Colorless'};
-
-function renderMana() {
-  const pool = S.mana_pool || {};
-  document.getElementById('mana-grid').innerHTML = MANA_KEYS.map(c => `
-    <div class="mana-cell">
-      <div class="mc-sym mc-${c}" data-color="${c}" data-dir="1" title="Add ${MANA_NAMES[c]}">${c}</div>
-      <div class="mc-count" id="mn-${c}">${pool[c]||0}</div>
-      <div class="mc-adj">
-        <div class="mc-btn" data-color="${c}" data-dir="-1">-</div>
-        <div class="mc-btn" data-color="${c}" data-dir="1">+</div>
-      </div>
-    </div>`).join('');
-
-  document.getElementById('mana-grid').querySelectorAll('[data-color]').forEach(el => {
-    el.addEventListener('click', () => adjMana(el.dataset.color, parseInt(el.dataset.dir)));
-  });
-}
-
-async function adjMana(color, delta) {
-  const r = await doApi('POST','/update_mana',{username,color,delta});
-  if (r) { S.mana_pool = r.mana_pool; renderMana(); }
-}
-
-// ════════════════════════════════════════════════
-// COUNTERS
-// ════════════════════════════════════════════════
-const CTRS = [
-  {key:'poison_counters',    label:'Poison',     icon:'&#9760;', ep:'/update_poison'},
-  {key:'energy_counters',    label:'Energy',     icon:'&#9889;', ep:'/update_energy'},
-  {key:'storm_count',        label:'Storm',      icon:'&#9928;', ep:'/update_storm'},
-  {key:'experience_counters',label:'Experience', icon:'&#11052;', ep:'/update_experience'},
-  {key:'rad_counters',       label:'Rad',        icon:'&#9762;', ep:'/update_rad'},
-];
-
-function renderCounters() {
-  const poisonMax = S.game_mode === 'two_headed_giant' ? 15 : 10;
-  document.getElementById('ctr-panel').innerHTML = CTRS.map(({key,label,icon}) => {
-    const v = S[key]||0;
-    const cls = key==='poison_counters' && v>=poisonMax ? 'lethal' : key==='poison_counters' && v>=7 ? 'warn' : '';
-    return `<div class="ctr-row">
-      <div class="ctr-label"><span class="ctr-icon">${icon}</span>${label}</div>
-      <div class="ctr-val ${cls}">${v}</div>
-      <div class="ctr-btns">
-        <div class="ctr-btn" data-ckey="${key}" data-cd="-1">-</div>
-        <div class="ctr-btn" data-ckey="${key}" data-cd="1">+</div>
+  const ctrsHtml = ctrs.map(c => {
+    const cls = c.val >= c.dead ? 'dead' : c.val >= c.warn ? 'warn' : '';
+    return `<div class="pc-row">
+      <div class="pc-lbl"><span class="pc-ico">${c.icon}</span>${c.label}</div>
+      <div class="pc-val ${cls}">${c.val}</div>
+      <div class="pca">
+        <div class="pca-btn" data-pact="ctr-adj" data-pidx="${i}" data-key="${c.key}" data-delta="-1">-</div>
+        <div class="pca-btn" data-pact="ctr-adj" data-pidx="${i}" data-key="${c.key}" data-delta="1">+</div>
       </div>
     </div>`;
   }).join('');
 
-  document.getElementById('ctr-panel').querySelectorAll('[data-ckey]').forEach(el => {
-    el.addEventListener('click', () => adjCtr(el.dataset.ckey, parseInt(el.dataset.cd)));
-  });
-}
-
-async function adjCtr(key, delta) {
-  const ep = CTRS.find(c=>c.key===key)?.ep;
-  if (!ep) return;
-  const r = await doApi('POST', ep, {username, delta});
-  if (r) { S[key] = r[key]; renderCounters(); }
-}
-
-// ════════════════════════════════════════════════
-// COMMANDER ZONE
-// ════════════════════════════════════════════════
-function renderCmdZone() {
-  const m = MODES[S.game_mode] || MODES.commander;
-  const bar = document.getElementById('cmd-bar');
-  if (!m.cmd) { bar.classList.remove('on'); document.getElementById('cdmg-panel').style.display='none'; return; }
-  bar.classList.add('on');
-  document.getElementById('cdmg-panel').style.display='block';
-  const cmds = S.commander_zone || [];
-  const cont = document.getElementById('cmd-cards');
-  if (!cmds.length) {
-    cont.innerHTML = '<span style="color:var(--text-dim);font-size:0.68rem;font-style:italic;">No commander set.</span>';
-    return;
-  }
-  cont.innerHTML = cmds.map(cmd => `
-    <div class="cmd-chip" data-iid="${cmd.instance_id}" title="Cast ${cmd.card_data.name}">
-      <div class="cmd-chip-name">${cmd.card_data.name}</div>
-      <div class="cmd-chip-info">${cmd.cast_count > 0 ? '+' + (cmd.cast_count*2) + ' tax' : 'Free'} &mdash; ${cmd.cast_count} cast${cmd.cast_count!==1?'s':''}</div>
-    </div>`).join('');
-  cont.querySelectorAll('.cmd-chip').forEach(el => {
-    el.addEventListener('click', () => castCommander(el.dataset.iid));
-  });
-}
-
-// ════════════════════════════════════════════════
-// COMMANDER DAMAGE
-// ════════════════════════════════════════════════
-function renderCmdDmg() {
-  const dmg = S.commander_damage || {};
-  const tax = S.command_tax || 0;
-  document.getElementById('cmd-tax').textContent = tax > 0 ? `Command tax: +${tax} generic` : '';
-  const all = [...new Set([...cdmgOpps, ...Object.keys(dmg)])];
-  document.getElementById('cdmg-rows').innerHTML = all.map((opp,i) => {
-    const v = dmg[opp]||0;
-    const cls = v>=21 ? 'lethal' : v>=18 ? 'warn' : '';
-    return `<div class="cdmg-row">
-      <input class="cdmg-opp" value="${opp}" data-old="${opp}" onblur="renameOpp(this)">
-      <div class="cdmg-val ${cls}">${v}</div>
-      <div class="ctr-btns">
-        <div class="ctr-btn" data-opp="${opp}" data-dd="-1">-</div>
-        <div class="ctr-btn" data-opp="${opp}" data-dd="1">+</div>
-      </div>
-    </div>`;
-  }).join('');
-  document.getElementById('cdmg-rows').querySelectorAll('[data-opp]').forEach(el => {
-    el.addEventListener('click', () => adjCmdDmg(el.dataset.opp, parseInt(el.dataset.dd)));
-  });
-}
-function renameOpp(inp) {
-  const old = inp.dataset.old; const nw = inp.value.trim();
-  if (!nw || nw===old) return;
-  const i = cdmgOpps.indexOf(old); if(i>=0) cdmgOpps[i]=nw;
-  if (S.commander_damage) { S.commander_damage[nw]=S.commander_damage[old]||0; delete S.commander_damage[old]; }
-  inp.dataset.old = nw; renderCmdDmg();
-}
-function addCdmgRow() { cdmgOpps.push(`Opponent ${cdmgOpps.length+1}`); renderCmdDmg(); }
-async function adjCmdDmg(opp, delta) {
-  const r = await doApi('POST','/update_commander_damage',{username,opponent:opp,delta});
-  if (r) { S.commander_damage = r.commander_damage; renderCmdDmg(); }
-}
-
-// ════════════════════════════════════════════════
-// ZONE COUNTS & PANELS
-// ════════════════════════════════════════════════
-function renderZoneCounts() {
-  document.getElementById('gy-n').textContent    = (S.graveyard||[]).length;
-  document.getElementById('exile-n').textContent = (S.exile||[]).length;
-  document.getElementById('hand-n').textContent  = (S.hand||[]).length;
-}
-function renderZonePanels() {
-  renderZoneCards('gy',    S.graveyard||[],  false);
-  renderZoneCards('exile', S.exile||[],      true);
-  renderZoneCards('hand',  S.hand||[],       false);
-}
-function renderZoneCards(zone, cards, isExile) {
-  const el = document.getElementById(zone+'-cards');
-  if (!el) return;
-  if (!cards.length) { el.innerHTML='<span style="color:var(--text-dim);font-size:0.72rem;font-style:italic;">Empty</span>'; return; }
-  el.innerHTML = cards.map(c=>`
-    <div class="zcard ${isExile?'exile':''}">
-      <div class="zcard-name">${c.card_data.name}</div>
-      <div class="zcard-type">${c.card_data.type||''}</div>
-      <div class="zcard-acts">
-        ${zone==='gy' ? `<span class="btn btn-sm" data-iid="${c.instance_id}" data-action="reanimate">BF</span><span class="btn btn-sm" data-iid="${c.instance_id}" data-action="exile-gy">Exile</span>` : ''}
-        ${zone==='hand' ? `<span class="btn btn-sm" data-iid="${c.instance_id}" data-action="play-hand">Play</span>` : ''}
-      </div>
-    </div>`).join('');
-  el.querySelectorAll('[data-action]').forEach(el2 => {
-    el2.addEventListener('click', e => {
-      e.stopPropagation();
-      const {iid, action} = el2.dataset;
-      if (action==='reanimate') reanimateCard(iid);
-      else if (action==='exile-gy') exileFromGrave(iid);
-      else if (action==='play-hand') playFromHand(iid);
-    });
-  });
-}
-function toggleZone(zone) {
-  const panels = {gy:'zp-gy', exile:'zp-exile', hand:'zp-hand'};
-  Object.entries(panels).forEach(([k,id]) => {
-    const p = document.getElementById(id);
-    p.classList.toggle('open', k===zone && !document.getElementById(panels[zone]).classList.contains('open') );
-  });
-}
-function closeZones() { ['zp-gy','zp-exile','zp-hand'].forEach(id => document.getElementById(id)?.classList.remove('open')); }
-
-// ════════════════════════════════════════════════
-// STATUS TOGGLES
-// ════════════════════════════════════════════════
-function renderToggles() {
-  document.getElementById('monarch-tog').classList.toggle('on',    !!S.is_monarch);
-  document.getElementById('initiative-tog').classList.toggle('on', !!S.has_initiative);
-}
-async function toggleMonarch() {
-  const r = await doApi('POST','/toggle_monarch',{username});
-  if (r) { S.is_monarch = r.is_monarch; renderToggles(); logLocal(r.is_monarch ? 'Became the Monarch' : 'Lost the Monarch'); }
-}
-async function toggleInitiative() {
-  const r = await doApi('POST','/toggle_initiative',{username});
-  if (r) { S.has_initiative = r.has_initiative; renderToggles(); logLocal(r.has_initiative ? 'Took the Initiative' : 'Lost the Initiative'); }
-}
-
-// ════════════════════════════════════════════════
-// ACTIVITY LOG
-// ════════════════════════════════════════════════
-function renderLog() {
-  const log = S.activity_log || [];
-  document.getElementById('log-scroll').innerHTML = log.length
-    ? log.map(l=>`<div class="log-line">${l}</div>`).join('')
-    : '<div class="log-line" style="color:var(--text-dim);">No actions yet.</div>';
-}
-function logLocal(msg) {
-  S.activity_log = [msg, ...(S.activity_log||[])].slice(0,25);
-  renderLog();
-}
-
-// ════════════════════════════════════════════════
-// BATTLEFIELD
-// ════════════════════════════════════════════════
-function renderBattlefield() {
-  const grid  = document.getElementById('bf-grid');
-  const empty = document.getElementById('bf-empty');
-  const cards = S.battlefield || [];
-  empty.style.display = cards.length ? 'none' : 'flex';
-  grid.innerHTML = cards.map(inst => cardHTML(inst)).join('');
-
-  // Delegate all button clicks on the grid
-  grid.querySelectorAll('[data-act]').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const {act, iid} = btn.dataset;
-      if (act==='plus')    adjCardCtr(iid,  1);
-      else if (act==='minus')   adjCardCtr(iid, -1);
-      else if (act==='tap')     tapCard(iid);
-      else if (act==='cmdzone') returnToCmdZone(iid);
-      else if (act==='remove')  showMoveOptions(iid);
-    });
-  });
-  // Card click = select
-  grid.querySelectorAll('.bfc').forEach(el => {
-    el.addEventListener('click', () => { focusedId = el.dataset.id; el.classList.add('selected'); });
-  });
-  // Drag
-  grid.querySelectorAll('.bfc').forEach(el => {
-    el.draggable = true;
-    el.addEventListener('dragstart', () => { dragSrc = el.dataset.id; el.style.opacity='0.5'; });
-    el.addEventListener('dragend',   () => { el.style.opacity='1'; });
-    el.addEventListener('dragover',  e => { e.preventDefault(); el.classList.add('drag-over'); });
-    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
-    el.addEventListener('drop', e => {
-      e.preventDefault(); el.classList.remove('drag-over');
-      if (dragSrc && dragSrc!==el.dataset.id) reorderBf(dragSrc, el.dataset.id);
-    });
-  });
-}
-
-function cardHTML(inst) {
-  const cd  = inst.card_data;
-  const isC = cd.type && (cd.type.toLowerCase().includes('creature') || cd.type.toLowerCase().includes('token'));
-  const ctr  = inst.counters||0;
-  const hasPT = cd.power !== null && cd.power !== undefined;
-  const pt   = isC && hasPT ? `${(parseInt(cd.power)||0)+ctr}/${cd.toughness}` : null;
-  const m    = MODES[S.game_mode]||MODES.commander;
   return `
-  <div class="bfc ${inst.tapped?'tapped':''} ${inst.is_token?'tok':''} ${inst.is_commander?'cmdr':''}"
-    data-id="${inst.instance_id}">
-    <div class="bfc-art">
-      ${cd.art_url
-        ? `<img src="${cd.art_url}" alt="" loading="lazy" class="blur" onload="this.classList.remove('blur')" onerror="this.parentNode.innerHTML='<div class=art-ph>${cd.name}</div>'">`
-        : `<div class="art-ph">${cd.name}</div>`}
-      ${inst.is_commander ? `<div class="bfc-crown">&#9812;</div>` : ''}
-      ${inst.is_token     ? `<div class="bfc-badge">Token</div>` : ''}
+  <div class="pp ${isActive ? 'active' : ''}" id="pp-${i}">
+    <div class="pp-head">
+      <span class="pp-name">${p.name}</span>
+      <span class="pp-turn-badge">ACTIVE TURN</span>
+      <span class="pp-format-badge">${MODES[G.mode]?.name || ''}</span>
     </div>
-    <div class="bfc-body">
-      <div class="bfc-name-row">
-        <div class="bfc-name">${cd.name}</div>
-        <div class="bfc-cost">${manaHtml(cd.mana_cost)}</div>
-      </div>
-      <div class="bfc-type">${cd.type||''}</div>
-      <div class="bfc-text">${cd.text||''}</div>
-      ${pt || ctr ? `<div class="bfc-pt-row">
-        ${pt ? `<div class="bfc-pt">${pt}</div>` : '<div></div>'}
-        <div class="bfc-ctrs ${ctr===0?'zero':''}">${ctr}</div>
-      </div>` : ''}
-      ${inst.notes ? `<div class="bfc-notes">${inst.notes}</div>` : ''}
+    <div class="pp-life">
+      <div class="pp-life-adj" data-pact="life-adj" data-pidx="${i}" data-delta="-1">&#8722;</div>
+      <div class="pp-life-num ${lifeCls}" data-pact="life-open" data-pidx="${i}">${p.life}</div>
+      <div class="pp-life-adj" data-pact="life-adj" data-pidx="${i}" data-delta="1">+</div>
     </div>
-    <div class="bfc-btns">
-      <button class="bfc-btn" data-act="minus" data-iid="${inst.instance_id}">-1</button>
-      <button class="bfc-btn" data-act="plus"  data-iid="${inst.instance_id}">+1</button>
-      <button class="bfc-btn tap-btn" data-act="tap" data-iid="${inst.instance_id}">${inst.tapped?'Untap':'Tap'}</button>
-      ${inst.is_commander && m.cmd ? `<button class="bfc-btn cz-btn" data-act="cmdzone" data-iid="${inst.instance_id}">Zone</button>` : ''}
-      <button class="bfc-btn rm-btn" data-act="remove" data-iid="${inst.instance_id}">X</button>
+    <div class="pp-quick">
+      <div class="qlb neg" data-pact="quick-life" data-pidx="${i}" data-delta="-5">-5</div>
+      <div class="qlb neg" data-pact="quick-life" data-pidx="${i}" data-delta="-2">-2</div>
+      <div class="qlb neg" data-pact="quick-life" data-pidx="${i}" data-delta="-1">-1</div>
+      <div class="qlb pos" data-pact="quick-life" data-pidx="${i}" data-delta="1">+1</div>
+      <div class="qlb pos" data-pact="quick-life" data-pidx="${i}" data-delta="2">+2</div>
+      <div class="qlb pos" data-pact="quick-life" data-pidx="${i}" data-delta="5">+5</div>
+    </div>
+    <div class="pp-ctrs">
+      ${ctrsHtml}
+    </div>
+    ${cdmgHtml}
+    <div class="pp-status">
+      <div class="status-chip ${p.monarch?'on':''}" data-pact="status-tog" data-pidx="${i}" data-key="monarch">Monarch</div>
+      <div class="status-chip ${p.initiative?'on':''}" data-pact="status-tog" data-pidx="${i}" data-key="initiative">Initiative</div>
     </div>
   </div>`;
 }
 
-function reorderBf(srcId, destId) {
-  const bf = S.battlefield||[];
-  const si = bf.findIndex(c=>c.instance_id===srcId);
-  const di = bf.findIndex(c=>c.instance_id===destId);
-  if (si<0||di<0) return;
-  const [c] = bf.splice(si,1); bf.splice(di,0,c);
-  S.battlefield = bf; renderBattlefield();
+// ════════════════════════════════════════
+// PLAYER ACTIONS
+// ════════════════════════════════════════
+function adjLife(idx, delta) {
+  if (!G) return;
+  G.players[idx].life += delta;
+  saveGame();
+  renderPlayers();
 }
 
-function showMoveOptions(instanceId) {
-  const inst = (S.battlefield||[]).find(c=>c.instance_id===instanceId);
-  if (!inst) return;
-  const m = MODES[S.game_mode]||MODES.commander;
-  const dests = inst.is_commander && m.cmd
-    ? ['graveyard','exile','hand','commander_zone']
-    : ['graveyard','exile','hand'];
-  const labels = {graveyard:'Graveyard',exile:'Exile',hand:'Hand',commander_zone:'Command Zone'};
-  document.getElementById('detail-title').textContent = `Move: ${inst.card_data.name}`;
-  document.getElementById('detail-body').innerHTML = `
-    <p style="color:var(--text-lo);font-size:0.78rem;margin-bottom:12px;">Send to:</p>
-    ${dests.map(d=>`<button class="btn btn-full" data-dest="${d}" data-iid="${instanceId}">${labels[d]}</button>`).join('')}`;
-  document.getElementById('detail-foot').innerHTML = `<button class="btn" onclick="closeOverlay('detail-overlay')">Cancel</button>`;
-
-  document.getElementById('detail-body').querySelectorAll('[data-dest]').forEach(btn => {
-    btn.addEventListener('click', () => { moveCard(btn.dataset.iid, btn.dataset.dest); closeOverlay('detail-overlay'); });
-  });
-  openOverlay('detail-overlay');
+function adjCounter(idx, key, delta) {
+  if (!G) return;
+  G.players[idx][key] = Math.max(0, (G.players[idx][key] || 0) + delta);
+  saveGame();
+  renderPlayers();
 }
 
-// ════════════════════════════════════════════════
-// CARD ACTIONS
-// ════════════════════════════════════════════════
-async function addToBf(cardId) {
-  const r = await doApi('POST','/add_to_battlefield',{username,card_id:cardId});
-  if (r) { S.battlefield = r.battlefield; renderBattlefield(); logLocal('Added card to battlefield'); }
+function adjCmdDmg(idx, fromName, delta) {
+  if (!G) return;
+  const p = G.players[idx];
+  if (!p.cmdDmg) p.cmdDmg = {};
+  p.cmdDmg[fromName] = Math.max(0, (p.cmdDmg[fromName] || 0) + delta);
+  saveGame();
+  renderPlayers();
 }
 
-async function adjCardCtr(iid, delta) {
-  const r = await doApi('POST','/update_counter',{username,instance_id:iid,delta});
-  if (r) {
-    const c = (S.battlefield||[]).find(c=>c.instance_id===iid);
-    if (c) c.counters = r.counters;
-    renderBattlefield();
-  }
+function toggleStatus(idx, key) {
+  if (!G) return;
+  G.players[idx][key] = !G.players[idx][key];
+  saveGame();
+  renderPlayers();
 }
 
-async function tapCard(iid) {
-  const r = await doApi('POST','/toggle_tap',{username,instance_id:iid});
-  if (r) {
-    const c = (S.battlefield||[]).find(c=>c.instance_id===iid);
-    if (c) c.tapped = r.tapped;
-    renderBattlefield();
-  }
+// ════════════════════════════════════════
+// LIFE MODAL
+// ════════════════════════════════════════
+let lifeModalIdx = null;
+function openLifeModal(idx) {
+  lifeModalIdx = idx;
+  const p = G.players[idx];
+  document.getElementById('life-ov-title').textContent = `Set Life — ${p.name}`;
+  document.getElementById('life-ov-inp').value = p.life;
+  openOv('life-ov');
+  setTimeout(() => document.getElementById('life-ov-inp').select(), 60);
 }
+function confirmSetLife() {
+  const v = parseInt(document.getElementById('life-ov-inp').value);
+  if (isNaN(v) || lifeModalIdx === null) return;
+  G.players[lifeModalIdx].life = v;
+  saveGame();
+  renderPlayers();
+  closeOv('life-ov');
+}
+document.getElementById('life-ov-inp').addEventListener('keydown', e => { if(e.key==='Enter') confirmSetLife(); });
 
-async function moveCard(iid, dest) {
-  const r = await doApi('POST','/remove_card',{username,instance_id:iid,destination:dest});
-  if (r) { await loadState(); }
-}
-
-async function doUntapAll() {
-  const r = await doApi('POST','/untap_all',{username});
-  if (r) { S.battlefield = r.battlefield; renderBattlefield(); logLocal('Untapped all'); }
-}
-
-async function doEndTurn() {
-  const r = await doApi('POST','/end_turn',{username});
-  if (r) {
-    S.turn_player = r.turn_player;
-    S.battlefield = r.battlefield;
-    S.mana_pool   = {W:0,U:0,B:0,R:0,G:0,C:0};
-    S.storm_count = 0;
-    renderBattlefield(); renderMana(); renderCounters(); renderTopbar();
-    activePhase = 0; renderHelper();
-    logLocal(`End of turn. Now: ${r.turn_player||username}`);
-  }
-}
-
-async function castCommander(iid) {
-  const r = await doApi('POST','/cast_commander',{username,instance_id:iid});
-  if (r) {
-    S.battlefield    = r.battlefield;
-    S.commander_zone = r.commander_zone;
-    S.command_tax    = r.command_tax;
-    renderCmdZone(); renderBattlefield(); renderCmdDmg();
-  }
-}
-
-async function returnToCmdZone(iid) {
-  const r = await doApi('POST','/return_commander_to_zone',{username,instance_id:iid});
-  if (r) {
-    S.battlefield    = r.battlefield;
-    S.commander_zone = r.commander_zone;
-    renderBattlefield(); renderCmdZone();
-  }
-}
-
-async function doClearTokens() {
-  if (!(S.battlefield||[]).some(c=>c.is_token)) return;
-  const r = await doApi('DELETE','/clear_tokens',{username});
-  if (r) { S.battlefield = r.battlefield; renderBattlefield(); }
-}
-
-async function reanimateCard(iid) {
-  const r = await doApi('POST','/move_from_graveyard',{username,instance_id:iid,destination:'battlefield'});
-  if (r) { S = {...S,...r}; renderAll(); }
-}
-async function exileFromGrave(iid) {
-  const r = await doApi('POST','/move_from_graveyard',{username,instance_id:iid,destination:'exile'});
-  if (r) { S = {...S,...r}; renderAll(); }
-}
-function playFromHand(iid) {
-  const card = (S.hand||[]).find(c=>c.instance_id===iid);
-  if (!card) return;
-  S.hand = (S.hand||[]).filter(c=>c.instance_id!==iid);
-  card.tapped = false;
-  S.battlefield = [...(S.battlefield||[]), card];
+// ════════════════════════════════════════
+// END TURN — REAL ROTATION
+// ════════════════════════════════════════
+function endTurn() {
+  if (!G) return;
+  const prev = G.turn;
+  G.turn = (G.turn + 1) % G.players.length;
+  // Increment turn number only when we wrap back to player 0
+  if (G.turn === 0) G.turnNum++;
+  // Reset storm counter for ALL players on new full round
+  if (G.turn === 0) G.players.forEach(p => { p.storm = 0; });
+  // Flash animation on old panel
+  const oldEl = document.getElementById(`pp-${prev}`);
+  if (oldEl) oldEl.style.opacity = '0.5';
+  saveGame();
   renderAll();
+  // Restore opacity
+  setTimeout(() => {
+    const el = document.getElementById(`pp-${prev}`);
+    if (el) el.style.opacity = '';
+  }, 300);
+  // Scroll new active player into view on mobile
+  const newEl = document.getElementById(`pp-${G.turn}`);
+  if (newEl) newEl.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-// ════════════════════════════════════════════════
-// LIFE
-// ════════════════════════════════════════════════
-async function adjLife(delta) {
-  const r = await doApi('POST','/update_life',{username,delta});
-  if (r) { S.life_total = r.life_total; renderTopbar(); logLocal(`Life: ${delta>0?'+':''}${delta} = ${r.life_total}`); }
-}
-function openLifeOverlay() {
-  document.getElementById('life-inp').value = S.life_total||0;
-  openOverlay('life-overlay');
-  setTimeout(()=>document.getElementById('life-inp').focus(),60);
-}
-async function confirmSetLife() {
-  const v = parseInt(document.getElementById('life-inp').value);
-  if (isNaN(v)) return;
-  const r = await doApi('POST','/set_life',{username,value:v});
-  if (r) { S.life_total = r.life_total; renderTopbar(); closeOverlay('life-overlay'); }
-}
-document.getElementById('life-inp').addEventListener('keydown', e => { if(e.key==='Enter') confirmSetLife(); });
-
-// ════════════════════════════════════════════════
-// TOKENS
-// ════════════════════════════════════════════════
-async function submitToken() {
-  const r = await doApi('POST','/create_token',{
-    username,
-    name:       document.getElementById('tok-name').value.trim()||'Token',
-    token_type: document.getElementById('tok-type').value.trim()||'Token Creature',
-    power:      parseInt(document.getElementById('tok-pow').value)||0,
-    toughness:  parseInt(document.getElementById('tok-tgh').value)||0,
-    color:      document.getElementById('tok-clr').value,
-    text:       document.getElementById('tok-txt').value.trim(),
-    count:      parseInt(document.getElementById('tok-cnt').value)||1,
-  });
-  if (r) { S.battlefield = r.battlefield; renderBattlefield(); closeOverlay('token-overlay'); }
-}
-
-// ════════════════════════════════════════════════
-// SCAN
-// ════════════════════════════════════════════════
-let pendingCard = null;
-function openScanOverlay() {
-  document.getElementById('scan-inp').value = '';
-  document.getElementById('scan-result').innerHTML = '';
-  pendingCard = null;
-  openOverlay('scan-overlay');
-  setTimeout(()=>document.getElementById('scan-inp').focus(),60);
-}
-document.getElementById('scan-inp').addEventListener('keydown', e => { if(e.key==='Enter') doScan(); });
-
-async function doScan() {
-  const id = document.getElementById('scan-inp').value.trim();
-  if (!id) return;
-  const res = document.getElementById('scan-result');
-  res.innerHTML = '<span style="color:var(--text-lo);font-size:0.75rem;">Searching...</span>';
-  const card = await doApi('GET', `/scan_card/${username}/${encodeURIComponent(id)}`);
-  if (!card) { res.innerHTML = `<div style="color:var(--ruby);font-size:0.78rem;">Not found: "${id}"</div>`; return; }
-  pendingCard = card;
-  res.innerHTML = `
-    <div style="display:flex;gap:16px;margin-bottom:12px;">
-      ${card.art_url ? `<img src="${card.art_url}" style="width:120px;border:1px solid var(--border2);" alt="">` : ''}
-      <div>
-        <div style="font-family:var(--ff-display);font-size:0.95rem;color:var(--gold);margin-bottom:4px;">${card.name}</div>
-        <div style="font-size:0.7rem;color:var(--text-lo);font-style:italic;margin-bottom:8px;">${card.type||''}</div>
-        <div style="font-size:0.78rem;color:var(--text);line-height:1.6;">${card.text||''}</div>
-        ${card.power!==null&&card.power!==undefined ? `<div style="font-size:0.8rem;color:var(--text-hi);margin-top:6px;">${card.power} / ${card.toughness}</div>` : ''}
-      </div>
-    </div>
-    <button class="btn btn-gold" style="width:100%;" id="scan-add-btn">Add to Battlefield</button>`;
-  document.getElementById('scan-add-btn').addEventListener('click', async () => {
-    if (!pendingCard) return;
-    await addToBf(pendingCard.id);
-    closeOverlay('scan-overlay');
+function untapAllPlayers() {
+  // Visual only — signals to untap; no digital permanents tracked here
+  // Flash all panels gold briefly
+  document.querySelectorAll('.pp').forEach(el => {
+    el.style.boxShadow = '0 0 20px rgba(200,164,74,.4)';
+    setTimeout(() => el.style.boxShadow = '', 600);
   });
 }
 
-// ════════════════════════════════════════════════
-// DECK UPLOAD
-// ════════════════════════════════════════════════
-async function handleUpload(input) {
-  const file = input.files[0]; if (!file) return;
-  const fd = new FormData();
-  fd.append('username', username);
-  fd.append('file', file);
-  const r = await fetch('/upload_deck',{method:'POST',body:fd}).then(r=>r.json()).catch(()=>null);
-  if (r?.status==='ok') {
-    await loadState();
-    logLocal(`Deck "${r.deck_name}" loaded — ${r.resolved}/${r.card_count} cards resolved`);
-  } else alert('Deck upload failed.');
-  input.value='';
-}
-
-async function loadStarter() {
-  const r = await doApi('POST','/load_default_deck',{username,deck:DEFAULT_DECK});
-  if (r) { await loadState(); logLocal(`Starter deck loaded — ${r.resolved}/${r.card_count} resolved`); }
-}
-
-async function resolveAllArt() {
-  logLocal('Re-fetching art from Scryfall...');
-  const r = await doApi('POST','/resolve_deck',{username});
-  if (r) { await loadState(); logLocal(`Art resolved — ${r.resolved}/${r.card_count} cards`); }
-}
-
-// ════════════════════════════════════════════════
-// SET COMMANDER
-// ════════════════════════════════════════════════
-function openSetCmdOverlay() {
-  if (!S.deck?.cards?.length) { alert('Load a deck first.'); return; }
-  const el = document.getElementById('setcmd-body');
-  el.innerHTML = `
-    <p style="color:var(--text-lo);font-size:0.75rem;margin-bottom:12px;">Select a card to designate as Commander.</p>
-    <div style="max-height:60vh;overflow-y:auto;">
-      ${S.deck.cards.map(c=>`
-        <div class="deck-item" data-cid="${c.id}" style="padding:6px 10px;">
-          <div class="deck-item-info">
-            <div class="deck-item-name">${c.name}</div>
-            <div class="deck-item-type">${c.type||''}</div>
-          </div>
-          <div class="deck-item-cost">${c.mana_cost||''}</div>
-        </div>`).join('')}
-    </div>`;
-  el.querySelectorAll('[data-cid]').forEach(el2 => {
-    el2.addEventListener('click', async () => {
-      const r = await doApi('POST','/add_commander',{username,card_id:el2.dataset.cid,is_signature_spell:false});
-      if (r) { S.commander_zone = r.commander_zone||S.commander_zone; renderCmdZone(); closeOverlay('setcmd-overlay'); }
-    });
-  });
-  openOverlay('setcmd-overlay');
-}
-
-// ════════════════════════════════════════════════
-// RESET
-// ════════════════════════════════════════════════
-function populateResetModal() {
-  const sel = document.getElementById('reset-mode-sel');
-  sel.innerHTML = Object.entries(MODES).map(([k,m])=>`<option value="${k}" ${k===S.game_mode?'selected':''}>${m.name} (${m.life} life)</option>`).join('');
-}
-async function confirmReset() {
-  const mode = document.getElementById('reset-mode-sel').value;
-  const r = await doApi('POST','/reset_game',{username,mode});
-  if (r) { S = r; selMode = S.game_mode; renderAll(); closeOverlay('reset-overlay'); }
-}
-function recordResult(result) {
-  const st = loadStats();
-  if (result==='W') st.wins++;
-  else st.losses++;
-  const m = MODES[S.game_mode]||MODES.commander;
-  st.history.unshift({result, format:m.name, life:S.life_total, date:new Date().toLocaleDateString()});
-  st.history = st.history.slice(0,50);
-  saveStats(st);
-  renderQuickStats();
-  logLocal(result==='W' ? 'Win recorded!' : 'Loss recorded.');
-}
-
-// ════════════════════════════════════════════════
-// NEW GAME
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
+// NEW GAME SETUP
+// ════════════════════════════════════════
+let ngMode = 'commander';
 let ngPlayers = [];
+
 function openNewGame() {
-  ngMode = S.game_mode || 'commander';
-  ngPlayers = [username];
+  ngMode = G?.mode || 'commander';
+  ngPlayers = G ? G.players.map(p=>p.name) : [myName, 'Player 2'];
   buildNgModeGrid();
-  buildNgPlayers();
+  buildNgPlayersList();
   document.getElementById('ng-life').value = MODES[ngMode]?.life || 20;
-  openOverlay('new-game-overlay');
+  openOv('ng-ov');
 }
+
 function buildNgModeGrid() {
-  const cont = document.getElementById('ng-mode-container');
-  cont.innerHTML = MODE_CATS.map(cat=>`
-    <div class="mode-category ${cat.cls}">${cat.label}</div>
-    <div class="mode-grid">
-      ${cat.keys.map(k=>{const m=MODES[k]; return `
-        <div class="mode-tile ${k===ngMode?'sel':''}" data-ngmode="${k}">
-          <div class="mt-name">${m.name}</div>
-          <div class="mt-life">${m.life} life</div>
-          <div class="mt-deck">${m.deck} cards${m.cmd?' | Cmdr':''}</div>
+  const cont = document.getElementById('ng-mode-cont');
+  cont.innerHTML = MODE_CATS.map(cat => `
+    <div class="mc ${cat.c}">${cat.l}</div>
+    <div class="mgrid">
+      ${cat.k.map(k => { const m = MODES[k]; return `
+        <div class="mt ${k===ngMode?'sel':''}" data-ngm="${k}">
+          <div class="mn">${m.name}</div>
+          <div class="ml">${m.life} life</div>
+          <div class="md">${m.deck} cards${m.cmd?' &bull; Cmdr':''}</div>
         </div>`;}).join('')}
     </div>`).join('');
-  cont.querySelectorAll('[data-ngmode]').forEach(el => {
+  cont.querySelectorAll('[data-ngm]').forEach(el => {
     el.addEventListener('click', () => {
-      ngMode = el.dataset.ngmode;
-      cont.querySelectorAll('.mode-tile').forEach(t => t.classList.toggle('sel', t.dataset.ngmode===ngMode));
+      ngMode = el.dataset.ngm;
+      cont.querySelectorAll('.mt').forEach(t => t.classList.toggle('sel', t.dataset.ngm===ngMode));
       document.getElementById('ng-life').value = MODES[ngMode]?.life || 20;
     });
   });
 }
-function buildNgPlayers() {
-  const el = document.getElementById('ng-players');
-  el.innerHTML = ngPlayers.map((p,i)=>`
-    <div class="player-entry">
+
+function buildNgPlayersList() {
+  const el = document.getElementById('ng-players-list');
+  el.innerHTML = ngPlayers.map((name, i) => `
+    <div class="player-row">
       <span class="pnum">P${i+1}</span>
-      <input class="inp" style="flex:1;" value="${p}" data-pidx="${i}" placeholder="Player name...">
+      <input class="inp" style="flex:1;" value="${name}" data-pidx="${i}" placeholder="Player name..." maxlength="24">
+      ${i > 1 ? `<button class="player-row-rm" data-rmidx="${i}">&times;</button>` : ''}
     </div>`).join('');
   el.querySelectorAll('[data-pidx]').forEach(inp => {
-    inp.addEventListener('input', () => { ngPlayers[parseInt(inp.dataset.pidx)] = inp.value; });
+    inp.addEventListener('input', () => { ngPlayers[parseInt(inp.dataset.pidx)] = inp.value.trim(); });
+  });
+  el.querySelectorAll('[data-rmidx]').forEach(btn => {
+    btn.addEventListener('click', () => { ngPlayers.splice(parseInt(btn.dataset.rmidx),1); buildNgPlayersList(); });
   });
 }
+
 function addNgPlayer() {
   ngPlayers.push(`Player ${ngPlayers.length+1}`);
-  buildNgPlayers();
-}
-async function startNewGame() {
-  const mode = ngMode;
-  const life = parseInt(document.getElementById('ng-life').value) || MODES[mode].life;
-  const players = ngPlayers.filter(p=>p.trim());
-  // Reset via API
-  const r = await doApi('POST','/reset_game',{username,mode});
-  if (!r) return;
-  S = r;
-  // Override life with custom value if different
-  if (life !== MODES[mode].life) {
-    const lr = await doApi('POST','/set_life',{username,value:life});
-    if (lr) S.life_total = lr.life_total;
-  }
-  // Set player order
-  S.player_order = players;
-  S.turn_player  = players[0] || username;
-  selMode = mode;
-  renderAll();
-  closeOverlay('new-game-overlay');
-  logLocal(`New game started — ${MODES[mode].name} with ${players.length} player${players.length!==1?'s':''}`);
+  buildNgPlayersList();
 }
 
-// ════════════════════════════════════════════════
-// MODE MODAL
-// ════════════════════════════════════════════════
-function openModeOverlay() {
-  selMode = S.game_mode||'commander';
-  buildModeGrid('mode-grid-cont');
-  openOverlay('mode-overlay');
+function startGame() {
+  const players = ngPlayers.filter(p => p.trim());
+  if (!players.length) return alert('Add at least one player.');
+  const life = parseInt(document.getElementById('ng-life').value) || MODES[ngMode].life;
+  // Record win/loss if there was a previous game
+  G = defaultGame(ngMode, players, life);
+  saveGame();
+  closeOv('ng-ov');
+  renderAll();
 }
+
+// ════════════════════════════════════════
+// MODE MODAL
+// ════════════════════════════════════════
+let selMode = 'commander';
+
 function buildModeGrid(containerId) {
+  selMode = G?.mode || 'commander';
   const cont = document.getElementById(containerId);
-  cont.innerHTML = MODE_CATS.map(cat=>`
-    <div class="mode-category ${cat.cls}">${cat.label}</div>
-    <div class="mode-grid">
-      ${cat.keys.map(k=>{const m=MODES[k]; return `
-        <div class="mode-tile ${k===selMode?'sel':''}" data-selmode="${k}">
-          <div class="mt-name">${m.name}</div>
-          <div class="mt-life">${m.life} life</div>
-          <div class="mt-deck">${m.deck} cards${m.cmd?' | Cmdr':''}</div>
+  cont.innerHTML = MODE_CATS.map(cat => `
+    <div class="mc ${cat.c}">${cat.l}</div>
+    <div class="mgrid">
+      ${cat.k.map(k => { const m = MODES[k]; return `
+        <div class="mt ${k===selMode?'sel':''}" data-sm="${k}">
+          <div class="mn">${m.name}</div>
+          <div class="ml">${m.life} life</div>
+          <div class="md">${m.deck} cards${m.cmd?' &bull; Cmdr':''}</div>
         </div>`;}).join('')}
     </div>`).join('');
-  cont.querySelectorAll('[data-selmode]').forEach(el => {
+  cont.querySelectorAll('[data-sm]').forEach(el => {
     el.addEventListener('click', () => {
-      selMode = el.dataset.selmode;
-      cont.querySelectorAll('.mode-tile').forEach(t => t.classList.toggle('sel', t.dataset.selmode===selMode));
+      selMode = el.dataset.sm;
+      cont.querySelectorAll('.mt').forEach(t => t.classList.toggle('sel', t.dataset.sm===selMode));
     });
   });
 }
-async function confirmMode() {
-  if (selMode === S.game_mode) { closeOverlay('mode-overlay'); return; }
+
+function confirmMode() {
+  if (!G || selMode === G.mode) { closeOv('mode-ov'); return; }
   const m = MODES[selMode];
-  if (!confirm(`Switch to ${m.name}? The game will reset (${m.life} life).`)) { closeOverlay('mode-overlay'); return; }
-  const r = await doApi('POST','/reset_game',{username,mode:selMode});
-  if (r) { S = r; renderAll(); }
-  closeOverlay('mode-overlay');
+  if (!confirm(`Switch to ${m.name}? Starting life will reset to ${m.life}.`)) { closeOv('mode-ov'); return; }
+  G.mode = selMode;
+  G.players.forEach(p => { p.life = m.life; });
+  saveGame();
+  renderAll();
+  closeOv('mode-ov');
 }
 
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════
 // STATS
-// ════════════════════════════════════════════════
-function openStatsOverlay() {
+// ════════════════════════════════════════
+function renderStats() {
+  document.getElementById('stats-name').textContent = myName;
   const st = loadStats();
-  const wr = st.wins+st.losses > 0 ? Math.round(st.wins/(st.wins+st.losses)*100) : 0;
+  const total = st.wins + st.losses;
+  const wr = total > 0 ? Math.round(st.wins/total*100) : 0;
   document.getElementById('stats-body').innerHTML = `
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-card-val w">${st.wins}</div><div class="stat-card-label">Wins</div></div>
-      <div class="stat-card"><div class="stat-card-val l">${st.losses}</div><div class="stat-card-label">Losses</div></div>
-      <div class="stat-card"><div class="stat-card-val">${st.wins+st.losses}</div><div class="stat-card-label">Games Played</div></div>
-      <div class="stat-card"><div class="stat-card-val">${wr}%</div><div class="stat-card-label">Win Rate</div></div>
+    <div class="stat-grid">
+      <div class="stat-tile"><div class="stat-big w">${st.wins}</div><div class="stat-lbl">Wins</div></div>
+      <div class="stat-tile"><div class="stat-big l">${st.losses}</div><div class="stat-lbl">Losses</div></div>
+      <div class="stat-tile"><div class="stat-big">${total}</div><div class="stat-lbl">Games</div></div>
+      <div class="stat-tile"><div class="stat-big">${wr}%</div><div class="stat-lbl">Win Rate</div></div>
     </div>
-    <div style="margin-bottom:8px;font-family:var(--ff-display);font-size:0.6rem;letter-spacing:0.16em;color:var(--text-lo);">GAME HISTORY</div>
+    <div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;">
+      <span style="font-family:var(--ff1);font-size:.58rem;letter-spacing:.14em;color:var(--tlo);">RECORD WIN / LOSS FOR CURRENT GAME:</span>
+      <button class="btn grn sm" onclick="recordResult('W')">Win</button>
+      <button class="btn red sm" onclick="recordResult('L')">Loss</button>
+    </div>
+    <div style="font-family:var(--ff1);font-size:.56rem;letter-spacing:.16em;color:var(--tlo);margin-bottom:8px;">HISTORY</div>
     ${st.history.length
       ? st.history.map(g=>`
-          <div class="game-hist-row">
-            <span class="gh-result ${g.result}">${g.result==='W'?'WIN':'LOSS'}</span>
-            <div class="gh-details">
-              <div>${g.format||'Unknown Format'}</div>
-              <div class="gh-meta">${g.date||''} &mdash; Ended at ${g.life||'?'} life</div>
+          <div class="hist-row">
+            <span class="hist-res ${g.result}">${g.result==='W'?'WIN':'LOSS'}</span>
+            <div class="hist-detail">
+              <div class="hist-fmt">${g.format} &mdash; ${g.players}</div>
+              <div class="hist-meta">${g.date} &bull; Ended at ${g.life} life &bull; Turn ${g.turns||'?'}</div>
             </div>
-          </div>`).join('')
-      : '<div style="color:var(--text-dim);font-style:italic;font-size:0.78rem;padding:12px 0;">No games recorded yet.<br>Use Win / Loss buttons when resetting.</div>'}`;
-  openOverlay('stats-overlay');
+          </div>`)
+        .join('')
+      : '<div style="color:var(--tlo);font-style:italic;font-size:.78rem;padding:12px 0;">No history yet. Record wins/losses when games end.</div>'}`;
 }
+
 function clearStats() {
-  if (!confirm('Clear all stats and history?')) return;
+  if (!confirm('Clear all stats for ' + myName + '?')) return;
   saveStats({wins:0,losses:0,history:[]});
-  openStatsOverlay();
-  renderQuickStats();
+  renderStats();
 }
 
-// ════════════════════════════════════════════════
-// HELPER DRAWER
-// ════════════════════════════════════════════════
-function toggleHelper() { document.getElementById('helper-drawer').classList.toggle('open'); }
-function renderHelper() {
-  const phases = document.getElementById('phase-bar');
-  phases.innerHTML = PHASES.map((p,i)=>`
-    <div class="phase-step ${i===activePhase?'active':''}" data-ph="${i}">
-      <div class="phase-num">${i+1}</div>
-      <div>
-        <div class="phase-name">${p.name}</div>
-        <div class="phase-desc">${p.desc}</div>
-      </div>
-    </div>`).join('');
-  phases.querySelectorAll('[data-ph]').forEach(el => {
-    el.addEventListener('click', () => { activePhase = parseInt(el.dataset.ph); renderHelper(); });
-  });
+// ════════════════════════════════════════
+// CAMERA CARD SCANNING (OCR like Mana Box)
+// ════════════════════════════════════════
+let camStream = null;
+let tesseractWorker = null;
 
-  const m = MODES[S.game_mode]||MODES.commander;
-  const rules = document.getElementById('format-rules');
-  const formatRules = {
-    commander: ['100-card singleton deck.','40 starting life.','Commander damage: 21 from same commander = death.','Commanders go to Command Zone instead of graveyard (optional).','Command tax: +2 generic for each previous cast.'],
-    brawl: ['60-card singleton (Standard-legal).',`25 starting life.`,'Commander mechanic applies.'],
-    historic_brawl: ['100-card singleton (Historic-legal).','25 starting life.'],
-    oathbreaker: ['Planeswalker as commander.','60-card singleton.','Signature spell must match oathbreaker\'s color identity.'],
-    two_headed_giant: ['2v2 team format.','Teams share a life total (30).','15 poison counters to lose.','Both players untap simultaneously.'],
-    draft: ['40-card minimum deck.','20 starting life.','Build deck from booster packs.'],
-  };
-  const fr = formatRules[S.game_mode];
-  if (fr) {
-    rules.innerHTML = `
-      <div class="help-section-title">${m.name} Rules</div>
-      ${fr.map(r=>`<div class="help-rule">${r}</div>`).join('')}`;
-  } else {
-    rules.innerHTML = `<div class="help-section-title">${m.name}</div><div class="help-rule">${m.deck}-card decks. ${m.life} starting life.</div>`;
+async function openCamera() {
+  document.getElementById('cam-ov').classList.remove('hidden');
+  document.getElementById('cam-results').classList.add('hidden');
+  document.getElementById('cam-status').textContent = 'Starting camera...';
+
+  try {
+    // Prefer back camera on mobile
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: {ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} }
+    });
+    const video = document.getElementById('cam-video');
+    video.srcObject = camStream;
+    await video.play();
+    document.getElementById('cam-status').textContent = 'Ready — align card name in the box, then press Capture';
+  } catch(e) {
+    document.getElementById('cam-status').textContent = 'Camera access denied. Use manual search below.';
+    showManualFallback();
+  }
+
+  // Init Tesseract worker if not done
+  if (!tesseractWorker) {
+    try {
+      tesseractWorker = await Tesseract.createWorker('eng');
+    } catch(e) {
+      console.warn('Tesseract init failed:', e);
+    }
   }
 }
 
-async function doCardLookup() {
-  const name = document.getElementById('lookup-inp').value.trim();
-  if (!name) return;
-  const res = document.getElementById('lookup-result');
-  res.style.display = 'block';
-  res.innerHTML = '<span style="color:var(--text-lo);">Looking up...</span>';
-  const card = await doApi('GET', `/resolve_card?name=${encodeURIComponent(name)}`);
-  if (!card) { res.innerHTML = `<span style="color:var(--ruby);">Not found.</span>`; return; }
-  res.innerHTML = `
-    <div class="lr-name">${card.name}</div>
-    <div class="lr-type">${card.type||''} &mdash; ${card.mana_cost||''}</div>
-    <div>${card.text||''}</div>
-    ${card.power!==null&&card.power!==undefined ? `<div style="margin-top:6px;font-weight:700;">${card.power} / ${card.toughness}</div>` : ''}
-    ${card.set_name ? `<div style="font-size:0.6rem;color:var(--text-dim);margin-top:4px;">${card.set_name}</div>` : ''}`;
+function closeCamera() {
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  document.getElementById('cam-ov').classList.add('hidden');
+  document.getElementById('cam-guide').classList.remove('scanning');
 }
-document.getElementById('lookup-inp').addEventListener('keydown', e => { if(e.key==='Enter') doCardLookup(); });
 
-// ════════════════════════════════════════════════
+async function captureAndScan() {
+  const video = document.getElementById('cam-video');
+  const guide = document.getElementById('cam-guide');
+  const status = document.getElementById('cam-status');
+
+  if (!video.srcObject) { showManualFallback(); return; }
+
+  // Start scan animation
+  guide.classList.add('scanning');
+  status.textContent = 'Capturing...';
+  document.getElementById('cam-cap-btn').disabled = true;
+
+  try {
+    // Draw current frame to canvas
+    const canvas = document.getElementById('ocr-canvas');
+    canvas.width  = video.videoWidth  || 1280;
+    canvas.height = video.videoHeight || 720;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Calculate the guide box region in video coordinates
+    // The guide box is centered horizontally, roughly 85% wide, and is a thin strip
+    // Guide covers the card name bar (top ~12% of card)
+    const guideRect = guide.getBoundingClientRect();
+    const videoRect = video.getBoundingClientRect();
+
+    const scaleX = canvas.width  / videoRect.width;
+    const scaleY = canvas.height / videoRect.height;
+
+    const cropX = (guideRect.left - videoRect.left) * scaleX;
+    const cropY = (guideRect.top  - videoRect.top)  * scaleY;
+    const cropW = guideRect.width  * scaleX;
+    const cropH = guideRect.height * scaleY;
+
+    // Extract the cropped region
+    const cropCanvas = document.createElement('canvas');
+    cropCanvas.width  = Math.max(cropW, 1);
+    cropCanvas.height = Math.max(cropH, 1);
+    const cropCtx = cropCanvas.getContext('2d');
+
+    // Process image for better OCR:
+    // 1. Grayscale
+    // 2. High contrast
+    cropCtx.filter = 'grayscale(100%) contrast(180%) brightness(110%)';
+    cropCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropCanvas.width, cropCanvas.height);
+
+    // Scale up for better OCR accuracy
+    const bigCanvas = document.createElement('canvas');
+    bigCanvas.width  = cropCanvas.width  * 3;
+    bigCanvas.height = cropCanvas.height * 3;
+    const bigCtx = bigCanvas.getContext('2d');
+    bigCtx.imageSmoothingEnabled = false;
+    bigCtx.drawImage(cropCanvas, 0, 0, bigCanvas.width, bigCanvas.height);
+
+    status.textContent = 'Reading card name...';
+
+    let ocrText = '';
+    if (tesseractWorker) {
+      const result = await tesseractWorker.recognize(bigCanvas);
+      ocrText = result.data.text.trim();
+    }
+
+    guide.classList.remove('scanning');
+    document.getElementById('cam-cap-btn').disabled = false;
+
+    if (!ocrText || ocrText.length < 2) {
+      status.textContent = 'Could not read text — try again or use manual search';
+      showSearchResults([], '');
+      return;
+    }
+
+    // Clean OCR text — take first line, remove non-letter chars
+    const cleaned = ocrText.split('\n')[0]
+      .replace(/[^a-zA-Z0-9 ',\-]/g, '')
+      .trim()
+      .substring(0, 40);
+
+    status.textContent = `Read: "${cleaned}" — searching...`;
+    await searchAndShowResults(cleaned);
+
+  } catch(e) {
+    guide.classList.remove('scanning');
+    document.getElementById('cam-cap-btn').disabled = false;
+    status.textContent = 'Error — try again or use manual search';
+    console.error('Scan error:', e);
+    showManualFallback();
+  }
+}
+
+function retryCapture() {
+  document.getElementById('cam-results').classList.add('hidden');
+  document.getElementById('cam-status').textContent = 'Ready — align card name in the box, then press Capture';
+}
+
+async function searchAndShowResults(query) {
+  if (!query) { showSearchResults([], query); return; }
+  try {
+    // Use Scryfall autocomplete then fetch each match
+    const r = await fetch(`/autocomplete?q=${encodeURIComponent(query)}`);
+    const data = await r.json();
+    const names = (data.names || []).slice(0, 5);
+
+    if (!names.length) {
+      // Try fuzzy via search endpoint
+      const r2 = await fetch(`/search_cards?q=${encodeURIComponent(query)}`);
+      const d2  = await r2.json();
+      const cards = (d2.cards || []).slice(0, 5);
+      showSearchResults(cards, query);
+      return;
+    }
+
+    // Fetch each name for art
+    const cards = await Promise.all(names.map(async name => {
+      try {
+        const rc = await fetch(`/resolve_card?name=${encodeURIComponent(name)}`);
+        if (rc.ok) return await rc.json();
+      } catch {}
+      return {name, type:'', text:'', art_url:'', power:null, toughness:null};
+    }));
+    showSearchResults(cards.filter(Boolean), query);
+  } catch(e) {
+    showSearchResults([], query);
+  }
+}
+
+function showSearchResults(cards, query) {
+  const res = document.getElementById('cam-results');
+  const list = document.getElementById('cr-list');
+  document.getElementById('cr-title').textContent = cards.length
+    ? `Found ${cards.length} match${cards.length>1?'es':''} for "${query}"`
+    : `No matches for "${query}"`;
+
+  list.innerHTML = cards.map(c => `
+    <div class="cr-match" data-cname="${encodeURIComponent(c.name)}">
+      ${c.art_url
+        ? `<img src="${c.art_url}" alt="" loading="lazy">`
+        : `<div class="cr-ph">${c.name[0]}</div>`}
+      <div>
+        <div class="cr-name">${c.name}</div>
+        <div class="cr-type">${c.type||''} ${c.mana_cost ? '&bull; '+c.mana_cost : ''}</div>
+        <div class="cr-text">${(c.text||'').substring(0,100)}${(c.text||'').length>100?'...':''}</div>
+        ${c.power!==null&&c.power!==undefined ? `<div style="margin-top:4px;font-family:var(--ff1);font-size:.6rem;color:var(--thi);">${c.power}/${c.toughness}</div>` : ''}
+      </div>
+    </div>`).join('');
+
+  // Clicking a result opens the card detail
+  list.querySelectorAll('.cr-match').forEach(el => {
+    el.addEventListener('click', () => {
+      const name = decodeURIComponent(el.dataset.cname);
+      const card = cards.find(c => c.name === name);
+      if (card) showCardDetail(card);
+    });
+  });
+
+  document.getElementById('cr-manual-inp').value = query;
+  res.classList.remove('hidden');
+}
+
+function showManualFallback() {
+  document.getElementById('cam-results').classList.remove('hidden');
+  document.getElementById('cr-title').textContent = 'Manual Card Search';
+  document.getElementById('cr-list').innerHTML = '';
+  document.getElementById('cr-manual-inp').value = '';
+  setTimeout(() => document.getElementById('cr-manual-inp').focus(), 100);
+}
+
+async function manualSearch() {
+  const q = document.getElementById('cr-manual-inp').value.trim();
+  if (!q) return;
+  document.getElementById('cr-title').textContent = `Searching "${q}"...`;
+  await searchAndShowResults(q);
+}
+document.getElementById('cr-manual-inp').addEventListener('keydown', e => { if(e.key==='Enter') manualSearch(); });
+
+function showCardDetail(card) {
+  closeCamera();
+  document.getElementById('card-ov-title').textContent = card.name;
+  document.getElementById('card-ov-body').innerHTML = `
+    <div style="display:flex;gap:18px;flex-wrap:wrap;">
+      ${card.art_url ? `<img src="${card.art_url}" style="width:160px;border:1px solid var(--bdr2);flex-shrink:0;" alt="">` : ''}
+      <div style="flex:1;min-width:160px;">
+        <div style="font-family:var(--ff1);font-size:1rem;color:var(--gold);margin-bottom:5px;">${card.name}</div>
+        <div style="font-size:.72rem;color:var(--tlo);font-style:italic;margin-bottom:8px;">${card.type||''}</div>
+        ${card.mana_cost ? `<div style="font-size:.72rem;color:var(--thi);margin-bottom:8px;">Cost: ${card.mana_cost}</div>` : ''}
+        <div style="font-size:.8rem;color:var(--text);line-height:1.6;margin-bottom:10px;">${card.text||''}</div>
+        ${card.power!==null&&card.power!==undefined ? `<div style="font-family:var(--ff1);font-size:.85rem;color:var(--thi);">${card.power} / ${card.toughness}</div>` : ''}
+        ${card.set_name ? `<div style="font-size:.62rem;color:var(--tlo);margin-top:8px;">${card.set_name}</div>` : ''}
+        ${card.legalities ? buildLegality(card.legalities) : ''}
+      </div>
+    </div>`;
+  openOv('card-ov');
+}
+
+function buildLegality(leg) {
+  const show = ['standard','historic','pioneer','modern','legacy','commander','pauper'];
+  const rows = show.map(f => {
+    const v = leg[f];
+    if (!v) return '';
+    const legal = v === 'legal';
+    const color = legal ? '#50c870' : '#f07060';
+    return `<span style="font-family:var(--ff1);font-size:.5rem;letter-spacing:.06em;padding:2px 6px;border-radius:2px;background:var(--s2);border:1px solid var(--bdr);color:${color};display:inline-block;margin:2px;">${f.replace('_',' ')}</span>`;
+  }).join('');
+  return rows ? `<div style="margin-top:8px;">${rows}</div>` : '';
+}
+
+// ════════════════════════════════════════
 // OVERLAY HELPERS
-// ════════════════════════════════════════════════
-function openOverlay(id)  { document.getElementById(id)?.classList.remove('hidden'); }
-function closeOverlay(id) { document.getElementById(id)?.classList.add('hidden'); }
-document.querySelectorAll('.overlay').forEach(el => {
-  el.addEventListener('click', e => { if(e.target===el) closeOverlay(el.id); });
+// ════════════════════════════════════════
+function openOv(id)  { document.getElementById(id)?.classList.remove('hidden'); }
+function closeOv(id) { document.getElementById(id)?.classList.add('hidden'); }
+
+document.querySelectorAll('.ov').forEach(el => {
+  el.addEventListener('click', e => { if(e.target===el) closeOv(el.id); });
 });
 
-// ════════════════════════════════════════════════
-// KEYBOARD
-// ════════════════════════════════════════════════
-document.addEventListener('keydown', e => {
-  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
-  if (!focusedId) return;
-  if (e.key==='=' || e.key==='+') { e.preventDefault(); adjCardCtr(focusedId,  1); }
-  if (e.key==='-' || e.key==='_') { e.preventDefault(); adjCardCtr(focusedId, -1); }
-  if (e.key==='t' || e.key==='T') { e.preventDefault(); tapCard(focusedId); }
-  if (e.key==='Delete' || e.key==='Backspace') { e.preventDefault(); showMoveOptions(focusedId); }
-});
-document.addEventListener('keydown', e => {
-  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
-  if (e.key==='u') doUntapAll();
-  if (e.key==='e') doEndTurn();
-  if (e.key==='h') toggleHelper();
-});
-
-// ════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════
-buildModeGrid('mode-grid-cont');
+// ════════════════════════════════════════
+// INIT — start default game if no saved
+// ════════════════════════════════════════
+// Login enter key
+document.getElementById('l-name').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 </script>
 </body>
 </html>
