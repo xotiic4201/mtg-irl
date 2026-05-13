@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTG IRL</title>
+<style>
+:root {
+  --bg: #0a0c10;
+  --playmat: #1a1e24;
+  --sidebar: #111318;
+  --card-bg: #ece9df;
+  --card-border: #c0b89a;
+  --card-text: #2c2a24;
+  --gold: #c9a84c;
+  --gold-dim: #8a6d20;
+  --gold-bright: #f0d070;
+  --btn-bg: #2c2820;
+  --btn-hover: #3a342c;
+  --border-subtle: #2a2e38;
+  --text-main: #d4cdb8;
+  --text-muted: #7a7468;
+  --text-bright: #f0e8d0;
+  --red: #c0392b;
+  --green: #27ae60;
+  --font-serif: 'Georgia', 'Palatino Linotype', 'Times New Roman', serif;
+  --font-display: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --shadow-card: 0 8px 24px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+  --shadow-panel: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-serif);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(201,168,76,0.06) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* SCROLLBARS */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0d0f14; }
+::-webkit-scrollbar-thumb { background: #3a3430; border-radius: 2px; }
+
+/* MODAL OVERLAYS */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.82);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.modal-overlay.hidden { display: none; }
+
+.modal-box {
+  background: #161b22;
+  border: 1px solid #3a3430;
+  border-top: 2px solid var(--gold);
+  padding: 28px 32px;
+  width: min(520px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(201,168,76,0.12);
+}
+.modal-box.wide { width: min(820px, 96vw); }
+.modal-box.full { width: min(1100px, 98vw); max-height: 94vh; }
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #2a2820;
+}
+
+/* LOGIN MODAL */
+#login-modal .modal-box {
+  text-align: center;
+  padding: 48px 40px;
+}
+.app-logo {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  color: var(--gold);
+  letter-spacing: 0.12em;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 20px rgba(201,168,76,0.3);
+}
+.app-tagline {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 36px;
+}
+.login-input {
+  width: 100%;
+  background: #0e1116;
+  border: 1px solid #3a3430;
+  border-bottom: 2px solid var(--gold-dim);
+  color: var(--text-bright);
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  padding: 12px 16px;
+  outline: none;
+  transition: border-color 0.2s cubic-bezier(0.4,0,0.2,1);
+  border-radius: 2px 4px 0 0;
+}
+.login-input:focus { border-bottom-color: var(--gold); }
+.login-input::placeholder { color: var(--text-muted); font-style: italic; }
+
+/* BUTTONS */
+.btn {
+  background: var(--btn-bg);
+  color: var(--text-main);
+  border: none;
+  border-top: 2px solid var(--gold-dim);
+  border-radius: 2px 4px 0 4px;
+  padding: 9px 18px;
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--btn-hover); border-top-color: var(--gold); color: var(--gold-bright); }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: #3a2e10; border-top-color: var(--gold); color: var(--gold-bright); }
+.btn.primary:hover { background: #4a3c14; }
+.btn.danger { background: #2c1010; border-top-color: #8b1c1c; color: #ff8080; }
+.btn.danger:hover { background: #3c1414; border-top-color: var(--red); }
+.btn.sm { padding: 5px 10px; font-size: 0.74rem; }
+.btn.icon-btn { padding: 6px 8px; min-width: 32px; text-align: center; font-size: 0.78rem; }
+.btn.full { width: 100%; margin-bottom: 6px; text-align: left; }
+.btn.green { background: #0d2b1a; border-top-color: #27ae60; color: #7de8a0; }
+.btn.green:hover { background: #143820; }
+.btn.blue { background: #0c1a2e; border-top-color: #2563eb; color: #90b8ff; }
+.btn.blue:hover { background: #112240; }
+
+/* MODE SELECTOR */
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.mode-card {
+  background: #0e1116;
+  border: 1px solid #2a2e38;
+  border-top: 2px solid transparent;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  border-radius: 2px;
+}
+.mode-card:hover { background: #141820; border-top-color: var(--gold-dim); }
+.mode-card.selected { background: #1a1608; border-color: var(--gold); border-top-color: var(--gold-bright); }
+.mode-card .mode-name { font-size: 0.82rem; color: var(--text-bright); font-weight: 600; margin-bottom: 4px; }
+.mode-card .mode-life { font-size: 0.7rem; color: var(--gold); }
+.mode-card .mode-deck { font-size: 0.68rem; color: var(--text-muted); }
+.mode-category-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 12px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #1e2028;
+}
+.mode-category-label.arena { color: #a78bfa; }
+.mode-category-label.paper { color: #6ee7b7; }
+.mode-category-label.commander { color: var(--gold); }
+.mode-category-label.limited { color: #93c5fd; }
+.mode-category-label.special { color: #f9a8d4; }
+
+/* TOP BAR */
+#topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 52px;
+  background: #0d1016;
+  border-bottom: 1px solid #2a2820;
+  border-bottom: 2px solid var(--gold-dim);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 14px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.6);
+}
+.topbar-logo {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+.topbar-divider { width: 1px; height: 28px; background: #2a2820; flex-shrink: 0; }
+.topbar-user { font-size: 0.78rem; color: var(--text-muted); flex-shrink: 0; }
+.topbar-user span { color: var(--text-main); }
+.mode-badge {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  background: rgba(201,168,76,0.08);
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.mode-badge:hover { border-color: var(--gold); background: rgba(201,168,76,0.14); }
+.topbar-spacer { flex: 1; }
+.life-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.life-number {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--text-bright);
+  min-width: 52px;
+  text-align: center;
+  line-height: 1;
+  cursor: pointer;
+}
+.life-number.danger { color: var(--red); }
+.life-number.critical { color: #ff4040; text-shadow: 0 0 12px rgba(255,64,64,0.4); animation: pulse 1.5s ease-in-out infinite; }
+.btn-life {
+  background: #1a1e24;
+  border: 1px solid #3a3430;
+  color: var(--text-muted);
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 2px;
+  flex-shrink: 0;
+  transition: all 0.1s;
+}
+.btn-life:hover { background: #2a2420; color: var(--gold); border-color: var(--gold-dim); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+.turn-indicator {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.turn-indicator span { color: var(--gold); }
+
+/* MAIN LAYOUT */
+#app {
+  display: none;
+  padding-top: 52px;
+  height: 100vh;
+}
+#app.visible { display: flex; flex-direction: column; }
+#main-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr 268px;
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+}
+
+/* LEFT COLUMN - DECK */
+#left-col {
+  background: var(--sidebar);
+  border-right: 1px solid #1e2228;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.left-col-header {
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid #1e2228;
+  flex-shrink: 0;
+}
+.left-col-header h3 {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.deck-filter {
+  width: 100%;
+  background: #0e1116;
+  border: 1px solid #2a2e38;
+  border-bottom: 1.5px solid #3a3430;
+  color: var(--text-main);
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  padding: 6px 10px;
+  outline: none;
+  border-radius: 2px;
+}
+.deck-filter:focus { border-bottom-color: var(--gold-dim); }
+.deck-filter::placeholder { color: var(--text-muted); font-style: italic; }
+
+#deck-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+.deck-card-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 8px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: background 0.12s, border-color 0.12s;
+}
+.deck-card-item:hover { background: #161c22; border-left-color: var(--gold-dim); }
+.deck-card-item:active { background: #1e2428; }
+.deck-thumb {
+  width: 36px; height: 50px;
+  object-fit: cover;
+  border: 1px solid #3a3430;
+  flex-shrink: 0;
+  background: #1a1e24;
+  display: block;
+}
+.deck-thumb-placeholder {
+  width: 36px; height: 50px;
+  background: #1a1e24;
+  border: 1px solid #2a2e38;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+.deck-card-info { flex: 1; min-width: 0; }
+.deck-card-name {
+  font-size: 0.75rem;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.deck-card-type { font-size: 0.64rem; color: var(--text-muted); font-style: italic; }
+.deck-card-cost { font-size: 0.65rem; color: var(--gold-dim); flex-shrink: 0; }
+
+.left-col-actions {
+  padding: 10px;
+  border-top: 1px solid #1e2228;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+/* CENTER COLUMN - BATTLEFIELD */
+#center-col {
+  background: var(--playmat);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 80px rgba(0,0,0,0.4);
+}
+
+#commander-zone-bar {
+  background: #0e1116;
+  border-bottom: 1px solid #2a2820;
+  padding: 8px 14px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+#commander-zone-bar.visible { display: flex; }
+.commander-zone-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  flex-shrink: 0;
+}
+#commander-zone-cards {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+  overflow-x: auto;
+}
+.commander-card-mini {
+  background: #1a1608;
+  border: 1px solid var(--gold-dim);
+  border-top: 2px solid var(--gold);
+  padding: 5px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: border-color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.commander-card-mini:hover { background: #221d0a; border-color: var(--gold); }
+.commander-card-mini .cmd-name { font-size: 0.76rem; color: var(--gold-bright); }
+.commander-card-mini .cmd-tax { font-size: 0.64rem; color: var(--text-muted); }
+
+#battlefield-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+#battlefield-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 12px;
+  align-content: start;
+  min-height: 100%;
+}
+#battlefield-grid.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-battlefield-msg {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.9rem;
+  padding: 60px 40px;
+}
+.empty-battlefield-msg div { margin-bottom: 6px; }
+
+/* BATTLEFIELD CARDS */
+.bf-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--card-text);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34,1.2,0.64,1), box-shadow 0.2s;
+  transform-origin: center bottom;
+  position: relative;
+  user-select: none;
+}
+.bf-card:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1); }
+.bf-card.tapped {
+  transform: rotate(90deg) scale(0.88);
+  filter: brightness(0.8) saturate(0.7);
+  box-shadow: 4px 4px 16px rgba(0,0,0,0.6);
+}
+.bf-card.is-token { border-color: #a0c880; border-style: dashed; }
+.bf-card.is-commander { border-color: var(--gold); border-width: 2px; }
+.bf-card.selected-card { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.card-art-box {
+  width: 100%;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  background: #1a1e24;
+  border-bottom: 2px solid var(--card-border);
+  position: relative;
+}
+.card-art-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: filter 0.3s;
+}
+.card-art-img.loading { filter: blur(8px) saturate(0); }
+.card-art-placeholder {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #2a2e38 0%, #1a1e24 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3a3e48;
+  font-size: 0.7rem;
+  font-style: italic;
+}
+.card-commander-crown {
+  position: absolute; top: 4px; right: 5px;
+  color: var(--gold);
+  font-size: 0.75rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+.card-token-badge {
+  position: absolute; top: 4px; left: 5px;
+  background: rgba(0,0,0,0.7);
+  color: #a0c880;
+  font-size: 0.6rem;
+  padding: 1px 5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.card-body {
+  padding: 5px 7px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.card-name-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+}
+.card-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #1c1a14;
+  line-height: 1.2;
+  flex: 1;
+}
+.card-mana-cost {
+  display: flex;
+  gap: 1px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.mana-sym {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  font-size: 8px;
+  font-weight: bold;
+  font-family: var(--font-serif);
+  flex-shrink: 0;
+}
+.ms-W { background: #f8f4e0; color: #8a6d20; border: 1px solid #c9a84c; }
+.ms-U { background: #1a74bd; color: #fff; }
+.ms-B { background: #383838; color: #ccc; }
+.ms-R { background: #cc2222; color: #fff; }
+.ms-G { background: #0a7040; color: #fff; }
+.ms-C { background: #bab4b0; color: #444; }
+.ms-X { background: #666; color: #fff; }
+.ms-n { background: #888; color: #fff; }
+
+.card-type {
+  font-size: 0.65rem;
+  color: #5a5040;
+  font-style: italic;
+  border-top: 1px solid rgba(0,0,0,0.12);
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+  padding: 2px 0;
+}
+.card-rules-text {
+  font-size: 0.63rem;
+  color: #3a3020;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+.card-pt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+}
+.card-pt {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--card-border);
+  padding: 1px 6px;
+  border: 1px solid #a09078;
+  letter-spacing: 0.03em;
+  color: #2c2a24;
+}
+.card-counter-badge {
+  background: #2c2a24;
+  color: var(--gold-bright);
+  border: 1.5px solid var(--gold-dim);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+.card-counter-badge.zero { opacity: 0.3; }
+
+.card-notes-text {
+  font-size: 0.6rem;
+  color: #7a6050;
+  font-style: italic;
+  padding: 1px 2px;
+}
+
+.card-btn-row {
+  display: flex;
+  gap: 2px;
+  padding: 4px 5px;
+  background: rgba(0,0,0,0.08);
+  border-top: 1px solid rgba(0,0,0,0.12);
+  flex-wrap: wrap;
+}
+.card-btn {
+  flex: 1;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(0,0,0,0.18);
+  color: #4a4038;
+  font-size: 0.65rem;
+  padding: 3px 0;
+  cursor: pointer;
+  font-family: var(--font-serif);
+  transition: background 0.1s, color 0.1s;
+  min-width: 22px;
+  text-align: center;
+}
+.card-btn:hover { background: rgba(0,0,0,0.3); color: #2c1a10; }
+.card-btn.tap-btn { color: #1a4080; }
+.card-btn.tap-btn:hover { background: #ddeeff; color: #0a2860; }
+.card-btn.remove-btn { color: #802020; }
+.card-btn.remove-btn:hover { background: #ffe0e0; color: #500a0a; }
+.card-btn.cmd-return-btn { color: #806020; font-size: 0.6rem; }
+.card-btn.cmd-return-btn:hover { background: #fff0d0; color: #604010; }
+
+/* GRAVEYARD / EXILE STRIPS */
+#zones-row {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid #1e2228;
+  flex-shrink: 0;
+}
+.zone-strip {
+  flex: 1;
+  background: #0e1116;
+  border-right: 1px solid #1e2228;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s;
+}
+.zone-strip:last-child { border-right: none; }
+.zone-strip:hover { background: #141820; }
+.zone-strip-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.zone-strip-count {
+  font-size: 0.85rem;
+  color: var(--text-bright);
+  background: #2a2e38;
+  padding: 1px 7px;
+  border-radius: 2px;
+}
+.zone-strip.exile-strip .zone-strip-label { color: #9b8b7b; }
+
+/* ZONE PANEL (expanded) */
+.zone-panel {
+  display: none;
+  flex-direction: column;
+  background: #0e1116;
+  border-top: 1px solid #2a2820;
+  max-height: 220px;
+  overflow: hidden;
+}
+.zone-panel.open { display: flex; }
+.zone-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid #1e2228;
+}
+.zone-panel-title { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+.zone-panel-cards {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  overflow-x: auto;
+  flex: 1;
+}
+.zone-mini-card {
+  background: #1a1e24;
+  border: 1px solid #2a2e38;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  color: var(--text-main);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: background 0.1s;
+}
+.zone-mini-card:hover { background: #22282e; }
+.zone-mini-card.exile-card { filter: grayscale(40%); opacity: 0.8; }
+.zone-mini-card-name { font-size: 0.72rem; color: var(--text-main); }
+.zone-mini-card-type { font-size: 0.62rem; color: var(--text-muted); font-style: italic; }
+
+/* RIGHT COLUMN */
+#right-col {
+  background: var(--sidebar);
+  border-left: 1px solid #1e2228;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.right-section {
+  padding: 12px 14px;
+  border-bottom: 1px solid #1e2228;
+  flex-shrink: 0;
+}
+.right-section-title {
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* MANA POOL */
+.mana-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-bottom: 8px;
+}
+.mana-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #0e1116;
+  border: 1px solid #2a2e38;
+  padding: 6px 4px;
+  gap: 4px;
+  border-radius: 2px;
+}
+.mana-cell-sym {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: var(--font-serif);
+  cursor: pointer;
+  transition: transform 0.1s, filter 0.1s;
+  flex-shrink: 0;
+}
+.mana-cell-sym:hover { transform: scale(1.1); filter: brightness(1.2); }
+.mana-W-c { background: #f8f4e0; color: #8a6d20; border: 1.5px solid #c9a84c; }
+.mana-U-c { background: #1a74bd; color: #fff; }
+.mana-B-c { background: #383838; color: #ccc; border: 1.5px solid #666; }
+.mana-R-c { background: #cc2222; color: #fff; }
+.mana-G-c { background: #0a7040; color: #fff; }
+.mana-C-c { background: #bab4b0; color: #444; border: 1.5px solid #999; }
+
+.mana-count {
+  font-size: 1rem;
+  color: var(--text-bright);
+  min-width: 24px;
+  text-align: center;
+  font-family: var(--font-display);
+}
+.mana-btns { display: flex; gap: 2px; }
+.mana-btn {
+  background: #1e2228;
+  border: 1px solid #2a2e38;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  width: 20px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.1s, color 0.1s;
+}
+.mana-btn:hover { background: #2a2e38; color: var(--text-bright); }
+
+/* COUNTERS */
+.counter-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+.counter-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.counter-icon { font-size: 0.8rem; }
+.counter-value {
+  font-size: 0.95rem;
+  color: var(--text-bright);
+  min-width: 28px;
+  text-align: center;
+  font-family: var(--font-display);
+}
+.counter-btns { display: flex; gap: 3px; }
+.counter-btn {
+  background: #1a1e24;
+  border: 1px solid #2a2e38;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.1s;
+}
+.counter-btn:hover { background: #2a2e38; color: var(--text-bright); }
+.counter-warning { color: #ff8040; }
+.counter-danger { color: #ff4040; animation: pulse 1.5s ease-in-out infinite; }
+
+/* COMMANDER DAMAGE */
+#commander-damage-section { display: none; }
+#commander-damage-section.visible { display: block; }
+.cmd-dmg-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+.cmd-dmg-opponent {
+  background: #0e1116;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-serif);
+  font-size: 0.7rem;
+  padding: 3px 6px;
+  width: 80px;
+  border-bottom: 1px solid #3a3430;
+  outline: none;
+}
+.cmd-dmg-opponent:focus { border-bottom-color: var(--gold-dim); color: var(--text-main); }
+.cmd-dmg-value {
+  font-size: 0.9rem;
+  min-width: 26px;
+  text-align: center;
+  color: var(--text-bright);
+  font-family: var(--font-display);
+}
+.cmd-dmg-value.warning { color: #ff8040; }
+.cmd-dmg-value.lethal { color: #ff4040; font-weight: bold; }
+
+/* TOGGLE STATES */
+.state-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: #0e1116;
+  border: 1px solid #1e2228;
+  cursor: pointer;
+  margin-bottom: 5px;
+  transition: background 0.15s;
+  border-radius: 2px;
+}
+.state-toggle:hover { background: #141820; }
+.state-toggle.active { background: #1a1608; border-color: var(--gold-dim); }
+.state-toggle-label { font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.state-toggle.active .state-toggle-label { color: var(--gold); }
+.state-toggle-indicator {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #2a2e38;
+  border: 1px solid #3a3e48;
+}
+.state-toggle.active .state-toggle-indicator {
+  background: var(--gold);
+  box-shadow: 0 0 6px rgba(201,168,76,0.5);
+}
+
+/* ACTIVITY LOG */
+#activity-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 14px;
+}
+.log-entry {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  padding: 3px 0;
+  border-bottom: 1px solid #1e2228;
+  line-height: 1.3;
+}
+.log-entry:first-child { color: var(--text-main); }
+
+/* CARD DETAIL MODAL */
+.card-detail-inner {
+  display: flex;
+  gap: 24px;
+}
+.card-detail-art {
+  width: 180px;
+  flex-shrink: 0;
+  border: 1px solid var(--card-border);
+}
+.card-detail-art img { width: 100%; display: block; }
+.card-detail-info { flex: 1; }
+.card-detail-name { font-size: 1.15rem; color: var(--gold); margin-bottom: 4px; font-family: var(--font-display); }
+.card-detail-cost { margin-bottom: 8px; }
+.card-detail-type { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-bottom: 10px; }
+.card-detail-text { font-size: 0.82rem; color: var(--text-main); line-height: 1.6; margin-bottom: 12px; }
+.card-detail-pt { font-size: 0.9rem; color: var(--text-bright); }
+
+/* SCAN MODAL */
+.scan-input {
+  width: 100%;
+  background: #0e1116;
+  border: 1px solid #3a3430;
+  border-bottom: 2px solid var(--gold-dim);
+  color: var(--text-bright);
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  padding: 10px 14px;
+  outline: none;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+  border-radius: 2px 4px 0 0;
+}
+.scan-input:focus { border-bottom-color: var(--gold); }
+
+/* TOKEN MODAL */
+.token-form { display: flex; flex-direction: column; gap: 12px; }
+.form-row { display: flex; gap: 10px; align-items: center; }
+.form-label { font-size: 0.74rem; color: var(--text-muted); min-width: 80px; }
+.form-input {
+  flex: 1;
+  background: #0e1116;
+  border: 1px solid #2a2e38;
+  border-bottom: 1.5px solid #3a3430;
+  color: var(--text-bright);
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  padding: 6px 10px;
+  outline: none;
+  border-radius: 2px 2px 0 0;
+}
+.form-input:focus { border-bottom-color: var(--gold-dim); }
+.form-input::placeholder { color: var(--text-muted); font-style: italic; }
+
+/* RESPONSIVE - tablet */
+@media (max-width: 900px) {
+  #main-layout { grid-template-columns: 200px 1fr; }
+  #right-col { display: none; }
+}
+@media (max-width: 640px) {
+  #main-layout { grid-template-columns: 1fr; }
+  #left-col { display: none; }
+  .topbar-logo { font-size: 0.95rem; }
+}
+
+/* DRAG INDICATOR */
+.bf-card.drag-over { outline: 2px dashed var(--gold); opacity: 0.7; }
+.bf-card[draggable="true"] { cursor: grab; }
+
+/* MISC */
+.flex-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.mt8 { margin-top: 8px; }
+.hidden { display: none !important; }
+.text-muted { color: var(--text-muted); font-size: 0.75rem; font-style: italic; }
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal-box" style="text-align:center;padding:48px 40px;">
+    <div class="app-logo">MTG IRL</div>
+    <div class="app-tagline">Real-World Card Tracker</div>
+    <input type="text" class="login-input" id="login-username" placeholder="Enter your name..." maxlength="32" autocomplete="off" autofocus>
+    <div style="margin-top:12px;">
+      <button class="btn primary" style="width:100%;padding:12px;" onclick="doLogin()">Enter the Game</button>
+    </div>
+    <div style="margin-top:16px;font-size:0.72rem;color:var(--text-muted);">State persists across sessions.</div>
+  </div>
+</div>
+
+<!-- MODE SELECT MODAL -->
+<div class="modal-overlay hidden" id="mode-modal">
+  <div class="modal-box wide">
+    <div class="modal-title">Select Game Format</div>
+    <div id="mode-grid-container"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn" onclick="closeModeModal()">Cancel</button>
+      <button class="btn primary" onclick="confirmMode()">Confirm Format</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOKEN MODAL -->
+<div class="modal-overlay hidden" id="token-modal">
+  <div class="modal-box">
+    <div class="modal-title">Create Token</div>
+    <div class="token-form">
+      <div class="form-row">
+        <span class="form-label">Name</span>
+        <input class="form-input" id="tok-name" placeholder="Goblin" value="Goblin">
+      </div>
+      <div class="form-row">
+        <span class="form-label">Type</span>
+        <input class="form-input" id="tok-type" placeholder="Token Creature - Goblin" value="Token Creature - Goblin">
+      </div>
+      <div class="form-row">
+        <span class="form-label">Power</span>
+        <input class="form-input" id="tok-power" type="number" value="1" min="0" max="99">
+        <span class="form-label" style="min-width:50px;">Toughness</span>
+        <input class="form-input" id="tok-tough" type="number" value="1" min="0" max="99">
+      </div>
+      <div class="form-row">
+        <span class="form-label">Color</span>
+        <select class="form-input" id="tok-color" style="cursor:pointer;">
+          <option value="">Colorless</option>
+          <option value="W">White</option>
+          <option value="U">Blue</option>
+          <option value="B">Black</option>
+          <option value="R">Red</option>
+          <option value="G">Green</option>
+          <option value="WU">Azorius (W/U)</option>
+          <option value="WB">Orzhov (W/B)</option>
+          <option value="UB">Dimir (U/B)</option>
+          <option value="UR">Izzet (U/R)</option>
+          <option value="BR">Rakdos (B/R)</option>
+          <option value="BG">Golgari (B/G)</option>
+          <option value="RG">Gruul (R/G)</option>
+          <option value="RW">Boros (R/W)</option>
+          <option value="GW">Selesnya (G/W)</option>
+          <option value="GU">Simic (G/U)</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <span class="form-label">Abilities</span>
+        <input class="form-input" id="tok-text" placeholder="Flying, Haste (optional)">
+      </div>
+      <div class="form-row">
+        <span class="form-label">Count</span>
+        <input class="form-input" id="tok-count" type="number" value="1" min="1" max="20">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;">
+      <button class="btn" onclick="closeModal('token-modal')">Cancel</button>
+      <button class="btn primary" onclick="submitToken()">Create Token</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCAN MODAL -->
+<div class="modal-overlay hidden" id="scan-modal">
+  <div class="modal-box">
+    <div class="modal-title">Scan Card ID</div>
+    <input class="scan-input" id="scan-input" placeholder="Enter card ID from QR code..." autofocus>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn primary" onclick="submitScan()" style="flex:1;">Look Up</button>
+      <button class="btn" onclick="closeModal('scan-modal')">Cancel</button>
+    </div>
+    <div id="scan-result" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- CARD DETAIL MODAL -->
+<div class="modal-overlay hidden" id="card-detail-modal">
+  <div class="modal-box wide">
+    <div class="modal-title" id="card-detail-title">Card Detail</div>
+    <div class="card-detail-inner" id="card-detail-inner"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;">
+      <button class="btn primary" id="card-detail-add-btn" onclick="addCardFromDetail()">Add to Battlefield</button>
+      <button class="btn" onclick="closeModal('card-detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ZONE VIEWER MODAL -->
+<div class="modal-overlay hidden" id="zone-modal">
+  <div class="modal-box wide">
+    <div class="modal-title" id="zone-modal-title">Zone</div>
+    <div id="zone-modal-cards" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;max-height:60vh;overflow-y:auto;"></div>
+    <div style="text-align:right;"><button class="btn" onclick="closeModal('zone-modal')">Close</button></div>
+  </div>
+</div>
+
+<!-- RESET CONFIRM MODAL -->
+<div class="modal-overlay hidden" id="reset-modal">
+  <div class="modal-box">
+    <div class="modal-title">Reset Game</div>
+    <p style="color:var(--text-main);margin-bottom:8px;font-size:0.88rem;">This will clear the battlefield, graveyard, exile, and reset all counters. Your deck and commanders will be preserved.</p>
+    <p style="color:var(--text-muted);margin-bottom:20px;font-size:0.78rem;font-style:italic;">You can optionally change format before resetting.</p>
+    <div id="reset-mode-section" style="margin-bottom:16px;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn" onclick="closeModal('reset-modal')">Cancel</button>
+      <button class="btn danger" onclick="confirmReset()">Reset Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- SET LIFE MODAL -->
+<div class="modal-overlay hidden" id="life-modal">
+  <div class="modal-box" style="max-width:320px;">
+    <div class="modal-title">Set Life Total</div>
+    <input class="form-input" type="number" id="life-input" style="width:100%;font-size:1.2rem;text-align:center;margin-bottom:16px;" min="-999" max="999">
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn" onclick="closeModal('life-modal')">Cancel</button>
+      <button class="btn primary" onclick="confirmSetLife()">Set Life</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="topbar-logo">MTG IRL</div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-user">Player: <span id="topbar-username">—</span></div>
+    <div class="mode-badge" id="mode-badge" onclick="openModeModal()" title="Click to change format">Commander / EDH</div>
+    <div class="topbar-divider"></div>
+    <div class="turn-indicator" id="turn-indicator"></div>
+    <div class="topbar-spacer"></div>
+    <div class="life-display">
+      <div class="btn-life" onclick="adjustLife(-1)" title="Lose 1 life">-</div>
+      <div class="life-number" id="life-display" onclick="openLifeModal()" title="Click to set exact life">40</div>
+      <div class="btn-life" onclick="adjustLife(1)" title="Gain 1 life">+</div>
+    </div>
+    <div class="topbar-divider"></div>
+    <button class="btn sm" onclick="openModal('reset-modal')">Reset</button>
+    <button class="btn sm" onclick="openScanModal()">Scan</button>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div id="main-layout">
+
+    <!-- LEFT: DECK -->
+    <div id="left-col">
+      <div class="left-col-header">
+        <h3>Deck</h3>
+        <input type="text" class="deck-filter" id="deck-filter" placeholder="Filter cards..." oninput="filterDeck(this.value)">
+      </div>
+      <div id="deck-list">
+        <div style="padding:20px;color:var(--text-muted);font-size:0.78rem;font-style:italic;text-align:center;">No deck loaded.</div>
+      </div>
+      <div class="left-col-actions">
+        <label class="btn full" style="cursor:pointer;display:flex;align-items:center;gap:6px;">
+          <span>Upload Deck JSON</span>
+          <input type="file" accept=".json" style="display:none;" onchange="handleDeckUpload(this)">
+        </label>
+        <button class="btn full" onclick="loadDefaultDeck()">Load Starter Deck</button>
+      </div>
+    </div>
+
+    <!-- CENTER: BATTLEFIELD -->
+    <div id="center-col">
+      <!-- Commander Zone -->
+      <div id="commander-zone-bar">
+        <span class="commander-zone-label">Command Zone</span>
+        <div id="commander-zone-cards"></div>
+        <button class="btn sm" onclick="openAddCommanderModal()" title="Set commander from deck">+ Set Commander</button>
+      </div>
+
+      <!-- Battlefield -->
+      <div id="battlefield-scroll">
+        <div id="battlefield-grid" class="empty-state">
+          <div class="empty-battlefield-msg">
+            <div>No permanents in play.</div>
+            <div style="font-size:0.78rem;">Click a card in the deck list to add it.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone strips -->
+      <div id="zones-row">
+        <div class="zone-strip" onclick="toggleZonePanel('graveyard')">
+          <span class="zone-strip-label">Graveyard</span>
+          <span class="zone-strip-count" id="gy-count">0</span>
+        </div>
+        <div class="zone-strip exile-strip" onclick="toggleZonePanel('exile')">
+          <span class="zone-strip-label">Exile</span>
+          <span class="zone-strip-count" id="exile-count">0</span>
+        </div>
+        <div class="zone-strip" onclick="toggleZonePanel('hand')" style="flex:0.6;">
+          <span class="zone-strip-label">Hand</span>
+          <span class="zone-strip-count" id="hand-count">0</span>
+        </div>
+      </div>
+      <div class="zone-panel" id="zone-panel-graveyard">
+        <div class="zone-panel-header">
+          <span class="zone-panel-title">Graveyard</span>
+          <button class="btn sm" onclick="closeZonePanels()">Close</button>
+        </div>
+        <div class="zone-panel-cards" id="gy-panel-cards"></div>
+      </div>
+      <div class="zone-panel" id="zone-panel-exile">
+        <div class="zone-panel-header">
+          <span class="zone-panel-title">Exile</span>
+          <button class="btn sm" onclick="closeZonePanels()">Close</button>
+        </div>
+        <div class="zone-panel-cards" id="exile-panel-cards"></div>
+      </div>
+      <div class="zone-panel" id="zone-panel-hand">
+        <div class="zone-panel-header">
+          <span class="zone-panel-title">Hand</span>
+          <button class="btn sm" onclick="closeZonePanels()">Close</button>
+        </div>
+        <div class="zone-panel-cards" id="hand-panel-cards"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: CONTROLS -->
+    <div id="right-col">
+
+      <!-- MANA POOL -->
+      <div class="right-section">
+        <div class="right-section-title">Mana Pool</div>
+        <div class="mana-grid" id="mana-grid"></div>
+        <button class="btn sm full" onclick="clearMana()">Clear Mana Pool</button>
+      </div>
+
+      <!-- COUNTERS -->
+      <div class="right-section">
+        <div class="right-section-title">Counters</div>
+        <div id="counters-panel"></div>
+      </div>
+
+      <!-- COMMANDER DAMAGE -->
+      <div class="right-section" id="commander-damage-section">
+        <div class="right-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Commander Damage</span>
+          <button class="btn sm" onclick="addCmdDmgRow()" style="padding:2px 7px;">+ Opponent</button>
+        </div>
+        <div id="cmd-dmg-rows"></div>
+        <div id="cmd-tax-display" style="font-size:0.7rem;color:var(--gold-dim);margin-top:6px;"></div>
+      </div>
+
+      <!-- STATE TOGGLES -->
+      <div class="right-section">
+        <div class="right-section-title">Status</div>
+        <div class="state-toggle" id="monarch-toggle" onclick="toggleMonarch()">
+          <span class="state-toggle-label">Monarch</span>
+          <div class="state-toggle-indicator"></div>
+        </div>
+        <div class="state-toggle" id="initiative-toggle" onclick="toggleInitiative()">
+          <span class="state-toggle-label">Initiative</span>
+          <div class="state-toggle-indicator"></div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="right-section">
+        <div class="right-section-title">Actions</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <button class="btn full green" onclick="endTurn()">End Turn</button>
+          <button class="btn full" onclick="untapAll()">Untap All</button>
+          <button class="btn full" onclick="openModal('token-modal')">Create Token</button>
+          <button class="btn full" onclick="clearTokens()">Clear Tokens</button>
+          <button class="btn full" onclick="openScanModal()">Scan Card</button>
+        </div>
+      </div>
+
+      <!-- ACTIVITY LOG -->
+      <div class="right-section" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="right-section-title">Activity Log</div>
+        <div id="activity-log" style="flex:1;overflow-y:auto;font-size:0.66rem;"></div>
+      </div>
+    </div>
+
+  </div><!-- end main-layout -->
+</div><!-- end app -->
+
+<script>
+// ---- STATE ----
+let S = {};           // server state mirror
+let username = '';
+let selectedMode = 'commander';
+let pendingDetailCard = null;  // for card-detail modal "add to battlefield"
+let focusedInstanceId = null;  // for keyboard shortcuts
+let dragSrcId = null;
+let cmdDmgOpponents = ['Opponent 1'];
+
+const MODES = {
+  standard:        { name:'Standard',         life:20,  deck:60,  cmd:false, desc:'Current sets. 60 cards.' },
+  historic:        { name:'Historic',          life:20,  deck:60,  cmd:false, desc:'All Arena-legal cards.' },
+  timeless:        { name:'Timeless',          life:20,  deck:60,  cmd:false, desc:'Near-unrestricted Arena.' },
+  explorer:        { name:'Explorer',          life:20,  deck:60,  cmd:false, desc:'Arena Pioneer equivalent.' },
+  pioneer:         { name:'Pioneer',           life:20,  deck:60,  cmd:false, desc:'Post-Khans. No Fetch Lands.' },
+  modern:          { name:'Modern',            life:20,  deck:60,  cmd:false, desc:'8th Ed+. Powerful staples.' },
+  legacy:          { name:'Legacy',            life:20,  deck:60,  cmd:false, desc:'Duals and Fetches legal.' },
+  vintage:         { name:'Vintage',           life:20,  deck:60,  cmd:false, desc:'Power 9 legal. Restricted list.' },
+  pauper:          { name:'Pauper',            life:20,  deck:60,  cmd:false, desc:'Common cards only.' },
+  commander:       { name:'Commander / EDH',   life:40,  deck:100, cmd:true,  desc:'100-card singleton. 40 life.' },
+  brawl:           { name:'Brawl',             life:25,  deck:60,  cmd:true,  desc:'Standard singleton. 25 life.' },
+  historic_brawl:  { name:'Historic Brawl',    life:25,  deck:100, cmd:true,  desc:'Historic singleton. 25 life.' },
+  oathbreaker:     { name:'Oathbreaker',       life:20,  deck:60,  cmd:true,  desc:'Planeswalker commander + sig spell.' },
+  duel_commander:  { name:'Duel Commander',    life:20,  deck:100, cmd:true,  desc:'1v1. 20 life. Strict bans.' },
+  draft:           { name:'Draft / Sealed',    life:20,  deck:40,  cmd:false, desc:'40-card limited format.' },
+  two_headed_giant:{ name:'Two-Headed Giant',  life:30,  deck:60,  cmd:false, desc:'Team format. Shared 30 life.' },
+};
+
+const MANA_COLORS = ['W','U','B','R','G','C'];
+const MANA_LABELS = {W:'White',U:'Blue',B:'Black',R:'Red',G:'Green',C:'Colorless'};
+
+const DEFAULT_DECK = {
+  name: "Starter Deck",
+  cards: [
+    { id:"goblin_guide",    name:"Goblin Guide",      mana_cost:"R",    type:"Creature - Goblin Scout",       text:"Haste. Whenever Goblin Guide attacks, defending player reveals the top card of their library. If it's a land, that player puts it into their hand.",        art_url:"https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=426069&type=card",  power:2, toughness:2 },
+    { id:"llanowar_elves",  name:"Llanowar Elves",    mana_cost:"G",    type:"Creature - Elf Druid",          text:"{T}: Add {G}.",                                                                                                                                          art_url:"https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=447085&type=card",  power:1, toughness:1 },
+    { id:"counterspell",    name:"Counterspell",       mana_cost:"UU",   type:"Instant",                       text:"Counter target spell.",                                                                                                                                  art_url:"https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=382989&type=card",  power:null, toughness:null },
+    { id:"serra_angel",     name:"Serra Angel",        mana_cost:"3WW",  type:"Creature - Angel",              text:"Flying, vigilance",                                                                                                                                      art_url:"https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=426024&type=card",  power:4, toughness:4 },
+    { id:"lightning_bolt",  name:"Lightning Bolt",     mana_cost:"R",    type:"Instant",                       text:"Lightning Bolt deals 3 damage to any target.",                                                                                                           art_url:"https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=469854&type=card",  power:null, toughness:null },
+    { id:"wrath_of_god",    name:"Wrath of God",       mana_cost:"2WW",  type:"Sorcery",                       text:"Destroy all creatures. They can't be regenerated.",                                                                                                      art_url:"https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=413580&type=card",  power:null, toughness:null },
+    { id:"sol_ring",        name:"Sol Ring",           mana_cost:"1",    type:"Artifact",                      text:"{T}: Add {C}{C}.",                                                                                                                                        art_url:"https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=492774&type=card",  power:null, toughness:null },
+    { id:"birds_of_paradise",name:"Birds of Paradise", mana_cost:"G",    type:"Creature - Bird",               text:"Flying. {T}: Add one mana of any color.",                                                                                                                art_url:"https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=489516&type=card",  power:0, toughness:1 },
+    { id:"dark_ritual",     name:"Dark Ritual",        mana_cost:"B",    type:"Instant",                       text:"Add {B}{B}{B}.",                                                                                                                                          art_url:"https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=382850&type=card",  power:null, toughness:null },
+    { id:"giant_growth",    name:"Giant Growth",       mana_cost:"G",    type:"Instant",                       text:"Target creature gets +3/+3 until end of turn.",                                                                                                           art_url:"https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=447201&type=card",  power:null, toughness:null },
+  ]
+};
+
+// ---- API ----
+async function api(method, path, body) {
+  try {
+    const opts = { method, headers: {'Content-Type':'application/json'} };
+    if (body && method !== 'GET') opts.body = JSON.stringify(body);
+    const r = await fetch(path, opts);
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({detail: r.statusText}));
+      console.error('API error:', path, err);
+      return null;
+    }
+    return await r.json();
+  } catch(e) {
+    console.warn('Network error:', e);
+    return null;
+  }
+}
+
+// ---- LOGIN ----
+document.getElementById('login-username').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const u = document.getElementById('login-username').value.trim();
+  if(!u) return;
+  const res = await api('POST', '/login', {username: u});
+  if(!res) return alert('Could not connect to server. Make sure the backend is running.');
+  username = res.username;
+  selectedMode = res.game_mode || 'commander';
+  closeModal('login-modal');
+  await loadState();
+  document.getElementById('app').classList.add('visible');
+}
+
+// ---- STATE ----
+async function loadState() {
+  const data = await api('GET', `/get_state/${username}`);
+  if(!data) return;
+  S = data;
+  selectedMode = S.game_mode || 'commander';
+  renderAll();
+}
+
+function renderAll() {
+  updateTopbar();
+  renderBattlefield();
+  renderDeckList();
+  renderManaPool();
+  renderCounters();
+  renderCommanderZone();
+  renderCommanderDamage();
+  renderZoneCounts();
+  renderZonePanels();
+  renderStatusToggles();
+  renderActivityLog();
+}
+
+// ---- TOPBAR ----
+function updateTopbar() {
+  document.getElementById('topbar-username').textContent = username;
+  const m = MODES[S.game_mode] || MODES.commander;
+  document.getElementById('mode-badge').textContent = m.name;
+  const life = S.life_total || 0;
+  const el = document.getElementById('life-display');
+  el.textContent = life;
+  el.className = 'life-number' + (life <= 5 ? ' critical' : life <= 10 ? ' danger' : '');
+  const t = S.turn_player;
+  document.getElementById('turn-indicator').innerHTML = t ? `Turn: <span>${t}</span>` : '';
+}
+
+// ---- DECK LIST ----
+function renderDeckList(filter) {
+  const el = document.getElementById('deck-list');
+  const deck = S.deck;
+  if(!deck || !deck.cards || !deck.cards.length) {
+    el.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:0.78rem;font-style:italic;text-align:center;">No deck loaded.<br>Upload a deck or load the starter.</div>';
+    return;
+  }
+  let cards = deck.cards;
+  if(filter) {
+    const f = filter.toLowerCase();
+    cards = cards.filter(c => c.name.toLowerCase().includes(f) || (c.type||'').toLowerCase().includes(f));
+  }
+  el.innerHTML = cards.map(c => `
+    <div class="deck-card-item" onclick="addToBattlefield('${c.id}')" title="Add ${c.name} to battlefield">
+      ${c.art_url
+        ? `<img class="deck-thumb" src="${c.art_url}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : `<div class="deck-thumb-placeholder">${c.name[0]}</div>`}
+      <div class="deck-card-info">
+        <div class="deck-card-name">${c.name}</div>
+        <div class="deck-card-type">${c.type || ''}</div>
+      </div>
+      <div class="deck-card-cost">${c.mana_cost || ''}</div>
+    </div>
+  `).join('');
+}
+
+function filterDeck(v) { renderDeckList(v); }
+
+// ---- MANA POOL ----
+function renderManaPool() {
+  const pool = S.mana_pool || {};
+  document.getElementById('mana-grid').innerHTML = MANA_COLORS.map(c => `
+    <div class="mana-cell">
+      <div class="mana-cell-sym mana-${c}-c" onclick="adjustMana('${c}',1)" title="Add ${MANA_LABELS[c]}">${c}</div>
+      <div class="mana-count" id="mana-${c}">${pool[c]||0}</div>
+      <div class="mana-btns">
+        <div class="mana-btn" onclick="adjustMana('${c}',-1)">-</div>
+        <div class="mana-btn" onclick="adjustMana('${c}',1)">+</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---- COUNTERS ----
+function renderCounters() {
+  const counters = [
+    { key:'poison_counters',    label:'Poison',      icon:'☠', warning:7, danger:10 },
+    { key:'energy_counters',    label:'Energy',      icon:'⚡', warning:999, danger:999 },
+    { key:'storm_count',        label:'Storm',       icon:'⛈', warning:999, danger:999 },
+    { key:'experience_counters',label:'Experience',  icon:'◈',  warning:999, danger:999 },
+    { key:'rad_counters',       label:'Rad',         icon:'☢', warning:3, danger:5 },
+  ];
+  const m = MODES[S.game_mode] || MODES.commander;
+  const poisonThreshold = S.game_mode === 'two_headed_giant' ? 15 : 10;
+  document.getElementById('counters-panel').innerHTML = counters.map(({key,label,icon,warning,danger}) => {
+    const v = S[key] || 0;
+    const cls = key==='poison_counters' && v >= poisonThreshold ? ' counter-danger' : key==='poison_counters' && v >= warning ? ' counter-warning' : '';
+    return `<div class="counter-row">
+      <div class="counter-label"><span class="counter-icon">${icon}</span>${label}</div>
+      <div class="counter-value${cls}">${v}</div>
+      <div class="counter-btns">
+        <div class="counter-btn" onclick="adjustCounter('${key}',-1)">-</div>
+        <div class="counter-btn" onclick="adjustCounter('${key}',1)">+</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- COMMANDER ZONE ----
+function renderCommanderZone() {
+  const m = MODES[S.game_mode] || MODES.commander;
+  const bar = document.getElementById('commander-zone-bar');
+  if(!m.cmd) { bar.classList.remove('visible'); return; }
+  bar.classList.add('visible');
+  const cmds = S.commander_zone || [];
+  const tax = S.command_tax || 0;
+  document.getElementById('commander-zone-cards').innerHTML = cmds.map(cmd => `
+    <div class="commander-card-mini" onclick="castCommander('${cmd.instance_id}')" title="Cast ${cmd.card_data.name}">
+      <div class="cmd-name">${cmd.card_data.name}</div>
+      <div class="cmd-tax">${cmd.cast_count > 0 ? `+${cmd.cast_count*2} tax` : 'Free'} | Casts: ${cmd.cast_count}</div>
+    </div>
+  `).join('') || '<span style="color:var(--text-muted);font-size:0.72rem;font-style:italic;">No commander set. Click + Set Commander.</span>';
+}
+
+// ---- COMMANDER DAMAGE ----
+function renderCommanderDamage() {
+  const m = MODES[S.game_mode] || MODES.commander;
+  const sec = document.getElementById('commander-damage-section');
+  if(!m.cmd) { sec.classList.remove('visible'); return; }
+  sec.classList.add('visible');
+  const dmg = S.commander_damage || {};
+  const tax = S.command_tax || 0;
+  document.getElementById('cmd-tax-display').textContent = tax > 0 ? `Command tax: +${tax} generic mana` : '';
+  const container = document.getElementById('cmd-dmg-rows');
+  if(!Object.keys(dmg).length && !cmdDmgOpponents.length) {
+    container.innerHTML = '<div class="text-muted">Add opponents to track damage.</div>';
+    return;
+  }
+  // Ensure all opponents in cmdDmgOpponents are shown
+  const all = [...new Set([...cmdDmgOpponents, ...Object.keys(dmg)])];
+  container.innerHTML = all.map((opp, i) => {
+    const v = dmg[opp] || 0;
+    const cls = v >= 21 ? ' lethal' : v >= 18 ? ' warning' : '';
+    return `<div class="cmd-dmg-row" data-opp="${opp}">
+      <input class="cmd-dmg-opponent" value="${opp}" onblur="renameOpponent(this, '${opp}')" style="color:var(--text-main);">
+      <div class="cmd-dmg-value${cls}" id="cdmg-${i}">${v}</div>
+      <div class="counter-btns">
+        <div class="counter-btn" onclick="adjustCmdDmg('${opp}',-1)">-</div>
+        <div class="counter-btn" onclick="adjustCmdDmg('${opp}',1)">+</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renameOpponent(input, oldName) {
+  const newName = input.value.trim();
+  if(!newName || newName === oldName) return;
+  const i = cmdDmgOpponents.indexOf(oldName);
+  if(i >= 0) cmdDmgOpponents[i] = newName;
+  const v = S.commander_damage?.[oldName] || 0;
+  if(S.commander_damage) {
+    delete S.commander_damage[oldName];
+    S.commander_damage[newName] = v;
+  }
+  renderCommanderDamage();
+}
+
+function addCmdDmgRow() {
+  const n = cmdDmgOpponents.length + 1;
+  cmdDmgOpponents.push(`Opponent ${n}`);
+  renderCommanderDamage();
+}
+
+// ---- ZONE COUNTS ----
+function renderZoneCounts() {
+  document.getElementById('gy-count').textContent = (S.graveyard||[]).length;
+  document.getElementById('exile-count').textContent = (S.exile||[]).length;
+  document.getElementById('hand-count').textContent = (S.hand||[]).length;
+}
+
+// ---- ZONE PANELS ----
+function renderZonePanels() {
+  renderZonePanel('graveyard', S.graveyard||[], 'gy-panel-cards', false);
+  renderZonePanel('exile', S.exile||[], 'exile-panel-cards', true);
+  renderZonePanel('hand', S.hand||[], 'hand-panel-cards', false);
+}
+
+function renderZonePanel(zone, cards, containerId, isExile) {
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  if(!cards.length) {
+    el.innerHTML = '<span style="color:var(--text-muted);font-size:0.75rem;font-style:italic;">Empty</span>';
+    return;
+  }
+  el.innerHTML = cards.map(c => `
+    <div class="zone-mini-card ${isExile?'exile-card':''}" title="${c.card_data.name}">
+      <div class="zone-mini-card-name">${c.card_data.name}</div>
+      <div class="zone-mini-card-type">${c.card_data.type||''}</div>
+      ${zone === 'graveyard' ? `<div style="display:flex;gap:3px;margin-top:3px;">
+        <span class="btn sm" onclick="reanimateCard('${c.instance_id}')" style="font-size:0.62rem;padding:2px 5px;">To BF</span>
+        <span class="btn sm" onclick="exileFromGrave('${c.instance_id}')" style="font-size:0.62rem;padding:2px 5px;">Exile</span>
+      </div>` : ''}
+      ${zone === 'hand' ? `<span class="btn sm" onclick="playFromHand('${c.instance_id}')" style="font-size:0.62rem;padding:2px 5px;margin-top:3px;">Play</span>` : ''}
+    </div>
+  `).join('');
+}
+
+// ---- STATUS TOGGLES ----
+function renderStatusToggles() {
+  document.getElementById('monarch-toggle').classList.toggle('active', !!S.is_monarch);
+  document.getElementById('initiative-toggle').classList.toggle('active', !!S.has_initiative);
+}
+
+// ---- ACTIVITY LOG ----
+function renderActivityLog() {
+  const log = S.activity_log || [];
+  document.getElementById('activity-log').innerHTML = log.map(l => `<div class="log-entry">${l}</div>`).join('') || '<div class="log-entry" style="color:var(--text-muted);">No actions yet.</div>';
+}
+
+// ---- MANA SYMBOLS ----
+function parseMana(cost) {
+  if(!cost) return '';
+  return String(cost).replace(/([WUBRGC]|\d+|X)/g, tok => {
+    const t = tok.toUpperCase();
+    const cls = ['W','U','B','R','G','C'].includes(t) ? `ms-${t}` : isNaN(t) ? 'ms-X' : 'ms-n';
+    return `<span class="mana-sym ${cls}">${tok}</span>`;
+  });
+}
+
+// ---- BATTLEFIELD ----
+function renderBattlefield() {
+  const grid = document.getElementById('battlefield-grid');
+  const cards = S.battlefield || [];
+  if(!cards.length) {
+    grid.classList.add('empty-state');
+    grid.innerHTML = `<div class="empty-battlefield-msg">
+      <div>No permanents in play.</div>
+      <div style="font-size:0.78rem;margin-top:4px;">Click a card in the deck list to add it.</div>
+    </div>`;
+    return;
+  }
+  grid.classList.remove('empty-state');
+  grid.innerHTML = cards.map(inst => buildCardHTML(inst)).join('');
+  // attach drag events
+  grid.querySelectorAll('.bf-card').forEach(el => {
+    el.addEventListener('dragstart', e => { dragSrcId = el.dataset.id; el.style.opacity='0.5'; });
+    el.addEventListener('dragend', e => { el.style.opacity='1'; });
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', e => { el.classList.remove('drag-over'); });
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      if(dragSrcId && dragSrcId !== el.dataset.id) reorderCards(dragSrcId, el.dataset.id);
+    });
+  });
+}
+
+function buildCardHTML(inst) {
+  const cd = inst.card_data;
+  const isCreature = cd.type && (cd.type.toLowerCase().includes('creature') || cd.type.toLowerCase().includes('token'));
+  const power = cd.power !== null && cd.power !== undefined;
+  const tapped = inst.tapped;
+  const counters = inst.counters || 0;
+  const effectivePT = isCreature && power ? `${(parseInt(cd.power)||0)+counters}/${cd.toughness}` : null;
+  const m = MODES[S.game_mode] || MODES.commander;
+  return `
+  <div class="bf-card ${tapped?'tapped':''} ${inst.is_token?'is-token':''} ${inst.is_commander?'is-commander':''}"
+    data-id="${inst.instance_id}" draggable="true"
+    onclick="selectCard('${inst.instance_id}')" tabindex="0">
+    <div class="card-art-box">
+      ${cd.art_url
+        ? `<img class="card-art-img loading" src="${cd.art_url}" alt="" loading="lazy"
+            onload="this.classList.remove('loading')"
+            onerror="this.style.display='none'">`
+        : `<div class="card-art-placeholder">${cd.name}</div>`}
+      ${inst.is_commander ? `<div class="card-commander-crown">&#9812;</div>` : ''}
+      ${inst.is_token ? `<div class="card-token-badge">Token</div>` : ''}
+    </div>
+    <div class="card-body">
+      <div class="card-name-row">
+        <div class="card-name">${cd.name}</div>
+        <div class="card-mana-cost">${parseMana(cd.mana_cost)}</div>
+      </div>
+      <div class="card-type">${cd.type||''}</div>
+      <div class="card-rules-text">${cd.text||''}</div>
+      ${effectivePT || counters ? `
+      <div class="card-pt-row">
+        ${effectivePT ? `<div class="card-pt">${effectivePT}</div>` : '<div></div>'}
+        <div class="card-counter-badge ${counters===0?'zero':''}">${counters}</div>
+      </div>` : ''}
+      ${inst.notes ? `<div class="card-notes-text">${inst.notes}</div>` : ''}
+    </div>
+    <div class="card-btn-row">
+      <button class="card-btn" onclick="e=>{e.stopPropagation();counter('${inst.instance_id}',-1)}(event)">-1</button>
+      <button class="card-btn" onclick="e=>{e.stopPropagation();counter('${inst.instance_id}',1)}(event)">+1</button>
+      <button class="card-btn tap-btn" onclick="e=>{e.stopPropagation();tapCard('${inst.instance_id}')}(event)">${tapped?'Untap':'Tap'}</button>
+      ${inst.is_commander && m.cmd ? `<button class="card-btn cmd-return-btn" onclick="e=>{e.stopPropagation();returnToCommandZone('${inst.instance_id}')}(event)">Zone</button>` : ''}
+      <button class="card-btn remove-btn" onclick="e=>{e.stopPropagation();showRemoveOptions('${inst.instance_id}','${cd.name.replace(/'/g,"\\'")}',${inst.is_commander&&m.cmd})}(event)">X</button>
+    </div>
+  </div>`;
+}
+
+function selectCard(id) { focusedInstanceId = id; }
+
+function showRemoveOptions(instanceId, cardName, isCommander) {
+  const base = isCommander
+    ? ['graveyard','exile','hand','commander_zone']
+    : ['graveyard','exile','hand'];
+  const labels = {graveyard:'Graveyard',exile:'Exile',hand:'Hand',commander_zone:'Command Zone'};
+  const dest = base.map(d => `<button class="btn" onclick="removeCard('${instanceId}','${d}');closeModal('card-detail-modal')" style="width:100%;margin-bottom:4px;text-align:left;">${labels[d]}</button>`).join('');
+  document.getElementById('card-detail-title').textContent = `Move: ${cardName}`;
+  document.getElementById('card-detail-inner').innerHTML = `<div style="width:100%;"><p style="color:var(--text-muted);font-size:0.82rem;margin-bottom:12px;">Send to:</p>${dest}</div>`;
+  document.getElementById('card-detail-add-btn').style.display = 'none';
+  openModal('card-detail-modal');
+}
+
+// ---- KEYBOARD SHORTCUTS ----
+document.addEventListener('keydown', e => {
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if(!focusedInstanceId) return;
+  switch(e.key) {
+    case '+': case '=': e.preventDefault(); counter(focusedInstanceId, 1); break;
+    case '-': case '_': e.preventDefault(); counter(focusedInstanceId, -1); break;
+    case 't': case 'T': e.preventDefault(); tapCard(focusedInstanceId); break;
+    case 'Delete': case 'Backspace': e.preventDefault();
+      const inst = (S.battlefield||[]).find(c=>c.instance_id===focusedInstanceId);
+      if(inst) showRemoveOptions(focusedInstanceId, inst.card_data.name, inst.is_commander);
+      break;
+  }
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'u' && !e.ctrlKey && !e.metaKey && e.target.tagName !== 'INPUT') untapAll();
+  if(e.key === 'e' && !e.ctrlKey && !e.metaKey && e.target.tagName !== 'INPUT') endTurn();
+});
+
+// ---- DRAG REORDER ----
+function reorderCards(srcId, destId) {
+  const bf = S.battlefield || [];
+  const si = bf.findIndex(c=>c.instance_id===srcId);
+  const di = bf.findIndex(c=>c.instance_id===destId);
+  if(si<0||di<0) return;
+  const [card] = bf.splice(si,1);
+  bf.splice(di,0,card);
+  S.battlefield = bf;
+  renderBattlefield();
+}
+
+// ---- API ACTIONS ----
+async function addToBattlefield(cardId) {
+  const res = await api('POST','/add_to_battlefield',{username,card_id:cardId});
+  if(res) { S.battlefield = res.battlefield; renderBattlefield(); logLocal(`Added card to battlefield`); }
+}
+
+async function counter(instanceId, delta) {
+  const res = await api('POST','/update_counter',{username,instance_id:instanceId,delta});
+  if(res) {
+    const c = (S.battlefield||[]).find(c=>c.instance_id===instanceId);
+    if(c) c.counters = res.counters;
+    renderBattlefield();
+  }
+}
+
+async function tapCard(instanceId) {
+  const res = await api('POST','/toggle_tap',{username,instance_id:instanceId});
+  if(res) {
+    const c = (S.battlefield||[]).find(c=>c.instance_id===instanceId);
+    if(c) c.tapped = res.tapped;
+    renderBattlefield();
+  }
+}
+
+async function removeCard(instanceId, destination='graveyard') {
+  const res = await api('POST','/remove_card',{username,instance_id:instanceId,destination});
+  if(res) {
+    S = {...S, ...res};
+    await loadState();
+  }
+}
+
+async function adjustMana(color, delta) {
+  const res = await api('POST','/update_mana',{username,color,delta});
+  if(res) { S.mana_pool = res.mana_pool; renderManaPool(); }
+}
+
+async function clearMana() {
+  const res = await api('POST','/clear_mana',{username});
+  if(res) { S.mana_pool = res.mana_pool; renderManaPool(); }
+}
+
+async function adjustLife(delta) {
+  const res = await api('POST','/update_life',{username,delta});
+  if(res) { S.life_total = res.life_total; updateTopbar(); logLocal(`Life: ${delta>0?'+':''}${delta} = ${res.life_total}`); }
+}
+
+function openLifeModal() {
+  document.getElementById('life-input').value = S.life_total || 0;
+  openModal('life-modal');
+  setTimeout(()=>document.getElementById('life-input').focus(),50);
+}
+
+async function confirmSetLife() {
+  const v = parseInt(document.getElementById('life-input').value);
+  if(isNaN(v)) return;
+  const res = await api('POST','/set_life',{username,value:v});
+  if(res) { S.life_total = res.life_total; updateTopbar(); closeModal('life-modal'); }
+}
+document.getElementById('life-input').addEventListener('keydown', e => { if(e.key==='Enter') confirmSetLife(); });
+
+async function adjustCounter(key, delta) {
+  const endpoints = {
+    poison_counters:'/update_poison',
+    energy_counters:'/update_energy',
+    storm_count:'/update_storm',
+    experience_counters:'/update_experience',
+    rad_counters:'/update_rad',
+  };
+  const ep = endpoints[key];
+  if(!ep) return;
+  const res = await api('POST', ep, {username, delta});
+  if(res) { S[key] = res[key]; renderCounters(); }
+}
+
+async function adjustCmdDmg(opponent, delta) {
+  const res = await api('POST','/update_commander_damage',{username,opponent,delta});
+  if(res) { S.commander_damage = res.commander_damage; renderCommanderDamage(); }
+}
+
+async function toggleMonarch() {
+  const res = await api('POST','/toggle_monarch',{username});
+  if(res) { S.is_monarch = res.is_monarch; renderStatusToggles(); logLocal(res.is_monarch ? 'You became the Monarch.' : 'Lost the Monarch.'); }
+}
+
+async function toggleInitiative() {
+  const res = await api('POST','/toggle_initiative',{username});
+  if(res) { S.has_initiative = res.has_initiative; renderStatusToggles(); logLocal(res.has_initiative ? 'You have the Initiative.' : 'Lost the Initiative.'); }
+}
+
+async function untapAll() {
+  const res = await api('POST','/untap_all',{username});
+  if(res) { S.battlefield = res.battlefield; renderBattlefield(); logLocal('Untapped all permanents.'); }
+}
+
+async function endTurn() {
+  const res = await api('POST','/end_turn',{username});
+  if(res) {
+    S.turn_player = res.turn_player;
+    S.battlefield = res.battlefield;
+    S.mana_pool = {W:0,U:0,B:0,R:0,G:0,C:0};
+    S.storm_count = 0;
+    renderBattlefield(); renderManaPool(); renderCounters(); updateTopbar();
+  }
+}
+
+async function castCommander(instanceId) {
+  const res = await api('POST','/cast_commander',{username,instance_id:instanceId});
+  if(res) {
+    S.battlefield = res.battlefield;
+    S.commander_zone = res.commander_zone;
+    S.command_tax = res.command_tax;
+    renderCommanderZone(); renderBattlefield(); renderCommanderDamage();
+  }
+}
+
+async function returnToCommandZone(instanceId) {
+  const res = await api('POST','/return_commander_to_zone',{username,instance_id:instanceId});
+  if(res) {
+    S.battlefield = res.battlefield;
+    S.commander_zone = res.commander_zone;
+    renderBattlefield(); renderCommanderZone();
+    closeModal('card-detail-modal');
+  }
+}
+
+async function clearTokens() {
+  if(!(S.battlefield||[]).some(c=>c.is_token)) return;
+  const res = await api('DELETE','/clear_tokens',{username});
+  if(res) { S.battlefield = res.battlefield; renderBattlefield(); }
+}
+
+// ---- GRAVEYARD / EXILE ACTIONS ----
+async function reanimateCard(instanceId) {
+  const res = await api('POST','/move_from_graveyard',{username,instance_id:instanceId,destination:'battlefield'});
+  if(res) { S = {...S,...res}; renderAll(); }
+}
+
+async function exileFromGrave(instanceId) {
+  const res = await api('POST','/move_from_graveyard',{username,instance_id:instanceId,destination:'exile'});
+  if(res) { S = {...S,...res}; renderAll(); }
+}
+
+async function playFromHand(instanceId) {
+  // Move from hand to battlefield
+  const card = (S.hand||[]).find(c=>c.instance_id===instanceId);
+  if(!card) return;
+  S.hand = (S.hand||[]).filter(c=>c.instance_id!==instanceId);
+  card.tapped = false;
+  S.battlefield = [...(S.battlefield||[]), card];
+  // Sync to server via move endpoint if available, or just update local
+  renderAll();
+}
+
+// ---- ZONE TOGGLES ----
+function toggleZonePanel(zone) {
+  const panels = ['graveyard','exile','hand'];
+  panels.forEach(z => {
+    const p = document.getElementById(`zone-panel-${z}`);
+    if(p) p.classList.toggle('open', z===zone && !p.classList.contains('open'));
+  });
+}
+
+function closeZonePanels() {
+  ['graveyard','exile','hand'].forEach(z => {
+    const p = document.getElementById(`zone-panel-${z}`);
+    if(p) p.classList.remove('open');
+  });
+}
+
+// ---- DECK UPLOAD ----
+async function handleDeckUpload(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const formData = new FormData();
+  formData.append('username', username);
+  formData.append('file', file);
+  try {
+    const r = await fetch('/upload_deck', {method:'POST', body:formData});
+    const data = await r.json();
+    if(data.status === 'ok') { await loadState(); alert(`Deck loaded: ${data.card_count} cards`); }
+    else alert('Error loading deck: ' + (data.detail || 'Unknown error'));
+  } catch(e) { alert('Upload failed.'); }
+  input.value = '';
+}
+
+async function loadDefaultDeck() {
+  const res = await api('POST','/load_default_deck',{username,deck:DEFAULT_DECK});
+  if(res) { await loadState(); }
+}
+
+// ---- SCAN ----
+function openScanModal() {
+  document.getElementById('scan-result').style.display = 'none';
+  document.getElementById('scan-input').value = '';
+  document.getElementById('card-detail-add-btn').style.display = '';
+  openModal('scan-modal');
+  setTimeout(()=>document.getElementById('scan-input').focus(),50);
+}
+
+document.getElementById('scan-input').addEventListener('keydown', e => { if(e.key==='Enter') submitScan(); });
+
+async function submitScan() {
+  const cardId = document.getElementById('scan-input').value.trim();
+  if(!cardId) return;
+  const card = await api('GET',`/scan_card/${username}/${encodeURIComponent(cardId)}`);
+  const resultEl = document.getElementById('scan-result');
+  if(!card) {
+    resultEl.innerHTML = `<div style="color:var(--red);font-size:0.82rem;">Card "${cardId}" not found in deck.</div>`;
+    resultEl.style.display = 'block';
+    return;
+  }
+  pendingDetailCard = card;
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `
+    <div class="card-detail-inner">
+      <div class="card-detail-art">${card.art_url ? `<img src="${card.art_url}" alt="" style="width:100%;">` : ''}</div>
+      <div class="card-detail-info">
+        <div class="card-detail-name">${card.name}</div>
+        <div class="card-detail-cost">${parseMana(card.mana_cost)}</div>
+        <div class="card-detail-type">${card.type||''}</div>
+        <div class="card-detail-text">${card.text||''}</div>
+        ${card.power!==null&&card.power!==undefined ? `<div class="card-detail-pt">${card.power} / ${card.toughness}</div>` : ''}
+      </div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;">
+      <button class="btn primary" onclick="addCardFromScan()">Add to Battlefield</button>
+      <button class="btn" onclick="closeModal('scan-modal')">Close</button>
+    </div>
+  `;
+}
+
+async function addCardFromScan() {
+  if(!pendingDetailCard) return;
+  await addToBattlefield(pendingDetailCard.id);
+  closeModal('scan-modal');
+}
+
+async function addCardFromDetail() {
+  if(!pendingDetailCard) return;
+  await addToBattlefield(pendingDetailCard.id);
+  closeModal('card-detail-modal');
+}
+
+// ---- TOKENS ----
+async function submitToken() {
+  const name = document.getElementById('tok-name').value.trim() || 'Token';
+  const type = document.getElementById('tok-type').value.trim() || 'Token Creature';
+  const power = parseInt(document.getElementById('tok-power').value) || 0;
+  const toughness = parseInt(document.getElementById('tok-tough').value) || 0;
+  const color = document.getElementById('tok-color').value;
+  const text = document.getElementById('tok-text').value.trim();
+  const count = parseInt(document.getElementById('tok-count').value) || 1;
+  const res = await api('POST','/create_token',{username,name,token_type:type,power,toughness,color,text,count});
+  if(res) { S.battlefield = res.battlefield; renderBattlefield(); closeModal('token-modal'); }
+}
+
+// ---- RESET ----
+function openResetModal() {
+  const el = document.getElementById('reset-mode-section');
+  el.innerHTML = buildModeSelectMini();
+  openModal('reset-modal');
+}
+
+function buildModeSelectMini() {
+  return `<div style="font-size:0.74rem;color:var(--text-muted);margin-bottom:6px;">Change format (optional):</div>
+  <select id="reset-mode-select" class="form-input" style="width:100%;">
+    ${Object.entries(MODES).map(([k,m])=>`<option value="${k}" ${k===S.game_mode?'selected':''}>${m.name} (${m.life} life)</option>`).join('')}
+  </select>`;
+}
+
+async function confirmReset() {
+  const modeEl = document.getElementById('reset-mode-select');
+  const mode = modeEl ? modeEl.value : S.game_mode;
+  const res = await api('POST','/reset_game',{username,mode});
+  if(res) {
+    S = res;
+    selectedMode = S.game_mode;
+    renderAll();
+    closeModal('reset-modal');
+  }
+}
+
+// Bind reset modal open
+document.querySelector('#topbar button[onclick="openModal(\'reset-modal\')"]') &&
+  document.querySelector('#topbar button[onclick="openModal(\'reset-modal\')"]').addEventListener('click', openResetModal);
+// Override the topbar reset button
+document.querySelectorAll('#topbar .btn').forEach(btn => {
+  if(btn.textContent.trim()==='Reset') btn.onclick = () => { buildResetModal(); openModal('reset-modal'); };
+});
+function buildResetModal() {
+  const el = document.getElementById('reset-mode-section');
+  el.innerHTML = buildModeSelectMini();
+}
+
+// ---- MODE MODAL ----
+function openModeModal() {
+  selectedMode = S.game_mode || 'commander';
+  buildModeGrid();
+  openModal('mode-modal');
+}
+
+function closeModeModal() { closeModal('mode-modal'); }
+
+function buildModeGrid() {
+  const container = document.getElementById('mode-grid-container');
+  const cats = [
+    { label:'Arena Formats', cls:'arena', keys:['standard','historic','timeless','explorer'] },
+    { label:'Paper — 60 Card', cls:'paper', keys:['pioneer','modern','legacy','vintage','pauper'] },
+    { label:'Commander Family', cls:'commander', keys:['commander','brawl','historic_brawl','oathbreaker','duel_commander'] },
+    { label:'Limited & Special', cls:'limited', keys:['draft','two_headed_giant'] },
+  ];
+  container.innerHTML = cats.map(cat => `
+    <div class="mode-category-label ${cat.cls}">${cat.label}</div>
+    <div class="mode-grid">
+      ${cat.keys.map(k => {
+        const m = MODES[k];
+        return `<div class="mode-card ${k===selectedMode?'selected':''}" onclick="selectMode('${k}')" data-mode="${k}">
+          <div class="mode-name">${m.name}</div>
+          <div class="mode-life">${m.life} starting life</div>
+          <div class="mode-deck">${m.deck}-card deck${m.cmd?' | Commander':''}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+
+function selectMode(mode) {
+  selectedMode = mode;
+  document.querySelectorAll('.mode-card').forEach(el => {
+    el.classList.toggle('selected', el.dataset.mode === mode);
+  });
+}
+
+async function confirmMode() {
+  if(selectedMode === S.game_mode) { closeModal('mode-modal'); return; }
+  const m = MODES[selectedMode];
+  const doReset = confirm(`Switch to ${m.name}? This will reset the game (${m.life} starting life, ${m.deck}-card deck).`);
+  if(!doReset) { closeModal('mode-modal'); return; }
+  const res = await api('POST','/reset_game',{username,mode:selectedMode});
+  if(res) { S = res; renderAll(); }
+  closeModal('mode-modal');
+}
+
+// ---- ADD COMMANDER ----
+function openAddCommanderModal() {
+  if(!S.deck || !S.deck.cards) return alert('No deck loaded.');
+  const m = MODES[S.game_mode] || MODES.commander;
+  pendingDetailCard = null;
+  document.getElementById('card-detail-title').textContent = 'Set Commander';
+  document.getElementById('card-detail-add-btn').style.display = 'none';
+  const cards = S.deck.cards;
+  document.getElementById('card-detail-inner').innerHTML = `
+    <div style="width:100%;">
+      <p style="color:var(--text-muted);font-size:0.78rem;margin-bottom:10px;">Select a card from your deck to designate as commander.</p>
+      <div style="max-height:50vh;overflow-y:auto;">
+        ${cards.map(c => `<div class="deck-card-item" onclick="setCommander('${c.id}')" style="border-left:2px solid transparent;padding:5px 8px;">
+          <div class="deck-card-info">
+            <div class="deck-card-name">${c.name}</div>
+            <div class="deck-card-type">${c.type||''}</div>
+          </div>
+          <div class="deck-card-cost">${c.mana_cost||''}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  openModal('card-detail-modal');
+}
+
+async function setCommander(cardId) {
+  const res = await api('POST','/add_commander',{username,card_id:cardId,is_signature_spell:false});
+  if(res) {
+    S.commander_zone = res.commander_zone || S.commander_zone;
+    renderCommanderZone();
+    closeModal('card-detail-modal');
+  }
+}
+
+// ---- MODAL HELPERS ----
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => {
+    if(e.target === el) closeModal(el.id);
+  });
+});
+
+// ---- LOCAL LOG ----
+function logLocal(msg) {
+  S.activity_log = S.activity_log || [];
+  S.activity_log.unshift(msg);
+  S.activity_log = S.activity_log.slice(0,20);
+  renderActivityLog();
+}
+
+// ---- INIT ----
+// Pre-render mode grid
+buildModeGrid();
+// Bind Enter on login
+</script>
+</body>
+</html>
