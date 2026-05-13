@@ -4,3 +4,4 @@ python-multipart
 websockets
 pydantic
 gunicorn
+httpx
