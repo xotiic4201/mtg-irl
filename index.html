@@ -14,6 +14,7 @@
   --red:#be2c2c; --grn:#1e7a42; --blu:#1a5a9a;
   --text:#b0a898; --thi:#ece0c8; --tlo:#42403a;
   --ff1:'Cinzel',serif; --ff2:'Crimson Text',Georgia,serif;
+  --phase-col:#c8a44a;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;-webkit-tap-highlight-color:transparent;}
@@ -68,8 +69,10 @@ body{
 .btn.red{background:#160606;border-top-color:var(--red);color:#ff8070;}
 .btn.red:hover{background:#1e0a0a;}
 .btn.blu{background:#060e1c;border-top-color:#2070c0;color:#80b8ff;}
+.btn.blu:hover{background:#0a1428;}
 .btn.sm{padding:5px 10px;font-size:.57rem;}
 .btn.w100{width:100%;text-align:center;margin-bottom:6px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
 
 /* ─── INPUTS ─── */
 .inp{
@@ -85,9 +88,7 @@ select.inp{cursor:pointer;}
 .row2{display:flex;gap:10px;}
 .row2 .fl{flex:1;margin-bottom:0;}
 
-/* ═══════════════════════════════════════
-   LOGIN
-═══════════════════════════════════════ */
+/* ═══════════════════ LOGIN ═══════════════════ */
 #login{
   position:fixed;inset:0;z-index:900;
   background:radial-gradient(ellipse at 50% 25%,#161008 0%,#06080d 70%);
@@ -99,73 +100,93 @@ select.inp{cursor:pointer;}
 #login.hidden{display:none;}
 .lbox{
   background:var(--s1);border:1px solid var(--bdr2);border-top:3px solid var(--gold);
-  padding:50px 42px;width:min(400px,94vw);text-align:center;
+  padding:50px 42px;width:min(420px,94vw);text-align:center;
   box-shadow:0 60px 140px rgba(0,0,0,1),0 0 60px rgba(200,164,74,.06);
 }
 .llogo{font-family:var(--ff1);font-size:2.8rem;font-weight:900;color:var(--gold);
   letter-spacing:.22em;text-shadow:0 0 40px rgba(200,164,74,.4);margin-bottom:5px;}
 .lsub{font-family:var(--ff1);font-size:.52rem;letter-spacing:.36em;color:var(--tlo);margin-bottom:38px;}
 .orn{width:44px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 32px;}
+.login-tabs{display:flex;gap:2px;margin-bottom:24px;}
+.ltab{flex:1;font-family:var(--ff1);font-size:.58rem;letter-spacing:.1em;padding:8px;
+  border:1px solid var(--bdr);background:var(--s2);color:var(--tlo);cursor:pointer;transition:all .12s;}
+.ltab.sel{background:#1a1204;border-color:var(--gold);color:var(--ghi);}
+.login-section{display:none;}
+.login-section.on{display:block;}
 
-/* ═══════════════════════════════════════
-   TOPBAR
-═══════════════════════════════════════ */
+/* ═══════════════════ TOPBAR ═══════════════════ */
 #app{display:none;height:100vh;flex-direction:column;}
 #app.on{display:flex;}
 
 #topbar{
   height:50px;background:var(--s1);border-bottom:2px solid var(--glo);
-  display:flex;align-items:center;padding:0 12px;gap:9px;flex-shrink:0;
-  box-shadow:0 3px 20px rgba(0,0,0,.75);
+  display:flex;align-items:center;padding:0 10px;gap:7px;flex-shrink:0;
+  box-shadow:0 3px 20px rgba(0,0,0,.75);overflow:hidden;
 }
-.tb-logo{font-family:var(--ff1);font-size:1rem;font-weight:900;letter-spacing:.18em;
+.tb-logo{font-family:var(--ff1);font-size:.95rem;font-weight:900;letter-spacing:.18em;
   color:var(--gold);text-shadow:0 0 20px rgba(200,164,74,.3);flex-shrink:0;}
 .tb-div{width:1px;height:26px;background:var(--bdr2);flex-shrink:0;}
 .tb-mode{
-  font-family:var(--ff1);font-size:.56rem;letter-spacing:.1em;
-  padding:3px 9px;border:1px solid var(--glo);color:var(--gold);
+  font-family:var(--ff1);font-size:.54rem;letter-spacing:.08em;
+  padding:3px 8px;border:1px solid var(--glo);color:var(--gold);
   background:rgba(200,164,74,.08);cursor:pointer;border-radius:2px;flex-shrink:0;
+  max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.tb-mode:hover{border-color:var(--gold);background:rgba(200,164,74,.16);}
-
-/* TURN DISPLAY in topbar */
-#turn-display{
-  display:flex;align-items:center;gap:8px;flex-shrink:0;
-}
-.turn-arrow{
-  font-family:var(--ff1);font-size:.6rem;letter-spacing:.08em;color:var(--tlo);
-}
+.tb-mode:hover{border-color:var(--gold);}
+#turn-display{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.turn-arrow{font-family:var(--ff1);font-size:.56rem;color:var(--tlo);}
 #active-player-name{
-  font-family:var(--ff1);font-size:.72rem;font-weight:700;
-  color:var(--gold);letter-spacing:.06em;
+  font-family:var(--ff1);font-size:.68rem;font-weight:700;color:var(--gold);
   background:rgba(200,164,74,.1);border:1px solid var(--glo);
-  padding:3px 10px;border-radius:2px;
+  padding:2px 8px;border-radius:2px;max-width:80px;overflow:hidden;text-overflow:ellipsis;
 }
-#turn-num{font-family:var(--ff1);font-size:.56rem;color:var(--tlo);}
+#turn-num{font-family:var(--ff1);font-size:.54rem;color:var(--tlo);}
 .tb-sp{flex:1;}
-
-/* END TURN BUTTON — prominent in topbar */
 #end-turn-btn{
-  font-family:var(--ff1);font-size:.65rem;font-weight:700;letter-spacing:.1em;
-  padding:8px 18px;
+  font-family:var(--ff1);font-size:.6rem;font-weight:700;letter-spacing:.08em;
+  padding:7px 14px;
   background:linear-gradient(180deg,#1a2a0a,#0e1806);
   border:1px solid #306020;border-top:2px solid #50c030;
   color:#80f060;cursor:pointer;border-radius:2px 3px 0 3px;
   transition:all .15s;touch-action:manipulation;flex-shrink:0;
 }
 #end-turn-btn:hover{background:linear-gradient(180deg,#223a0c,#142008);border-top-color:#70e040;color:#a0ff80;}
-#end-turn-btn:active{transform:translateY(1px);}
 
-/* ═══════════════════════════════════════
-   PLAYER PANELS GRID
-═══════════════════════════════════════ */
-#players-area{
-  flex:1;overflow:auto;padding:10px;
-  display:grid;
-  gap:10px;
-  align-content:start;
+/* ─── ROOM BADGE ─── */
+#room-badge{
+  font-family:var(--ff1);font-size:.5rem;letter-spacing:.12em;
+  background:rgba(32,112,192,.15);border:1px solid #2070c0;
+  color:#80b8ff;padding:2px 7px;border-radius:2px;flex-shrink:0;cursor:pointer;
 }
-/* Layouts based on player count — set by JS */
+#room-badge:hover{background:rgba(32,112,192,.3);}
+
+/* ═══════════════════ PHASE TRACKER BAR ═══════════════════ */
+#phase-bar{
+  background:var(--s1);border-bottom:1px solid var(--bdr);
+  display:flex;align-items:stretch;flex-shrink:0;height:36px;overflow:hidden;
+}
+.phase-step{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  font-family:var(--ff1);font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tlo);cursor:pointer;transition:all .15s;border-right:1px solid var(--bdr);
+  padding:0 2px;text-align:center;touch-action:manipulation;position:relative;
+}
+.phase-step:last-child{border-right:none;}
+.phase-step:hover{background:var(--s2);color:var(--text);}
+.phase-step.active{
+  background:rgba(200,164,74,.12);color:var(--ghi);
+  border-bottom:2px solid var(--gold);
+}
+.phase-step.active::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+/* ═══════════════════ PLAYER GRID ═══════════════════ */
+#players-area{
+  flex:1;overflow:auto;padding:8px;
+  display:grid;gap:8px;align-content:start;
+}
 #players-area.p1{grid-template-columns:1fr;}
 #players-area.p2{grid-template-columns:1fr 1fr;}
 #players-area.p3{grid-template-columns:1fr 1fr 1fr;}
@@ -174,7 +195,6 @@ select.inp{cursor:pointer;}
 #players-area.p6{grid-template-columns:repeat(3,1fr);}
 @media(max-width:700px){
   #players-area.p3,#players-area.p4,#players-area.p5,#players-area.p6{grid-template-columns:1fr 1fr;}
-  #players-area.p2{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:480px){
   #players-area{grid-template-columns:1fr!important;}
@@ -185,9 +205,8 @@ select.inp{cursor:pointer;}
   background:var(--s1);border:1px solid var(--bdr2);
   display:flex;flex-direction:column;
   transition:border-color .25s,box-shadow .25s;
-  min-height:280px;position:relative;overflow:hidden;
+  min-height:260px;position:relative;overflow:hidden;
 }
-/* Active player glow */
 .pp.active{
   border-color:var(--gold);
   box-shadow:0 0 0 1px var(--glo),0 0 30px rgba(200,164,74,.15);
@@ -196,247 +215,121 @@ select.inp{cursor:pointer;}
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg,transparent,var(--gold),transparent);
 }
-
-/* Player header */
 .pp-head{
-  padding:8px 12px;background:var(--s2);border-bottom:1px solid var(--bdr);
+  padding:7px 10px;background:var(--s2);border-bottom:1px solid var(--bdr);
   display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
 }
-.pp-name{
-  font-family:var(--ff1);font-size:.72rem;font-weight:700;
-  color:var(--thi);letter-spacing:.06em;flex:1;min-width:0;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
+.pp-name{font-family:var(--ff1);font-size:.68rem;font-weight:700;color:var(--thi);letter-spacing:.06em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .pp.active .pp-name{color:var(--ghi);}
-.pp-turn-badge{
-  font-family:var(--ff1);font-size:.5rem;letter-spacing:.12em;
-  background:var(--gold);color:#1a1000;padding:2px 7px;border-radius:1px;
-  flex-shrink:0;margin-left:6px;display:none;
-}
+.pp-turn-badge{font-family:var(--ff1);font-size:.48rem;letter-spacing:.12em;background:var(--gold);color:#1a1000;padding:2px 6px;border-radius:1px;flex-shrink:0;margin-left:5px;display:none;}
 .pp.active .pp-turn-badge{display:block;}
-.pp-format-badge{
-  font-family:var(--ff1);font-size:.5rem;color:var(--glo);
-  letter-spacing:.08em;flex-shrink:0;margin-left:4px;
-}
 
-/* Life section */
-.pp-life{
-  padding:12px 12px 8px;text-align:center;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.pp-life-adj{
-  width:40px;height:40px;background:var(--s2);border:1px solid var(--bdr2);
-  color:var(--tlo);font-size:1.4rem;font-weight:300;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;border-radius:2px;transition:all .1s;touch-action:manipulation;
-  flex-shrink:0;
-}
+/* Warnings */
+.pp-warnings{padding:3px 10px;display:flex;gap:4px;flex-wrap:wrap;min-height:0;}
+.warn-chip{font-family:var(--ff1);font-size:.48rem;letter-spacing:.06em;padding:2px 7px;border-radius:2px;background:#1a0808;border:1px solid #601010;color:#ff7060;animation:throb 1.5s ease-in-out infinite;}
+
+/* Life */
+.pp-life{padding:10px 10px 6px;text-align:center;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:6px;}
+.pp-life-adj{width:36px;height:36px;background:var(--s2);border:1px solid var(--bdr2);color:var(--tlo);font-size:1.3rem;font-weight:300;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:2px;transition:all .1s;touch-action:manipulation;flex-shrink:0;}
 .pp-life-adj:hover{background:var(--s3);color:var(--gold);border-color:var(--glo);}
 .pp-life-adj:active{transform:scale(.92);}
-.pp-life-num{
-  font-family:var(--ff1);font-size:2.8rem;font-weight:900;
-  color:var(--thi);min-width:64px;text-align:center;line-height:1;
-  cursor:pointer;transition:color .25s;flex:1;
-}
+.pp-life-num{font-family:var(--ff1);font-size:2.6rem;font-weight:900;color:var(--thi);min-width:58px;text-align:center;line-height:1;cursor:pointer;transition:color .25s;flex:1;}
 .pp-life-num.lo{color:#ff8040;}
 .pp-life-num.crit{color:#ff2828;text-shadow:0 0 18px rgba(255,30,30,.5);animation:throb 1.3s ease-in-out infinite;}
 @keyframes throb{0%,100%{opacity:1}50%{opacity:.5}}
 
-/* Quick life buttons */
-.pp-quick{
-  display:flex;gap:3px;padding:0 10px 8px;justify-content:center;flex-wrap:wrap;flex-shrink:0;
-}
-.qlb{
-  font-family:var(--ff1);font-size:.55rem;letter-spacing:.06em;
-  padding:3px 7px;cursor:pointer;border-radius:2px;transition:all .1s;
-  touch-action:manipulation;user-select:none;border:1px solid var(--bdr);background:var(--s2);
-  color:var(--tlo);
-}
+.pp-quick{display:flex;gap:3px;padding:0 8px 6px;justify-content:center;flex-wrap:wrap;flex-shrink:0;}
+.qlb{font-family:var(--ff1);font-size:.53rem;letter-spacing:.06em;padding:3px 6px;cursor:pointer;border-radius:2px;transition:all .1s;touch-action:manipulation;user-select:none;border:1px solid var(--bdr);background:var(--s2);color:var(--tlo);}
 .qlb.pos{color:#50c870;border-color:#1a4820;}
 .qlb.neg{color:#e06858;border-color:#401414;}
 .qlb:hover{background:var(--s3);color:var(--thi);}
 .qlb:active{transform:scale(.92);}
 
-/* Counters in player panel */
-.pp-ctrs{
-  padding:4px 10px 6px;display:flex;flex-direction:column;gap:4px;
-  border-top:1px solid var(--bdr);flex:1;overflow:hidden;
-}
-.pc-row{display:flex;align-items:center;gap:5px;}
-.pc-lbl{font-size:.66rem;color:var(--tlo);flex:1;display:flex;align-items:center;gap:4px;}
-.pc-ico{font-size:.78rem;width:16px;text-align:center;}
-.pc-val{
-  font-family:var(--ff1);font-size:.8rem;color:var(--thi);
-  min-width:26px;text-align:center;
-}
+/* Counters */
+.pp-ctrs{padding:4px 8px 5px;display:flex;flex-direction:column;gap:3px;border-top:1px solid var(--bdr);}
+.pc-row{display:flex;align-items:center;gap:4px;}
+.pc-lbl{font-size:.63rem;color:var(--tlo);flex:1;display:flex;align-items:center;gap:3px;}
+.pc-ico{font-size:.76rem;width:15px;text-align:center;}
+.pc-val{font-family:var(--ff1);font-size:.78rem;color:var(--thi);min-width:24px;text-align:center;}
 .pc-val.warn{color:#ff8040;}
 .pc-val.dead{color:#ff2828;animation:throb 1.3s ease-in-out infinite;}
 .pca{display:flex;gap:2px;}
-.pca-btn{
-  background:var(--s2);border:1px solid var(--bdr);color:var(--tlo);
-  font-size:.72rem;width:22px;height:22px;display:flex;align-items:center;
-  justify-content:center;cursor:pointer;border-radius:2px;touch-action:manipulation;
-  transition:all .1s;
-}
+.pca-btn{background:var(--s2);border:1px solid var(--bdr);color:var(--tlo);font-size:.7rem;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:2px;touch-action:manipulation;transition:all .1s;}
 .pca-btn:hover{background:var(--s3);color:var(--thi);}
 .pca-btn:active{transform:scale(.9);}
 
 /* Commander damage */
-.cdmg-section{padding:4px 10px 6px;border-top:1px solid var(--bdr);flex-shrink:0;}
-.cdmg-title{font-family:var(--ff1);font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tlo);margin-bottom:5px;}
-.cdmg-row{display:flex;align-items:center;gap:4px;margin-bottom:4px;}
-.cdmg-from{font-size:.64rem;color:var(--tlo);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cdmg-val{font-family:var(--ff1);font-size:.78rem;color:var(--thi);min-width:22px;text-align:center;}
+.cdmg-section{padding:4px 8px 5px;border-top:1px solid var(--bdr);flex-shrink:0;}
+.cdmg-title{font-family:var(--ff1);font-size:.48rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tlo);margin-bottom:4px;}
+.cdmg-row{display:flex;align-items:center;gap:4px;margin-bottom:3px;}
+.cdmg-from{font-size:.62rem;color:var(--tlo);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cdmg-val{font-family:var(--ff1);font-size:.76rem;color:var(--thi);min-width:22px;text-align:center;}
 .cdmg-val.warn{color:#ff8040;}
 .cdmg-val.dead{color:#ff2828;font-weight:700;}
 
-/* Status toggles in panel */
-.pp-status{
-  padding:4px 10px 8px;display:flex;gap:5px;flex-wrap:wrap;
-  border-top:1px solid var(--bdr);flex-shrink:0;
-}
-.status-chip{
-  font-family:var(--ff1);font-size:.52rem;letter-spacing:.08em;
-  padding:3px 8px;border:1px solid var(--bdr);background:var(--s2);
-  cursor:pointer;border-radius:2px;color:var(--tlo);transition:all .12s;
-  touch-action:manipulation;
-}
+/* Status chips */
+.pp-status{padding:4px 8px 6px;display:flex;gap:4px;flex-wrap:wrap;border-top:1px solid var(--bdr);flex-shrink:0;}
+.status-chip{font-family:var(--ff1);font-size:.5rem;letter-spacing:.07em;padding:2px 7px;border:1px solid var(--bdr);background:var(--s2);cursor:pointer;border-radius:2px;color:var(--tlo);transition:all .12s;touch-action:manipulation;}
 .status-chip.on{background:#1a1006;border-color:var(--glo);color:var(--ghi);}
+.status-chip.mon.on{background:#160a1a;border-color:#7030a0;color:#c878ff;}
+.status-chip.ini.on{background:#0a1016;border-color:#2070c0;color:#80b8ff;}
 .status-chip:hover{background:var(--s3);color:var(--thi);}
 
-/* ═══════════════════════════════════════
-   BOTTOM BAR
-═══════════════════════════════════════ */
+/* Reminders in panel */
+.pp-reminders{padding:3px 8px 5px;display:flex;gap:3px;flex-wrap:wrap;border-top:1px solid var(--bdr);}
+.reminder-chip{font-family:var(--ff2);font-size:.6rem;padding:2px 7px;border-radius:2px;
+  background:#0a1a1a;border:1px solid #105050;color:#60d0d0;cursor:pointer;
+  transition:all .12s;display:flex;align-items:center;gap:4px;}
+.reminder-chip:hover{border-color:#20a0a0;}
+.reminder-chip .rc-x{color:#306060;font-size:.72rem;}
+
+/* ═══════════════════ BOTTOM BAR ═══════════════════ */
 #bottom-bar{
-  height:52px;background:var(--s1);border-top:1px solid var(--bdr);
-  display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0;
+  height:50px;background:var(--s1);border-top:1px solid var(--bdr);
+  display:flex;align-items:center;padding:0 10px;gap:6px;flex-shrink:0;overflow-x:auto;
 }
 #bottom-bar .bb-sp{flex:1;}
 
-/* ═══════════════════════════════════════
-   CAMERA SCAN OVERLAY
-═══════════════════════════════════════ */
-#cam-ov{
-  position:fixed;inset:0;z-index:900;
-  background:#000;display:flex;flex-direction:column;
-}
+/* ═══════════════════ CAMERA ═══════════════════ */
+#cam-ov{position:fixed;inset:0;z-index:900;background:#000;display:flex;flex-direction:column;}
 #cam-ov.hidden{display:none;}
-#cam-video{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-}
-/* Dark vignette with hole for scan zone */
-.cam-vignette{
-  position:absolute;inset:0;z-index:2;pointer-events:none;
-}
-/* Scan guide */
-.cam-guide-wrap{
-  position:absolute;inset:0;z-index:3;display:flex;
-  flex-direction:column;align-items:center;justify-content:center;
-  gap:14px;
-}
-/* Card name is at the TOP of the card — we guide user to align top of card here */
-.cam-guide{
-  width:min(320px,85vw);
-  border:2px solid var(--gold);
-  aspect-ratio:7/1;
-  box-shadow:0 0 0 4000px rgba(0,0,0,.68);
-  position:relative;border-radius:2px;
-  background:rgba(200,164,74,.04);
-}
+#cam-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.cam-guide-wrap{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.cam-guide{width:min(320px,85vw);border:2px solid var(--gold);aspect-ratio:7/1;box-shadow:0 0 0 4000px rgba(0,0,0,.68);position:relative;border-radius:2px;background:rgba(200,164,74,.04);}
 .cam-guide-corner{position:absolute;width:14px;height:14px;}
 .cam-guide-corner.tl{top:-3px;left:-3px;border-top:3px solid var(--ghi);border-left:3px solid var(--ghi);}
 .cam-guide-corner.tr{top:-3px;right:-3px;border-top:3px solid var(--ghi);border-right:3px solid var(--ghi);}
 .cam-guide-corner.bl{bottom:-3px;left:-3px;border-bottom:3px solid var(--ghi);border-left:3px solid var(--ghi);}
 .cam-guide-corner.br{bottom:-3px;right:-3px;border-bottom:3px solid var(--ghi);border-right:3px solid var(--ghi);}
-
-/* Animated scan line when scanning */
-.cam-scan-line{
-  position:absolute;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold),transparent);
-  top:0;display:none;animation:scanmove 1.6s ease-in-out infinite;
-}
+.cam-scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);top:0;display:none;animation:scanmove 1.6s ease-in-out infinite;}
 .scanning .cam-scan-line{display:block;}
 @keyframes scanmove{0%{top:0;opacity:1}100%{top:100%;opacity:0}}
-
-.cam-hint{
-  font-family:var(--ff1);font-size:.66rem;letter-spacing:.1em;
-  color:rgba(255,255,255,.9);text-align:center;padding:0 20px;
-  text-shadow:0 1px 6px rgba(0,0,0,1);
-}
-#cam-status{
-  font-family:var(--ff1);font-size:.6rem;letter-spacing:.1em;
-  color:var(--gold);background:rgba(0,0,0,.8);padding:5px 14px;border-radius:2px;
-  min-height:26px;text-align:center;
-}
-
-/* Camera controls */
-.cam-controls{
-  position:absolute;bottom:28px;left:0;right:0;
-  display:flex;justify-content:center;gap:12px;z-index:4;
-}
-.cam-cap-btn{
-  background:linear-gradient(180deg,#2a1c08,#160e04);
-  border:2px solid var(--gold);color:var(--ghi);
-  font-family:var(--ff1);font-size:.68rem;letter-spacing:.1em;
-  padding:13px 28px;cursor:pointer;border-radius:2px;touch-action:manipulation;
-  box-shadow:0 4px 20px rgba(0,0,0,.9);transition:all .15s;
-}
-.cam-cap-btn:hover{background:linear-gradient(180deg,#381e0a,#201408);}
-.cam-cap-btn:active{transform:scale(.97);}
-.cam-close-btn{
-  background:rgba(16,16,16,.9);border:1px solid #3a3a3a;color:#aaa;
-  font-family:var(--ff1);font-size:.65rem;letter-spacing:.1em;
-  padding:13px 20px;cursor:pointer;border-radius:2px;touch-action:manipulation;
-}
-
-/* Results panel */
-#cam-results{
-  position:absolute;inset:0;z-index:5;
-  background:rgba(3,5,10,.97);
-  display:flex;flex-direction:column;padding:18px;overflow-y:auto;
-}
+.cam-hint{font-family:var(--ff1);font-size:.66rem;letter-spacing:.1em;color:rgba(255,255,255,.9);text-align:center;padding:0 20px;text-shadow:0 1px 6px rgba(0,0,0,1);}
+#cam-status{font-family:var(--ff1);font-size:.6rem;letter-spacing:.1em;color:var(--gold);background:rgba(0,0,0,.8);padding:5px 14px;border-radius:2px;min-height:26px;text-align:center;}
+.cam-controls{position:absolute;bottom:28px;left:0;right:0;display:flex;justify-content:center;gap:12px;z-index:4;}
+.cam-cap-btn{background:linear-gradient(180deg,#2a1c08,#160e04);border:2px solid var(--gold);color:var(--ghi);font-family:var(--ff1);font-size:.68rem;letter-spacing:.1em;padding:13px 28px;cursor:pointer;border-radius:2px;touch-action:manipulation;box-shadow:0 4px 20px rgba(0,0,0,.9);transition:all .15s;}
+.cam-close-btn{background:rgba(16,16,16,.9);border:1px solid #3a3a3a;color:#aaa;font-family:var(--ff1);font-size:.65rem;letter-spacing:.1em;padding:13px 20px;cursor:pointer;border-radius:2px;touch-action:manipulation;}
+#cam-results{position:absolute;inset:0;z-index:5;background:rgba(3,5,10,.97);display:flex;flex-direction:column;padding:18px;overflow-y:auto;}
 #cam-results.hidden{display:none;}
 .cr-title{font-family:var(--ff1);font-size:.8rem;color:var(--gold);margin-bottom:12px;letter-spacing:.08em;}
-.cr-match{
-  display:flex;gap:12px;padding:10px;background:var(--s1);border:1px solid var(--bdr2);
-  margin-bottom:7px;cursor:pointer;border-left:3px solid transparent;
-  border-radius:2px;transition:all .12s;
-}
+.cr-match{display:flex;gap:12px;padding:10px;background:var(--s1);border:1px solid var(--bdr2);margin-bottom:7px;cursor:pointer;border-left:3px solid transparent;border-radius:2px;transition:all .12s;}
 .cr-match:hover{background:var(--s2);border-left-color:var(--gold);}
 .cr-match img{width:54px;height:76px;object-fit:cover;border:1px solid var(--bdr2);flex-shrink:0;}
 .cr-match .cr-name{font-family:var(--ff1);font-size:.75rem;color:var(--thi);margin-bottom:3px;}
 .cr-match .cr-type{font-size:.63rem;color:var(--tlo);font-style:italic;margin-bottom:4px;}
 .cr-match .cr-text{font-size:.63rem;color:var(--text);line-height:1.4;}
-.cr-ph{width:54px;height:76px;background:var(--s2);border:1px solid var(--bdr);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  font-family:var(--ff1);font-size:.55rem;color:var(--tlo);text-align:center;}
-.cr-no-results{color:var(--tlo);font-size:.78rem;font-style:italic;padding:14px 0;}
-.cr-manual{
-  background:var(--s2);border:1px solid var(--bdr);padding:14px;
-  margin-top:8px;border-radius:2px;
-}
+.cr-ph{width:54px;height:76px;background:var(--s2);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--ff1);font-size:.55rem;color:var(--tlo);text-align:center;}
+.cr-manual{background:var(--s2);border:1px solid var(--bdr);padding:14px;margin-top:8px;border-radius:2px;}
 .cr-manual-lbl{font-family:var(--ff1);font-size:.6rem;color:var(--tlo);letter-spacing:.12em;margin-bottom:8px;}
 .cr-inp-row{display:flex;gap:8px;}
 
-/* ═══════════════════════════════════════
-   MODALS — NEW GAME
-═══════════════════════════════════════ */
-.player-row{
-  display:flex;align-items:center;gap:8px;padding:8px 10px;
-  background:var(--s2);border:1px solid var(--bdr);border-left:2px solid var(--glo);
-  margin-bottom:6px;border-radius:2px;
-}
+/* ═══════════════════ NEW GAME ═══════════════════ */
+.player-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--s2);border:1px solid var(--bdr);border-left:2px solid var(--glo);margin-bottom:6px;border-radius:2px;}
 .player-row .pnum{font-family:var(--ff1);font-size:.6rem;color:var(--gold);min-width:20px;}
-.player-row-rm{
-  background:none;border:none;color:var(--tlo);cursor:pointer;
-  font-size:1rem;line-height:1;padding:2px 5px;transition:color .1s;
-}
+.player-row-rm{background:none;border:none;color:var(--tlo);cursor:pointer;font-size:1rem;line-height:1;padding:2px 5px;transition:color .1s;}
 .player-row-rm:hover{color:var(--red);}
-
-/* ─── MODE GRID ─── */
-.mc{font-family:var(--ff1);font-size:.54rem;letter-spacing:.18em;text-transform:uppercase;
-  padding:10px 0 5px;border-bottom:1px solid var(--bdr);margin-bottom:7px;}
-.mc.arena{color:#a78bfa;} .mc.paper{color:#5eead4;} .mc.edh{color:var(--gold);} .mc.limited{color:#93c5fd;}
+.mc{font-family:var(--ff1);font-size:.54rem;letter-spacing:.18em;text-transform:uppercase;padding:10px 0 5px;border-bottom:1px solid var(--bdr);margin-bottom:7px;}
+.mc.arena{color:#a78bfa;}.mc.paper{color:#5eead4;}.mc.edh{color:var(--gold);}.mc.limited{color:#93c5fd;}
 .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:5px;margin-bottom:14px;}
 .mt{background:var(--s2);border:1px solid var(--bdr);padding:9px 11px;cursor:pointer;border-radius:2px;transition:all .12s;}
 .mt:hover{background:var(--s3);border-color:var(--glo);}
@@ -445,24 +338,81 @@ select.inp{cursor:pointer;}
 .mt .ml{font-size:.6rem;color:var(--gold);}
 .mt .md{font-size:.56rem;color:var(--tlo);}
 
-/* ─── STATS MODAL ─── */
+/* ═══════════════════ PHASE MODAL ═══════════════════ */
+.phase-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;}
+.phase-tile{background:var(--s2);border:1px solid var(--bdr);padding:12px 8px;cursor:pointer;border-radius:2px;text-align:center;transition:all .12s;}
+.phase-tile:hover{background:var(--s3);border-color:var(--glo);}
+.phase-tile.active{background:#161004;border-color:var(--gold);}
+.phase-tile .pn{font-family:var(--ff1);font-size:.64rem;color:var(--thi);margin-bottom:3px;}
+.phase-tile .pd{font-size:.58rem;color:var(--tlo);}
+
+/* ═══════════════════ STACK PANEL ═══════════════════ */
+#stack-bar{
+  background:var(--s2);border-bottom:1px solid var(--bdr);
+  padding:5px 10px;display:none;gap:6px;align-items:center;flex-shrink:0;
+}
+#stack-bar.on{display:flex;}
+.stack-item{font-family:var(--ff2);font-size:.68rem;padding:3px 10px;
+  background:var(--s1);border:1px solid var(--bdr2);border-left:3px solid var(--gold);
+  color:var(--thi);border-radius:2px;flex-shrink:0;}
+.stack-item.top{border-left-color:#60d0d0;}
+#stack-label{font-family:var(--ff1);font-size:.5rem;letter-spacing:.14em;color:var(--tlo);flex-shrink:0;}
+
+/* ═══════════════════ REMINDERS MODAL ═══════════════════ */
+.reminder-row{display:flex;align-items:center;gap:8px;padding:8px;background:var(--s2);border:1px solid var(--bdr);margin-bottom:6px;border-radius:2px;}
+.reminder-text{flex:1;font-size:.72rem;color:var(--thi);}
+.reminder-meta{font-size:.58rem;color:var(--tlo);}
+
+/* ═══════════════════ RULES MODAL ═══════════════════ */
+.rule-result{padding:12px;background:var(--s2);border:1px solid var(--bdr);margin-bottom:8px;border-radius:2px;border-left:3px solid var(--glo);}
+.rule-keyword{font-family:var(--ff1);font-size:.68rem;color:var(--gold);margin-bottom:5px;text-transform:capitalize;}
+.rule-text{font-size:.75rem;color:var(--text);line-height:1.6;}
+
+/* ═══════════════════ DICE MODAL ═══════════════════ */
+.dice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.dice-btn{background:var(--s2);border:1px solid var(--bdr);padding:16px;cursor:pointer;border-radius:2px;text-align:center;transition:all .12s;}
+.dice-btn:hover{background:var(--s3);border-color:var(--glo);}
+.dice-btn .dv{font-family:var(--ff1);font-size:1.4rem;font-weight:900;color:var(--gold);}
+.dice-btn .dl{font-size:.58rem;color:var(--tlo);}
+.dice-result{font-family:var(--ff1);font-size:2rem;font-weight:900;text-align:center;color:var(--ghi);padding:16px;border:1px solid var(--bdr2);background:var(--s2);border-radius:2px;margin-top:8px;min-height:70px;display:flex;align-items:center;justify-content:center;gap:12px;}
+.coin-result{font-family:var(--ff1);font-size:1.5rem;font-weight:900;text-align:center;padding:16px;}
+.coin-heads{color:#f0d070;}
+.coin-tails{color:#80b8ff;}
+
+/* ═══════════════════ LOG ═══════════════════ */
+.log-entry{padding:5px 0;border-bottom:1px solid var(--bdr);font-size:.72rem;}
+.log-turn{font-family:var(--ff1);font-size:.52rem;color:var(--tlo);margin-right:6px;}
+.log-msg{color:var(--text);}
+.log-warn{color:#ff8060;}
+
+/* ═══════════════════ CARD DETAIL ═══════════════════ */
+.keyword-tag{display:inline-block;font-family:var(--ff1);font-size:.5rem;letter-spacing:.08em;padding:2px 7px;border-radius:2px;background:var(--s2);border:1px solid var(--bdr2);color:var(--ghi);margin:2px;}
+.ruling-row{padding:8px 0;border-bottom:1px solid var(--bdr);}
+.ruling-date{font-family:var(--ff1);font-size:.54rem;color:var(--tlo);margin-bottom:3px;}
+.ruling-text{font-size:.73rem;color:var(--text);line-height:1.5;}
+
+/* ═══════════════════ STATS ═══════════════════ */
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:16px;}
 .stat-tile{background:var(--s2);border:1px solid var(--bdr);padding:14px;text-align:center;border-radius:2px;}
 .stat-big{font-family:var(--ff1);font-size:1.8rem;font-weight:900;line-height:1;color:var(--thi);}
-.stat-big.w{color:#60d880;} .stat-big.l{color:#f07060;}
+.stat-big.w{color:#60d880;}.stat-big.l{color:#f07060;}
 .stat-lbl{font-family:var(--ff1);font-size:.52rem;letter-spacing:.1em;color:var(--tlo);margin-top:4px;}
 .hist-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bdr);}
 .hist-res{font-family:var(--ff1);font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:2px;flex-shrink:0;}
 .hist-res.W{background:#081a0a;color:#60d880;border:1px solid #1a4020;}
 .hist-res.L{background:#1a0606;color:#f07060;border:1px solid #481010;}
-.hist-detail{flex:1;min-width:0;}
-.hist-fmt{font-size:.7rem;color:var(--thi);}
-.hist-meta{font-size:.6rem;color:var(--tlo);}
+
+/* ═══════════════════ JOIN ROOM ═══════════════════ */
+.room-code{font-family:var(--ff1);font-size:2rem;font-weight:900;letter-spacing:.3em;text-align:center;color:var(--gold);padding:16px;background:var(--s2);border:1px solid var(--bdr2);border-top:2px solid var(--gold);margin-bottom:16px;}
+.players-online{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.player-online-badge{font-family:var(--ff1);font-size:.58rem;padding:3px 10px;border-radius:2px;background:var(--s2);border:1px solid #30a060;color:#60d880;}
 
 /* ─── HELPERS ─── */
 .hidden{display:none!important;}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
 canvas#ocr-canvas{display:none;}
+.sec-head{font-family:var(--ff1);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tlo);padding:8px 0 5px;border-bottom:1px solid var(--bdr);margin-bottom:10px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;}
 </style>
 </head>
 <body>
@@ -474,24 +424,37 @@ canvas#ocr-canvas{display:none;}
     <div class="llogo">MTG IRL</div>
     <div class="lsub">In-Person Game Tracker</div>
     <div class="orn"></div>
-    <div class="fl"><label>Your Name</label>
-      <input class="inp" id="l-name" placeholder="Enter your name..." maxlength="28" autocomplete="off" autofocus>
+    <div class="login-tabs">
+      <div class="ltab sel" onclick="switchLoginTab('new')">New / Solo Game</div>
+      <div class="ltab" onclick="switchLoginTab('join')">Join Room</div>
     </div>
-    <button class="btn gold w100" style="padding:12px;font-size:.72rem;margin-top:4px;" onclick="doLogin()">Enter the Arena</button>
+    <div class="login-section on" id="ls-new">
+      <div class="fl"><label>Your Name</label>
+        <input class="inp" id="l-name" placeholder="Enter your name..." maxlength="28" autocomplete="off" autofocus>
+      </div>
+      <button class="btn gold w100" style="padding:12px;font-size:.72rem;margin-top:4px;" onclick="doLogin()">Enter the Arena</button>
+    </div>
+    <div class="login-section" id="ls-join">
+      <div class="fl"><label>Your Name</label>
+        <input class="inp" id="lj-name" placeholder="Enter your name..." maxlength="28" autocomplete="off">
+      </div>
+      <div class="fl"><label>Room Code</label>
+        <input class="inp" id="lj-room" placeholder="6-char code..." maxlength="6" style="text-transform:uppercase;letter-spacing:.2em;font-family:var(--ff1);">
+      </div>
+      <button class="btn blu w100" style="padding:12px;font-size:.72rem;margin-top:4px;" onclick="doJoinRoom()">Join Room</button>
+    </div>
     <div style="margin-top:12px;font-size:.62rem;color:var(--tlo);">Stats saved between sessions.</div>
   </div>
 </div>
 
-<!-- ══════════════ CAMERA SCAN ══════════════ -->
+<!-- ══════════════ CAMERA ══════════════ -->
 <div id="cam-ov" class="hidden">
   <video id="cam-video" autoplay playsinline muted></video>
   <div class="cam-guide-wrap">
     <div class="cam-hint">Align the card's <strong style="color:var(--ghi)">name bar</strong> inside the box</div>
     <div class="cam-guide" id="cam-guide">
-      <div class="cam-guide-corner tl"></div>
-      <div class="cam-guide-corner tr"></div>
-      <div class="cam-guide-corner bl"></div>
-      <div class="cam-guide-corner br"></div>
+      <div class="cam-guide-corner tl"></div><div class="cam-guide-corner tr"></div>
+      <div class="cam-guide-corner bl"></div><div class="cam-guide-corner br"></div>
       <div class="cam-scan-line" id="scan-line"></div>
     </div>
     <div id="cam-status">Ready — press Capture to scan</div>
@@ -517,7 +480,7 @@ canvas#ocr-canvas{display:none;}
   </div>
 </div>
 
-<!-- ══════════════ NEW GAME MODAL ══════════════ -->
+<!-- ══════════════ NEW GAME ══════════════ -->
 <div class="ov hidden" id="ng-ov">
   <div class="panel wide">
     <div class="ph"><div class="pt">New Game</div><button class="xbtn" onclick="closeOv('ng-ov')">&times;</button></div>
@@ -528,12 +491,20 @@ canvas#ocr-canvas{display:none;}
       <div id="ng-players-list"></div>
       <button class="btn sm" onclick="addNgPlayer()" style="margin-bottom:16px;">+ Add Player</button>
       <div class="row2">
-        <div class="fl"><label>Starting Life (auto from format)</label>
+        <div class="fl"><label>Starting Life</label>
           <input class="inp" type="number" id="ng-life" value="40" min="1" max="999">
         </div>
         <div class="fl"><label>Notes (optional)</label>
           <input class="inp" id="ng-notes" placeholder="House rules...">
         </div>
+      </div>
+      <div style="margin-top:8px;padding:10px;background:var(--s2);border:1px solid var(--bdr);border-left:3px solid #2070c0;border-radius:2px;">
+        <div style="font-family:var(--ff1);font-size:.56rem;color:#80b8ff;letter-spacing:.1em;margin-bottom:5px;">MULTIPLAYER SYNC</div>
+        <div style="font-size:.72rem;color:var(--tlo);margin-bottom:8px;">Creates a shareable room code. Other players join via "Join Room" on login.</div>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="ng-create-room" style="width:14px;height:14px;">
+          <span style="font-family:var(--ff1);font-size:.6rem;color:var(--thi);">Create shareable room</span>
+        </label>
       </div>
     </div>
     <div class="pf">
@@ -555,19 +526,172 @@ canvas#ocr-canvas{display:none;}
   </div>
 </div>
 
-<!-- ══════════════ STATS MODAL ══════════════ -->
-<div class="ov hidden" id="stats-ov">
-  <div class="panel wide">
-    <div class="ph"><div class="pt">Player Stats &mdash; <span id="stats-name" style="color:var(--thi);"></span></div><button class="xbtn" onclick="closeOv('stats-ov')">&times;</button></div>
-    <div class="pb" id="stats-body"></div>
-    <div class="pf">
-      <button class="btn red sm" onclick="clearStats()">Clear All Stats</button>
-      <button class="btn" onclick="closeOv('stats-ov')">Close</button>
+<!-- ══════════════ PHASE MODAL ══════════════ -->
+<div class="ov hidden" id="phase-ov">
+  <div class="panel">
+    <div class="ph"><div class="pt">Phase &amp; Turn Order</div><button class="xbtn" onclick="closeOv('phase-ov')">&times;</button></div>
+    <div class="pb">
+      <div class="phase-grid" id="phase-grid"></div>
+      <div class="sec-head">Quick Phase</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="btn sm" onclick="advancePhase()">Next Phase &#8594;</button>
+        <button class="btn sm grn" onclick="doEndTurn()">End Turn</button>
+      </div>
+      <div class="sec-head" id="phase-reminder-head">Reminders this phase</div>
+      <div id="phase-reminder-list"></div>
     </div>
+    <div class="pf"><button class="btn" onclick="closeOv('phase-ov')">Close</button></div>
   </div>
 </div>
 
-<!-- ══════════════ LIFE EDIT MODAL ══════════════ -->
+<!-- ══════════════ REMINDERS MODAL ══════════════ -->
+<div class="ov hidden" id="remind-ov">
+  <div class="panel">
+    <div class="ph"><div class="pt">Reminders &amp; Triggers</div><button class="xbtn" onclick="closeOv('remind-ov')">&times;</button></div>
+    <div class="pb">
+      <div class="sec-head">Add Reminder</div>
+      <div class="fl"><label>Text (e.g. "Smothering Tithe" or "Pact trigger")</label>
+        <input class="inp" id="rem-text" placeholder="Reminder text..." autocomplete="off">
+      </div>
+      <div class="row2" style="margin-bottom:12px;">
+        <div class="fl"><label>Phase (optional)</label>
+          <select class="inp" id="rem-phase">
+            <option value="">Any phase</option>
+            <option value="upkeep">Upkeep</option>
+            <option value="draw">Draw</option>
+            <option value="main1">Main 1</option>
+            <option value="combat">Combat</option>
+            <option value="main2">Main 2</option>
+            <option value="end">End Step</option>
+          </select>
+        </div>
+        <div class="fl"><label>Expires (turns)</label>
+          <input class="inp" type="number" id="rem-expire" value="1" min="1" max="99" placeholder="Turns until expiry">
+        </div>
+      </div>
+      <div style="margin-bottom:16px;display:flex;gap:6px;flex-wrap:wrap;">
+        <div style="font-family:var(--ff1);font-size:.54rem;color:var(--tlo);width:100%;margin-bottom:5px;">COMMON REMINDERS:</div>
+        <button class="btn sm" onclick="quickRemind('Rhystic Study')">Rhystic Study</button>
+        <button class="btn sm" onclick="quickRemind('Smothering Tithe')">Smothering Tithe</button>
+        <button class="btn sm" onclick="quickRemind('Esper Sentinel')">Esper Sentinel</button>
+        <button class="btn sm" onclick="quickRemind('Pact trigger','upkeep',1)">Pact (Upkeep)</button>
+        <button class="btn sm" onclick="quickRemind('Cumulative Upkeep','upkeep',99)">Cum. Upkeep</button>
+        <button class="btn sm" onclick="quickRemind('Lose game at end step','end',1)">Lose EOT</button>
+        <button class="btn sm" onclick="quickRemind('Floating mana')">Floating Mana</button>
+      </div>
+      <button class="btn gold w100" onclick="addReminder()">+ Add Reminder</button>
+      <div class="sec-head" style="margin-top:14px;">Active Reminders</div>
+      <div id="remind-list"></div>
+    </div>
+    <div class="pf"><button class="btn" onclick="closeOv('remind-ov')">Close</button></div>
+  </div>
+</div>
+
+<!-- ══════════════ STACK MODAL ══════════════ -->
+<div class="ov hidden" id="stack-ov">
+  <div class="panel">
+    <div class="ph"><div class="pt">Priority Stack</div><button class="xbtn" onclick="closeOv('stack-ov')">&times;</button></div>
+    <div class="pb">
+      <div class="sec-head">Add to Stack</div>
+      <div class="cr-inp-row" style="margin-bottom:14px;">
+        <input class="inp" id="stack-text" placeholder="Spell or ability..." autocomplete="off">
+        <button class="btn gold sm" onclick="pushStack()">Push</button>
+      </div>
+      <div class="sec-head">Stack (top → bottom)</div>
+      <div id="stack-list"></div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn grn sm" onclick="popStack()">Resolve Top</button>
+        <button class="btn red sm" onclick="clearStack()">Clear All</button>
+      </div>
+    </div>
+    <div class="pf"><button class="btn" onclick="closeOv('stack-ov')">Close</button></div>
+  </div>
+</div>
+
+<!-- ══════════════ DICE MODAL ══════════════ -->
+<div class="ov hidden" id="dice-ov">
+  <div class="panel">
+    <div class="ph"><div class="pt">Dice &amp; Randomizers</div><button class="xbtn" onclick="closeOv('dice-ov')">&times;</button></div>
+    <div class="pb">
+      <div class="dice-grid">
+        <div class="dice-btn" onclick="rollDice(4)"><div class="dv">d4</div><div class="dl">4-sided</div></div>
+        <div class="dice-btn" onclick="rollDice(6)"><div class="dv">d6</div><div class="dl">6-sided</div></div>
+        <div class="dice-btn" onclick="rollDice(8)"><div class="dv">d8</div><div class="dl">8-sided</div></div>
+        <div class="dice-btn" onclick="rollDice(10)"><div class="dv">d10</div><div class="dl">10-sided</div></div>
+        <div class="dice-btn" onclick="rollDice(12)"><div class="dv">d12</div><div class="dl">12-sided</div></div>
+        <div class="dice-btn" onclick="rollDice(20)"><div class="dv">d20</div><div class="dl">20-sided</div></div>
+      </div>
+      <div class="row2" style="margin-bottom:12px;">
+        <div class="fl"><label>Custom sides</label><input class="inp" type="number" id="custom-sides" value="100" min="2" max="999"></div>
+        <div class="fl" style="justify-content:flex-end;padding-top:18px;"><button class="btn sm" onclick="rollCustom()">Roll Custom</button></div>
+      </div>
+      <div class="dice-result" id="dice-result">—</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+        <button class="btn sm" onclick="flipCoin()">&#9654; Coin Flip</button>
+        <button class="btn sm" onclick="rollPlanar()">Planar Die</button>
+        <button class="btn sm" onclick="randomPlayer()">Random Player</button>
+        <button class="btn sm" onclick="rollDice(6,2)">2d6</button>
+      </div>
+      <div id="coin-result" style="margin-top:10px;"></div>
+    </div>
+    <div class="pf"><button class="btn" onclick="closeOv('dice-ov')">Close</button></div>
+  </div>
+</div>
+
+<!-- ══════════════ RULES MODAL ══════════════ -->
+<div class="ov hidden" id="rules-ov">
+  <div class="panel wide">
+    <div class="ph"><div class="pt">Rules &amp; Keyword Reference</div><button class="xbtn" onclick="closeOv('rules-ov')">&times;</button></div>
+    <div class="pb">
+      <div class="cr-inp-row" style="margin-bottom:14px;">
+        <input class="inp" id="rules-inp" placeholder="Search rules... (flying, commander damage, storm...)" autocomplete="off">
+        <button class="btn gold sm" onclick="searchRules()">Search</button>
+      </div>
+      <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:5px;">
+        <div style="font-family:var(--ff1);font-size:.54rem;color:var(--tlo);width:100%;margin-bottom:4px;">QUICK LOOKUP:</div>
+        <button class="btn sm" onclick="quickRules('flying')">Flying</button>
+        <button class="btn sm" onclick="quickRules('deathtouch')">Deathtouch</button>
+        <button class="btn sm" onclick="quickRules('commander damage')">Commander Damage</button>
+        <button class="btn sm" onclick="quickRules('the stack')">The Stack</button>
+        <button class="btn sm" onclick="quickRules('priority')">Priority</button>
+        <button class="btn sm" onclick="quickRules('state based actions')">State-Based Actions</button>
+        <button class="btn sm" onclick="quickRules('ward')">Ward</button>
+        <button class="btn sm" onclick="quickRules('toxic')">Toxic</button>
+        <button class="btn sm" onclick="quickRules('proliferate')">Proliferate</button>
+        <button class="btn sm" onclick="quickRules('layers')">Layers</button>
+      </div>
+      <div id="rules-results"></div>
+    </div>
+    <div class="pf"><button class="btn" onclick="closeOv('rules-ov')">Close</button></div>
+  </div>
+</div>
+
+<!-- ══════════════ CARD LOOKUP ══════════════ -->
+<div class="ov hidden" id="card-ov">
+  <div class="panel wide">
+    <div class="ph"><div class="pt" id="card-ov-title">Card Lookup</div><button class="xbtn" onclick="closeOv('card-ov')">&times;</button></div>
+    <div class="pb" id="card-ov-body"></div>
+    <div class="pf" id="card-ov-foot"><button class="btn" onclick="closeOv('card-ov')">Close</button></div>
+  </div>
+</div>
+
+<!-- ══════════════ ROOM INFO MODAL ══════════════ -->
+<div class="ov hidden" id="room-ov">
+  <div class="panel narrow">
+    <div class="ph"><div class="pt">Game Room</div><button class="xbtn" onclick="closeOv('room-ov')">&times;</button></div>
+    <div class="pb">
+      <div class="sec-head">Room Code — Share with other players</div>
+      <div class="room-code" id="room-code-display">——</div>
+      <div class="sec-head">Players Online</div>
+      <div class="players-online" id="room-players-list"></div>
+      <div style="font-size:.72rem;color:var(--tlo);margin-top:8px;">Other players: tap "Join Room" on login, enter this code.</div>
+      <div id="room-sync-status" style="margin-top:12px;font-family:var(--ff1);font-size:.58rem;color:var(--grn);"></div>
+    </div>
+    <div class="pf"><button class="btn" onclick="closeOv('room-ov')">Close</button></div>
+  </div>
+</div>
+
+<!-- ══════════════ LIFE EDIT ══════════════ -->
 <div class="ov hidden" id="life-ov">
   <div class="panel narrow">
     <div class="ph"><div class="pt" id="life-ov-title">Set Life</div><button class="xbtn" onclick="closeOv('life-ov')">&times;</button></div>
@@ -581,13 +705,26 @@ canvas#ocr-canvas{display:none;}
   </div>
 </div>
 
-<!-- ══════════════ CARD LOOKUP MODAL ══════════════ -->
-<div class="ov hidden" id="card-ov">
+<!-- ══════════════ STATS ══════════════ -->
+<div class="ov hidden" id="stats-ov">
   <div class="panel wide">
-    <div class="ph"><div class="pt" id="card-ov-title">Card Lookup</div><button class="xbtn" onclick="closeOv('card-ov')">&times;</button></div>
-    <div class="pb" id="card-ov-body"></div>
-    <div class="pf" id="card-ov-foot">
-      <button class="btn" onclick="closeOv('card-ov')">Close</button>
+    <div class="ph"><div class="pt">Player Stats &mdash; <span id="stats-name"></span></div><button class="xbtn" onclick="closeOv('stats-ov')">&times;</button></div>
+    <div class="pb" id="stats-body"></div>
+    <div class="pf">
+      <button class="btn red sm" onclick="clearStats()">Clear Stats</button>
+      <button class="btn" onclick="closeOv('stats-ov')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ GAME LOG ══════════════ -->
+<div class="ov hidden" id="log-ov">
+  <div class="panel wide">
+    <div class="ph"><div class="pt">Game Log</div><button class="xbtn" onclick="closeOv('log-ov')">&times;</button></div>
+    <div class="pb" id="log-body"></div>
+    <div class="pf">
+      <button class="btn red sm" onclick="if(G&&confirm('Clear log?')){G.global_log=[];saveGame();renderAll();}closeOv('log-ov');">Clear Log</button>
+      <button class="btn" onclick="closeOv('log-ov')">Close</button>
     </div>
   </div>
 </div>
@@ -605,17 +742,30 @@ canvas#ocr-canvas{display:none;}
       <span id="turn-num">1</span>
     </div>
     <div class="tb-sp"></div>
-    <button id="end-turn-btn" onclick="endTurn()">End Turn &#8594;</button>
+    <span id="room-badge" class="hidden" onclick="showRoomInfo()">ROOM: ——</span>
+    <button id="end-turn-btn" onclick="doEndTurn()">End Turn &#8594;</button>
   </div>
+
+  <!-- Phase bar -->
+  <div id="phase-bar">
+    <div id="stack-label" class="hidden" style="font-family:var(--ff1);font-size:.48rem;letter-spacing:.1em;color:#60d0d0;padding:0 8px;flex-shrink:0;">STACK</div>
+    <div id="stack-preview" style="display:flex;gap:4px;align-items:center;flex:1;overflow:hidden;padding:0 4px;"></div>
+  </div>
+  <div id="phase-steps-bar"></div>
 
   <div id="players-area" class="p2"></div>
 
   <div id="bottom-bar">
     <button class="btn gold" onclick="openNewGame()">New Game</button>
-    <button class="btn" onclick="openCamera()">&#9654; Scan Card</button>
+    <button class="btn" onclick="openCamera()">&#9654; Scan</button>
+    <button class="btn sm" onclick="openOv('phase-ov');renderPhaseModal()">Phase</button>
+    <button class="btn sm" onclick="openOv('remind-ov');renderReminderList()">Reminders</button>
+    <button class="btn sm" onclick="openOv('stack-ov');renderStackModal()">Stack</button>
     <div class="bb-sp"></div>
+    <button class="btn sm" onclick="openOv('dice-ov')">Dice</button>
+    <button class="btn sm" onclick="openOv('rules-ov')">Rules</button>
+    <button class="btn sm" onclick="openOv('log-ov');renderLogModal()">Log</button>
     <button class="btn sm" onclick="openOv('stats-ov');renderStats()">Stats</button>
-    <button class="btn sm" onclick="untapAllPlayers()">Untap All</button>
   </div>
 </div>
 
@@ -647,418 +797,119 @@ const MODE_CATS = [
   {l:'Commander',c:'edh',     k:['commander','brawl','historic_brawl','oathbreaker','duel_commander']},
   {l:'Limited',  c:'limited', k:['draft','two_headed_giant']},
 ];
+const PHASES = [
+  {key:'untap',   label:'Untap',    short:'UN'},
+  {key:'upkeep',  label:'Upkeep',   short:'UP'},
+  {key:'draw',    label:'Draw',     short:'DR'},
+  {key:'main1',   label:'Main 1',   short:'M1'},
+  {key:'combat',  label:'Combat',   short:'CB'},
+  {key:'main2',   label:'Main 2',   short:'M2'},
+  {key:'end',     label:'End Step', short:'EN'},
+  {key:'cleanup', label:'Cleanup',  short:'CL'},
+];
+const PHASE_ORDER = PHASES.map(p=>p.key);
+
+const RULES_LOCAL = {
+  "flying": "702.9 — Flying: Can't be blocked except by creatures with flying or reach.",
+  "deathtouch": "702.2 — Deathtouch: Any amount of damage this creature deals to a creature is enough to destroy it.",
+  "hexproof": "702.11 — Hexproof: Can't be targeted by opponents' spells or abilities.",
+  "trample": "702.19 — Trample: Excess combat damage may be assigned to the defending player.",
+  "lifelink": "702.15 — Lifelink: Damage dealt by this creature also causes you to gain that much life.",
+  "vigilance": "702.20 — Vigilance: Attacking doesn't cause this creature to tap.",
+  "first strike": "702.7 — First Strike: Deals combat damage before creatures without it.",
+  "double strike": "702.4 — Double Strike: Deals both first-strike and regular combat damage.",
+  "menace": "702.111 — Menace: Can only be blocked by two or more creatures.",
+  "indestructible": "702.12 — Indestructible: Lethal damage and 'destroy' effects have no effect.",
+  "flash": "702.8 — Flash: You may cast this any time you could cast an instant.",
+  "haste": "702.10 — Haste: Can attack and tap the turn it enters the battlefield.",
+  "reach": "702.17 — Reach: Can block creatures with flying.",
+  "shroud": "702.18 — Shroud: Can't be targeted by any spells or abilities.",
+  "ward": "702.20x — Ward: If targeted by an opponent, counter unless they pay the ward cost.",
+  "toxic": "702.164 — Toxic N: Deals N poison counters when dealing combat damage to a player.",
+  "proliferate": "701.27 — Proliferate: Choose any permanents/players with counters; give each another counter of each kind they have.",
+  "storm": "702.39 — Storm: When cast, copy for each other spell cast this turn.",
+  "infect": "702.90 — Infect: Deals damage to players as poison counters; to creatures as -1/-1 counters.",
+  "partner": "702.124 — Partner: You can have two commanders if both have partner.",
+  "cascade": "702.84 — Cascade: When cast, exile cards until a cheaper nonland; cast it free.",
+  "commander tax": "903.8 — Commander Tax: Each time you cast your commander from the command zone, it costs {2} more.",
+  "commander damage": "903.10 — A player who has been dealt 21 or more combat damage by a single commander loses the game.",
+  "the stack": "405 — The Stack resolves LIFO (last in, first out). Each player receives priority between spells.",
+  "priority": "116 — Active player gets priority first. Players must pass priority for spells/abilities to resolve.",
+  "state based actions": "704 — Checked constantly: 0 life (lose), 0 toughness (destroy), 10 poison (lose), legend rule, etc.",
+  "mana burn": "Removed in Magic 2010. Unspent mana no longer causes damage.",
+  "layers": "613 — Continuous effects apply in 7 layers: copy → control → text → type → color → ability → P/T.",
+  "replacement effects": "614 — Modify events before they happen (e.g. Leyline of the Void). Don't use the stack.",
+  "monarch": "The Monarch draws an extra card at their end step. Become monarch by dealing combat damage to current monarch.",
+  "initiative": "The Initiative: Venture into Undercity at the beginning of your upkeep.",
+  "day": "Day/Night — If no spells cast on last active player's turn, night falls. Daybound/Nightbound cards transform.",
+  "wither": "702.79 — Wither: Deals damage to creatures as -1/-1 counters instead of damage.",
+  "annihilator": "702.86 — Annihilator N: Whenever attacks, defending player sacrifices N permanents.",
+  "convoke": "702.50 — Convoke: Tap creatures to help pay; each tapped creature pays {1} or one mana of its color.",
+};
 
 // ════════════════════════════════════════
 // GAME STATE
 // ════════════════════════════════════════
 let myName = '';
-let G = null; // game state
+let G = null;
+let roomId = null;
+let ws = null;
+let wsConnected = false;
 
 function defaultGame(mode, players, lifeOverride) {
   const m = MODES[mode] || MODES.commander;
   const life = lifeOverride || m.life;
   return {
     mode,
-    turn: 0,          // index into players array
-    turnNum: 1,
+    turn: 0,
+    turn_num: 1,
+    phase: 'untap',
+    day_night: null,
+    stack: [],
+    reminders: [],
     players: players.map(name => ({
       name,
       life,
-      poison: 0,
-      energy: 0,
-      experience: 0,
-      storm: 0,
-      cmdDmg: {},     // { fromPlayerName: number }
-      monarch: false,
-      initiative: false,
+      counters: {poison:0,energy:0,experience:0,storm:0,rad:0},
+      cmd_dmg: {},
+      statuses: {monarch:false,initiative:false},
+      cmd_tax: 0,
+      cmd_cast_count: 0,
     })),
-    startedAt: Date.now(),
+    global_log: [],
     notes: '',
+    started_at: Date.now(),
   };
-}
-
-// ════════════════════════════════════════
-// STATS (localStorage)
-// ════════════════════════════════════════
-function loadStats() {
-  try { return JSON.parse(localStorage.getItem('mtgirl_stats_' + myName) || 'null') || {wins:0,losses:0,history:[]}; }
-  catch { return {wins:0,losses:0,history:[]}; }
-}
-function saveStats(st) {
-  localStorage.setItem('mtgirl_stats_' + myName, JSON.stringify(st));
-}
-function recordResult(result) {
-  if (!G) return;
-  const st = loadStats();
-  if (result === 'W') st.wins++; else st.losses++;
-  const m = MODES[G.mode] || MODES.commander;
-  const me = G.players.find(p => p.name === myName) || G.players[0];
-  st.history.unshift({
-    result,
-    format: m.name,
-    life: me.life,
-    players: G.players.map(p=>p.name).join(', '),
-    date: new Date().toLocaleDateString(),
-    turns: G.turnNum,
-  });
-  st.history = st.history.slice(0,50);
-  saveStats(st);
-  renderBottomStats();
-}
-
-function renderBottomStats() {
-  // no bottom stats needed — handled in stats modal
-}
-
-// ════════════════════════════════════════
-// LOGIN
-// ════════════════════════════════════════
-document.getElementById('l-name').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-
-function doLogin() {
-  const n = document.getElementById('l-name').value.trim();
-  if (!n) return;
-  myName = n;
-  document.getElementById('login').classList.add('hidden');
-  document.getElementById('app').classList.add('on');
-  // Check for saved game
-  const saved = localStorage.getItem('mtgirl_game_' + myName);
-  if (saved) {
-    try {
-      G = JSON.parse(saved);
-      renderAll();
-      return;
-    } catch {}
-  }
-  // Start new game setup
-  openNewGame();
-}
-
-function saveGame() {
-  if (G) localStorage.setItem('mtgirl_game_' + myName, JSON.stringify(G));
-}
-
-// ════════════════════════════════════════
-// RENDER ALL
-// ════════════════════════════════════════
-function renderAll() {
-  if (!G) return;
-  renderTopbar();
-  renderPlayers();
-}
-
-function renderTopbar() {
-  const m = MODES[G.mode] || MODES.commander;
-  document.getElementById('tb-mode').textContent = m.name;
-  const ap = G.players[G.turn];
-  document.getElementById('active-player-name').textContent = ap ? ap.name : '—';
-  document.getElementById('turn-num').textContent = `#${G.turnNum}`;
-}
-
-// ════════════════════════════════════════
-// RENDER PLAYER PANELS
-// ════════════════════════════════════════
-function renderPlayers() {
-  const area = document.getElementById('players-area');
-  const n = G.players.length;
-  // Set grid class
-  area.className = `p${Math.min(n,6)}`;
-  area.innerHTML = G.players.map((p,i) => buildPlayerPanel(p, i)).join('');
-
-  // Attach all events via delegation
-  area.querySelectorAll('[data-pact]').forEach(el => {
-    el.addEventListener('click', e => {
-      e.stopPropagation();
-      const {pact, pidx, delta, key, from} = el.dataset;
-      const idx = parseInt(pidx);
-      if (pact === 'life-adj')    adjLife(idx, parseInt(delta));
-      if (pact === 'life-open')   openLifeModal(idx);
-      if (pact === 'quick-life')  adjLife(idx, parseInt(delta));
-      if (pact === 'ctr-adj')     adjCounter(idx, key, parseInt(delta));
-      if (pact === 'cdmg-adj')    adjCmdDmg(idx, from, parseInt(delta));
-      if (pact === 'status-tog')  toggleStatus(idx, key);
-    });
-  });
-}
-
-function buildPlayerPanel(p, i) {
-  const isActive = i === G.turn;
-  const m = MODES[G.mode] || MODES.commander;
-  const poisonMax = G.mode === 'two_headed_giant' ? 15 : 10;
-
-  const lifeCls = p.life <= 5 ? 'crit' : p.life <= 10 ? 'lo' : '';
-
-  // Commander damage rows (only in commander formats, only from other players)
-  let cdmgHtml = '';
-  if (m.cmd && G.players.length > 1) {
-    const others = G.players.filter((_,j) => j !== i);
-    cdmgHtml = `
-    <div class="cdmg-section">
-      <div class="cdmg-title">Commander Damage Received</div>
-      ${others.map(op => {
-        const v = p.cmdDmg[op.name] || 0;
-        const cls = v >= 21 ? 'dead' : v >= 18 ? 'warn' : '';
-        return `<div class="cdmg-row">
-          <span class="cdmg-from">${op.name}</span>
-          <span class="cdmg-val ${cls}">${v}</span>
-          <div class="pca">
-            <div class="pca-btn" data-pact="cdmg-adj" data-pidx="${i}" data-from="${op.name}" data-delta="-1">-</div>
-            <div class="pca-btn" data-pact="cdmg-adj" data-pidx="${i}" data-from="${op.name}" data-delta="1">+</div>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  }
-
-  // Counter rows
-  const ctrs = [
-    {key:'poison',   label:'Poison',     icon:'&#9760;', val:p.poison,     warn:poisonMax-3, dead:poisonMax},
-    {key:'energy',   label:'Energy',     icon:'&#9889;', val:p.energy,     warn:999, dead:999},
-    {key:'experience',label:'Experience',icon:'&#11052;',val:p.experience, warn:999, dead:999},
-    {key:'storm',    label:'Storm',      icon:'&#9928;', val:p.storm,      warn:999, dead:999},
-  ];
-
-  const ctrsHtml = ctrs.map(c => {
-    const cls = c.val >= c.dead ? 'dead' : c.val >= c.warn ? 'warn' : '';
-    return `<div class="pc-row">
-      <div class="pc-lbl"><span class="pc-ico">${c.icon}</span>${c.label}</div>
-      <div class="pc-val ${cls}">${c.val}</div>
-      <div class="pca">
-        <div class="pca-btn" data-pact="ctr-adj" data-pidx="${i}" data-key="${c.key}" data-delta="-1">-</div>
-        <div class="pca-btn" data-pact="ctr-adj" data-pidx="${i}" data-key="${c.key}" data-delta="1">+</div>
-      </div>
-    </div>`;
-  }).join('');
-
-  return `
-  <div class="pp ${isActive ? 'active' : ''}" id="pp-${i}">
-    <div class="pp-head">
-      <span class="pp-name">${p.name}</span>
-      <span class="pp-turn-badge">ACTIVE TURN</span>
-      <span class="pp-format-badge">${MODES[G.mode]?.name || ''}</span>
-    </div>
-    <div class="pp-life">
-      <div class="pp-life-adj" data-pact="life-adj" data-pidx="${i}" data-delta="-1">&#8722;</div>
-      <div class="pp-life-num ${lifeCls}" data-pact="life-open" data-pidx="${i}">${p.life}</div>
-      <div class="pp-life-adj" data-pact="life-adj" data-pidx="${i}" data-delta="1">+</div>
-    </div>
-    <div class="pp-quick">
-      <div class="qlb neg" data-pact="quick-life" data-pidx="${i}" data-delta="-5">-5</div>
-      <div class="qlb neg" data-pact="quick-life" data-pidx="${i}" data-delta="-2">-2</div>
-      <div class="qlb neg" data-pact="quick-life" data-pidx="${i}" data-delta="-1">-1</div>
-      <div class="qlb pos" data-pact="quick-life" data-pidx="${i}" data-delta="1">+1</div>
-      <div class="qlb pos" data-pact="quick-life" data-pidx="${i}" data-delta="2">+2</div>
-      <div class="qlb pos" data-pact="quick-life" data-pidx="${i}" data-delta="5">+5</div>
-    </div>
-    <div class="pp-ctrs">
-      ${ctrsHtml}
-    </div>
-    ${cdmgHtml}
-    <div class="pp-status">
-      <div class="status-chip ${p.monarch?'on':''}" data-pact="status-tog" data-pidx="${i}" data-key="monarch">Monarch</div>
-      <div class="status-chip ${p.initiative?'on':''}" data-pact="status-tog" data-pidx="${i}" data-key="initiative">Initiative</div>
-    </div>
-  </div>`;
-}
-
-// ════════════════════════════════════════
-// PLAYER ACTIONS
-// ════════════════════════════════════════
-function adjLife(idx, delta) {
-  if (!G) return;
-  G.players[idx].life += delta;
-  saveGame();
-  renderPlayers();
-}
-
-function adjCounter(idx, key, delta) {
-  if (!G) return;
-  G.players[idx][key] = Math.max(0, (G.players[idx][key] || 0) + delta);
-  saveGame();
-  renderPlayers();
-}
-
-function adjCmdDmg(idx, fromName, delta) {
-  if (!G) return;
-  const p = G.players[idx];
-  if (!p.cmdDmg) p.cmdDmg = {};
-  p.cmdDmg[fromName] = Math.max(0, (p.cmdDmg[fromName] || 0) + delta);
-  saveGame();
-  renderPlayers();
-}
-
-function toggleStatus(idx, key) {
-  if (!G) return;
-  G.players[idx][key] = !G.players[idx][key];
-  saveGame();
-  renderPlayers();
-}
-
-// ════════════════════════════════════════
-// LIFE MODAL
-// ════════════════════════════════════════
-let lifeModalIdx = null;
-function openLifeModal(idx) {
-  lifeModalIdx = idx;
-  const p = G.players[idx];
-  document.getElementById('life-ov-title').textContent = `Set Life — ${p.name}`;
-  document.getElementById('life-ov-inp').value = p.life;
-  openOv('life-ov');
-  setTimeout(() => document.getElementById('life-ov-inp').select(), 60);
-}
-function confirmSetLife() {
-  const v = parseInt(document.getElementById('life-ov-inp').value);
-  if (isNaN(v) || lifeModalIdx === null) return;
-  G.players[lifeModalIdx].life = v;
-  saveGame();
-  renderPlayers();
-  closeOv('life-ov');
-}
-document.getElementById('life-ov-inp').addEventListener('keydown', e => { if(e.key==='Enter') confirmSetLife(); });
-
-// ════════════════════════════════════════
-// END TURN — REAL ROTATION
-// ════════════════════════════════════════
-function endTurn() {
-  if (!G) return;
-  const prev = G.turn;
-  G.turn = (G.turn + 1) % G.players.length;
-  // Increment turn number only when we wrap back to player 0
-  if (G.turn === 0) G.turnNum++;
-  // Reset storm counter for ALL players on new full round
-  if (G.turn === 0) G.players.forEach(p => { p.storm = 0; });
-  // Flash animation on old panel
-  const oldEl = document.getElementById(`pp-${prev}`);
-  if (oldEl) oldEl.style.opacity = '0.5';
-  saveGame();
-  renderAll();
-  // Restore opacity
-  setTimeout(() => {
-    const el = document.getElementById(`pp-${prev}`);
-    if (el) el.style.opacity = '';
-  }, 300);
-  // Scroll new active player into view on mobile
-  const newEl = document.getElementById(`pp-${G.turn}`);
-  if (newEl) newEl.scrollIntoView({behavior:'smooth', block:'nearest'});
-}
-
-function untapAllPlayers() {
-  // Visual only — signals to untap; no digital permanents tracked here
-  // Flash all panels gold briefly
-  document.querySelectorAll('.pp').forEach(el => {
-    el.style.boxShadow = '0 0 20px rgba(200,164,74,.4)';
-    setTimeout(() => el.style.boxShadow = '', 600);
-  });
-}
-
-// ════════════════════════════════════════
-// NEW GAME SETUP
-// ════════════════════════════════════════
-let ngMode = 'commander';
-let ngPlayers = [];
-
-function openNewGame() {
-  ngMode = G?.mode || 'commander';
-  ngPlayers = G ? G.players.map(p=>p.name) : [myName, 'Player 2'];
-  buildNgModeGrid();
-  buildNgPlayersList();
-  document.getElementById('ng-life').value = MODES[ngMode]?.life || 20;
-  openOv('ng-ov');
-}
-
-function buildNgModeGrid() {
-  const cont = document.getElementById('ng-mode-cont');
-  cont.innerHTML = MODE_CATS.map(cat => `
-    <div class="mc ${cat.c}">${cat.l}</div>
-    <div class="mgrid">
-      ${cat.k.map(k => { const m = MODES[k]; return `
-        <div class="mt ${k===ngMode?'sel':''}" data-ngm="${k}">
-          <div class="mn">${m.name}</div>
-          <div class="ml">${m.life} life</div>
-          <div class="md">${m.deck} cards${m.cmd?' &bull; Cmdr':''}</div>
-        </div>`;}).join('')}
-    </div>`).join('');
-  cont.querySelectorAll('[data-ngm]').forEach(el => {
-    el.addEventListener('click', () => {
-      ngMode = el.dataset.ngm;
-      cont.querySelectorAll('.mt').forEach(t => t.classList.toggle('sel', t.dataset.ngm===ngMode));
-      document.getElementById('ng-life').value = MODES[ngMode]?.life || 20;
-    });
-  });
-}
-
-function buildNgPlayersList() {
-  const el = document.getElementById('ng-players-list');
-  el.innerHTML = ngPlayers.map((name, i) => `
-    <div class="player-row">
-      <span class="pnum">P${i+1}</span>
-      <input class="inp" style="flex:1;" value="${name}" data-pidx="${i}" placeholder="Player name..." maxlength="24">
-      ${i > 1 ? `<button class="player-row-rm" data-rmidx="${i}">&times;</button>` : ''}
-    </div>`).join('');
-  el.querySelectorAll('[data-pidx]').forEach(inp => {
-    inp.addEventListener('input', () => { ngPlayers[parseInt(inp.dataset.pidx)] = inp.value.trim(); });
-  });
-  el.querySelectorAll('[data-rmidx]').forEach(btn => {
-    btn.addEventListener('click', () => { ngPlayers.splice(parseInt(btn.dataset.rmidx),1); buildNgPlayersList(); });
-  });
-}
-
-function addNgPlayer() {
-  ngPlayers.push(`Player ${ngPlayers.length+1}`);
-  buildNgPlayersList();
-}
-
-function startGame() {
-  const players = ngPlayers.filter(p => p.trim());
-  if (!players.length) return alert('Add at least one player.');
-  const life = parseInt(document.getElementById('ng-life').value) || MODES[ngMode].life;
-  // Record win/loss if there was a previous game
-  G = defaultGame(ngMode, players, life);
-  saveGame();
-  closeOv('ng-ov');
-  renderAll();
-}
-
-// ════════════════════════════════════════
-// MODE MODAL
-// ════════════════════════════════════════
-let selMode = 'commander';
-
-function buildModeGrid(containerId) {
-  selMode = G?.mode || 'commander';
-  const cont = document.getElementById(containerId);
-  cont.innerHTML = MODE_CATS.map(cat => `
-    <div class="mc ${cat.c}">${cat.l}</div>
-    <div class="mgrid">
-      ${cat.k.map(k => { const m = MODES[k]; return `
-        <div class="mt ${k===selMode?'sel':''}" data-sm="${k}">
-          <div class="mn">${m.name}</div>
-          <div class="ml">${m.life} life</div>
-          <div class="md">${m.deck} cards${m.cmd?' &bull; Cmdr':''}</div>
-        </div>`;}).join('')}
-    </div>`).join('');
-  cont.querySelectorAll('[data-sm]').forEach(el => {
-    el.addEventListener('click', () => {
-      selMode = el.dataset.sm;
-      cont.querySelectorAll('.mt').forEach(t => t.classList.toggle('sel', t.dataset.sm===selMode));
-    });
-  });
-}
-
-function confirmMode() {
-  if (!G || selMode === G.mode) { closeOv('mode-ov'); return; }
-  const m = MODES[selMode];
-  if (!confirm(`Switch to ${m.name}? Starting life will reset to ${m.life}.`)) { closeOv('mode-ov'); return; }
-  G.mode = selMode;
-  G.players.forEach(p => { p.life = m.life; });
-  saveGame();
-  renderAll();
-  closeOv('mode-ov');
 }
 
 // ════════════════════════════════════════
 // STATS
 // ════════════════════════════════════════
+function loadStats() {
+  try { return JSON.parse(localStorage.getItem('mtgirl_stats_v2_' + myName) || 'null') || {wins:0,losses:0,history:[]}; }
+  catch { return {wins:0,losses:0,history:[]}; }
+}
+function saveStats(st) { localStorage.setItem('mtgirl_stats_v2_' + myName, JSON.stringify(st)); }
+function recordResult(result) {
+  if (!G) return;
+  const st = loadStats();
+  if (result === 'W') st.wins++; else st.losses++;
+  const m = MODES[G.mode] || MODES.commander;
+  st.history.unshift({
+    result, format: m.name,
+    players: G.players.map(p=>p.name).join(', '),
+    date: new Date().toLocaleDateString(),
+    turns: G.turn_num,
+  });
+  st.history = st.history.slice(0,50);
+  saveStats(st);
+  renderStats();
+}
+function clearStats() {
+  if (!confirm('Clear all stats for ' + myName + '?')) return;
+  saveStats({wins:0,losses:0,history:[]});
+  renderStats();
+}
 function renderStats() {
   document.getElementById('stats-name').textContent = myName;
   const st = loadStats();
@@ -1071,33 +922,633 @@ function renderStats() {
       <div class="stat-tile"><div class="stat-big">${total}</div><div class="stat-lbl">Games</div></div>
       <div class="stat-tile"><div class="stat-big">${wr}%</div><div class="stat-lbl">Win Rate</div></div>
     </div>
-    <div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;">
-      <span style="font-family:var(--ff1);font-size:.58rem;letter-spacing:.14em;color:var(--tlo);">RECORD WIN / LOSS FOR CURRENT GAME:</span>
+    <div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <span style="font-family:var(--ff1);font-size:.56rem;letter-spacing:.12em;color:var(--tlo);">RECORD RESULT:</span>
       <button class="btn grn sm" onclick="recordResult('W')">Win</button>
       <button class="btn red sm" onclick="recordResult('L')">Loss</button>
     </div>
-    <div style="font-family:var(--ff1);font-size:.56rem;letter-spacing:.16em;color:var(--tlo);margin-bottom:8px;">HISTORY</div>
+    <div class="sec-head">History</div>
     ${st.history.length
       ? st.history.map(g=>`
           <div class="hist-row">
             <span class="hist-res ${g.result}">${g.result==='W'?'WIN':'LOSS'}</span>
-            <div class="hist-detail">
-              <div class="hist-fmt">${g.format} &mdash; ${g.players}</div>
-              <div class="hist-meta">${g.date} &bull; Ended at ${g.life} life &bull; Turn ${g.turns||'?'}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:.7rem;color:var(--thi);">${g.format} — ${g.players}</div>
+              <div style="font-size:.6rem;color:var(--tlo);">${g.date} · Turn ${g.turns||'?'}</div>
             </div>
-          </div>`)
-        .join('')
-      : '<div style="color:var(--tlo);font-style:italic;font-size:.78rem;padding:12px 0;">No history yet. Record wins/losses when games end.</div>'}`;
-}
-
-function clearStats() {
-  if (!confirm('Clear all stats for ' + myName + '?')) return;
-  saveStats({wins:0,losses:0,history:[]});
-  renderStats();
+          </div>`).join('')
+      : '<div style="color:var(--tlo);font-style:italic;font-size:.78rem;padding:12px 0;">No history yet.</div>'}`;
 }
 
 // ════════════════════════════════════════
-// CAMERA CARD SCANNING (OCR like Mana Box)
+// LOGIN & JOIN
+// ════════════════════════════════════════
+function switchLoginTab(tab) {
+  document.querySelectorAll('.ltab').forEach((t,i) => t.classList.toggle('sel', (i===0&&tab==='new')||(i===1&&tab==='join')));
+  document.getElementById('ls-new').classList.toggle('on', tab==='new');
+  document.getElementById('ls-join').classList.toggle('on', tab==='join');
+}
+
+document.getElementById('l-name').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('lj-name').addEventListener('keydown', e => { if(e.key==='Enter') doJoinRoom(); });
+document.getElementById('lj-room').addEventListener('keydown', e => { if(e.key==='Enter') doJoinRoom(); });
+document.getElementById('lj-room').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase(); });
+
+function doLogin() {
+  const n = document.getElementById('l-name').value.trim();
+  if (!n) return;
+  myName = n;
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.add('on');
+  const saved = localStorage.getItem('mtgirl_game_v2_' + myName);
+  if (saved) {
+    try {
+      G = JSON.parse(saved);
+      if (G.room_id) roomId = G.room_id;
+      renderAll();
+      if (roomId) connectWs(roomId);
+      return;
+    } catch {}
+  }
+  openNewGame();
+}
+
+async function doJoinRoom() {
+  const n = document.getElementById('lj-name').value.trim();
+  const code = document.getElementById('lj-room').value.trim().toUpperCase();
+  if (!n || !code) { alert('Enter name and room code'); return; }
+  myName = n;
+  try {
+    const r = await fetch('/join_room', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({room_id: code})});
+    if (!r.ok) { alert('Room not found: ' + code); return; }
+    const data = await r.json();
+    G = data.game;
+    roomId = code;
+    // Add player to game if not present
+    if (!G.players.find(p=>p.name===myName)) {
+      const m = MODES[G.mode] || MODES.commander;
+      G.players.push({
+        name: myName, life: m.life,
+        counters: {poison:0,energy:0,experience:0,storm:0,rad:0},
+        cmd_dmg: {}, statuses: {monarch:false,initiative:false},
+        cmd_tax:0, cmd_cast_count:0,
+      });
+      await roomAction('update_game', {game: G});
+    }
+    saveGame();
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('app').classList.add('on');
+    renderAll();
+    connectWs(roomId);
+  } catch(e) {
+    alert('Could not join room. Is the server running?');
+  }
+}
+
+// ════════════════════════════════════════
+// WEBSOCKET SYNC
+// ════════════════════════════════════════
+function connectWs(rid) {
+  if (ws) { ws.close(); ws = null; }
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  const url = `${proto}://${location.host}/ws/${rid}/${encodeURIComponent(myName)}`;
+  try {
+    ws = new WebSocket(url);
+    ws.onopen = () => {
+      wsConnected = true;
+      updateRoomBadge();
+    };
+    ws.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        if (msg.type === 'game_update' || msg.type === 'player_joined') {
+          if (msg.game) {
+            G = msg.game;
+            saveGame();
+            renderAll();
+          }
+        } else if (msg.type === 'player_left') {
+          logGlobal(`${msg.player} disconnected`);
+          renderAll();
+        }
+      } catch {}
+    };
+    ws.onerror = () => { wsConnected = false; updateRoomBadge(); };
+    ws.onclose = () => { wsConnected = false; updateRoomBadge(); };
+    // Ping keepalive
+    setInterval(() => { if(ws&&ws.readyState===1) ws.send(JSON.stringify({type:'ping'})); }, 20000);
+  } catch(e) {
+    console.warn('WS connect failed:', e);
+  }
+}
+
+async function roomAction(action, payload) {
+  if (!roomId) return;
+  try {
+    await fetch('/room_action', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({room_id: roomId, player: myName, action, payload}),
+    });
+  } catch {}
+}
+
+function updateRoomBadge() {
+  const badge = document.getElementById('room-badge');
+  if (roomId) {
+    badge.classList.remove('hidden');
+    badge.textContent = `ROOM: ${roomId}`;
+    badge.style.borderColor = wsConnected ? '#2070c0' : '#604020';
+    badge.style.color = wsConnected ? '#80b8ff' : '#c08040';
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+function showRoomInfo() {
+  document.getElementById('room-code-display').textContent = roomId || '——';
+  const list = document.getElementById('room-players-list');
+  if (G) {
+    list.innerHTML = G.players.map(p => `<div class="player-online-badge">${p.name}</div>`).join('');
+  }
+  document.getElementById('room-sync-status').textContent = wsConnected ? '● Live sync active' : '○ Not connected to server';
+  openOv('room-ov');
+}
+
+// ════════════════════════════════════════
+// SAVE / LOAD
+// ════════════════════════════════════════
+function saveGame() {
+  if (G) localStorage.setItem('mtgirl_game_v2_' + myName, JSON.stringify(G));
+}
+function logGlobal(msg) {
+  if (!G) return;
+  G.global_log = G.global_log || [];
+  G.global_log.unshift({turn: G.turn_num, phase: G.phase, msg});
+  G.global_log = G.global_log.slice(0, 100);
+}
+
+// ════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════
+function renderAll() {
+  if (!G) return;
+  renderTopbar();
+  renderPhaseStepsBar();
+  renderStackPreview();
+  renderPlayers();
+  updateRoomBadge();
+}
+
+function renderTopbar() {
+  const m = MODES[G.mode] || MODES.commander;
+  document.getElementById('tb-mode').textContent = m.name;
+  const ap = G.players[G.turn];
+  document.getElementById('active-player-name').textContent = ap ? ap.name : '—';
+  document.getElementById('turn-num').textContent = `#${G.turn_num}`;
+}
+
+function renderPhaseStepsBar() {
+  const bar = document.getElementById('phase-steps-bar');
+  bar.className = '';
+  bar.style.cssText = 'background:var(--s1);border-bottom:1px solid var(--bdr);display:flex;align-items:stretch;flex-shrink:0;height:32px;overflow:hidden;';
+  bar.innerHTML = PHASES.map(p => `
+    <div class="phase-step ${G.phase===p.key?'active':''}" onclick="setPhase('${p.key}')" title="${p.label}">${p.short}</div>
+  `).join('');
+}
+
+function renderStackPreview() {
+  const preview = document.getElementById('stack-preview');
+  const label = document.getElementById('stack-label');
+  const stack = G.stack || [];
+  if (stack.length) {
+    label.classList.remove('hidden');
+    preview.innerHTML = stack.slice(0,4).map((s,i) => `
+      <div class="stack-item ${i===0?'top':''}">${s.text}</div>
+    `).join('') + (stack.length>4?`<div style="font-family:var(--ff1);font-size:.5rem;color:var(--tlo);padding:0 6px;">+${stack.length-4}</div>`:'');
+  } else {
+    label.classList.add('hidden');
+    preview.innerHTML = '';
+  }
+}
+
+// ════════════════════════════════════════
+// PLAYER PANELS
+// ════════════════════════════════════════
+function renderPlayers() {
+  const area = document.getElementById('players-area');
+  const n = G.players.length;
+  area.className = `p${Math.min(n,6)}`;
+  area.innerHTML = G.players.map((p,i) => buildPlayerPanel(p,i)).join('');
+  area.querySelectorAll('[data-pact]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      const {pact,pidx,delta,key,from} = el.dataset;
+      const idx = parseInt(pidx);
+      if (pact==='life-adj')   doAdjLife(idx, parseInt(delta));
+      if (pact==='life-open')  openLifeModal(idx);
+      if (pact==='quick-life') doAdjLife(idx, parseInt(delta));
+      if (pact==='ctr-adj')    doAdjCounter(idx, key, parseInt(delta));
+      if (pact==='cdmg-adj')   doAdjCmdDmg(idx, from, parseInt(delta));
+      if (pact==='status-tog') doToggleStatus(idx, key);
+      if (pact==='rm-remind')  removeReminder(key);
+    });
+  });
+}
+
+function buildPlayerPanel(p, i) {
+  const isActive = i === G.turn;
+  const m = MODES[G.mode] || MODES.commander;
+  const poisonMax = G.mode==='two_headed_giant' ? 15 : 10;
+  const lifeCls = p.life <= 5 ? 'crit' : p.life <= 10 ? 'lo' : '';
+
+  // Warnings
+  const warnings = [];
+  if (p.life <= 0) warnings.push('☠ Dead');
+  if (p.life > 0 && p.life <= 5) warnings.push('⚠ Low life');
+  if ((p.counters.poison||0) >= poisonMax) warnings.push('☠ Poison lethal');
+  else if ((p.counters.poison||0) >= poisonMax-2) warnings.push('⚠ ' + p.counters.poison + ' poison');
+  if (m.cmd) {
+    Object.entries(p.cmd_dmg||{}).forEach(([from, v]) => {
+      if (v >= 21) warnings.push(`☠ Cmdr lethal (${from})`);
+      else if (v >= 18) warnings.push(`⚠ ${v} cmdr dmg (${from})`);
+    });
+  }
+  const warnHtml = warnings.length ? `<div class="pp-warnings">${warnings.map(w=>`<div class="warn-chip">${w}</div>`).join('')}</div>` : '';
+
+  // Commander damage
+  let cdmgHtml = '';
+  if (m.cmd && G.players.length > 1) {
+    const others = G.players.filter((_,j)=>j!==i);
+    cdmgHtml = `<div class="cdmg-section">
+      <div class="cdmg-title">Commander Damage</div>
+      ${others.map(op => {
+        const v = (p.cmd_dmg||{})[op.name] || 0;
+        const cls = v>=21?'dead':v>=18?'warn':'';
+        return `<div class="cdmg-row">
+          <span class="cdmg-from">${op.name}</span>
+          <span class="cdmg-val ${cls}">${v}</span>
+          <div class="pca">
+            <div class="pca-btn" data-pact="cdmg-adj" data-pidx="${i}" data-from="${op.name}" data-delta="-1">-</div>
+            <div class="pca-btn" data-pact="cdmg-adj" data-pidx="${i}" data-from="${op.name}" data-delta="1">+</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  // Counters
+  const ctrs = [
+    {key:'poison',    label:'Poison',      icon:'☠', val:p.counters?.poison||0,     warn:poisonMax-2, dead:poisonMax},
+    {key:'energy',    label:'Energy',      icon:'⚡', val:p.counters?.energy||0,     warn:999, dead:999},
+    {key:'experience',label:'Exp',         icon:'★',  val:p.counters?.experience||0, warn:999, dead:999},
+    {key:'storm',     label:'Storm',       icon:'⚡', val:p.counters?.storm||0,      warn:999, dead:999},
+    {key:'rad',       label:'Rad',         icon:'☢', val:p.counters?.rad||0,        warn:999, dead:999},
+  ].filter(c => c.val > 0 || ['poison','energy'].includes(c.key));
+
+  const ctrsHtml = ctrs.map(c => {
+    const cls = c.val>=c.dead?'dead':c.val>=c.warn?'warn':'';
+    return `<div class="pc-row">
+      <div class="pc-lbl"><span class="pc-ico">${c.icon}</span>${c.label}</div>
+      <div class="pc-val ${cls}">${c.val}</div>
+      <div class="pca">
+        <div class="pca-btn" data-pact="ctr-adj" data-pidx="${i}" data-key="${c.key}" data-delta="-1">-</div>
+        <div class="pca-btn" data-pact="ctr-adj" data-pidx="${i}" data-key="${c.key}" data-delta="1">+</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Per-player reminders
+  const myReminders = (G.reminders||[]).filter(r => r.player === p.name || !r.player);
+  const remindHtml = myReminders.length ? `<div class="pp-reminders">
+    ${myReminders.map(r => `
+      <div class="reminder-chip" data-pact="rm-remind" data-key="${r.id}">
+        <span>${r.text}</span><span class="rc-x">×</span>
+      </div>`).join('')}
+  </div>` : '';
+
+  return `
+  <div class="pp ${isActive?'active':''}" id="pp-${i}">
+    <div class="pp-head">
+      <span class="pp-name">${p.name}</span>
+      <span class="pp-turn-badge">ACTIVE TURN</span>
+    </div>
+    ${warnHtml}
+    <div class="pp-life">
+      <div class="pp-life-adj" data-pact="life-adj" data-pidx="${i}" data-delta="-1">−</div>
+      <div class="pp-life-num ${lifeCls}" data-pact="life-open" data-pidx="${i}">${p.life}</div>
+      <div class="pp-life-adj" data-pact="life-adj" data-pidx="${i}" data-delta="1">+</div>
+    </div>
+    <div class="pp-quick">
+      <div class="qlb neg" data-pact="quick-life" data-pidx="${i}" data-delta="-10">-10</div>
+      <div class="qlb neg" data-pact="quick-life" data-pidx="${i}" data-delta="-5">-5</div>
+      <div class="qlb neg" data-pact="quick-life" data-pidx="${i}" data-delta="-2">-2</div>
+      <div class="qlb neg" data-pact="quick-life" data-pidx="${i}" data-delta="-1">-1</div>
+      <div class="qlb pos" data-pact="quick-life" data-pidx="${i}" data-delta="1">+1</div>
+      <div class="qlb pos" data-pact="quick-life" data-pidx="${i}" data-delta="2">+2</div>
+      <div class="qlb pos" data-pact="quick-life" data-pidx="${i}" data-delta="5">+5</div>
+    </div>
+    <div class="pp-ctrs">${ctrsHtml}</div>
+    ${cdmgHtml}
+    <div class="pp-status">
+      <div class="status-chip mon ${p.statuses?.monarch?'on':''}" data-pact="status-tog" data-pidx="${i}" data-key="monarch">♔ Monarch</div>
+      <div class="status-chip ini ${p.statuses?.initiative?'on':''}" data-pact="status-tog" data-pidx="${i}" data-key="initiative">⚑ Initiative</div>
+    </div>
+    ${remindHtml}
+  </div>`;
+}
+
+// ════════════════════════════════════════
+// PLAYER ACTIONS (with room sync)
+// ════════════════════════════════════════
+function doAdjLife(idx, delta) {
+  if (!G) return;
+  G.players[idx].life += delta;
+  const target = G.players[idx].name;
+  logGlobal(`${target}: life ${delta>0?'+':''}${delta} → ${G.players[idx].life}`);
+  saveGame(); renderPlayers();
+  if (roomId) roomAction('adj_life', {target, delta});
+}
+function doAdjCounter(idx, key, delta) {
+  if (!G) return;
+  G.players[idx].counters = G.players[idx].counters || {};
+  G.players[idx].counters[key] = Math.max(0, (G.players[idx].counters[key]||0) + delta);
+  saveGame(); renderPlayers();
+  if (roomId) roomAction('adj_counter', {target: G.players[idx].name, key, delta});
+}
+function doAdjCmdDmg(idx, fromName, delta) {
+  if (!G) return;
+  const p = G.players[idx];
+  p.cmd_dmg = p.cmd_dmg || {};
+  p.cmd_dmg[fromName] = Math.max(0, (p.cmd_dmg[fromName]||0) + delta);
+  const v = p.cmd_dmg[fromName];
+  if (v >= 21) logGlobal(`⚠ ${p.name} at ${v} commander damage from ${fromName}!`);
+  saveGame(); renderPlayers();
+  if (roomId) roomAction('adj_cmd_dmg', {target: p.name, from_player: fromName, delta});
+}
+function doToggleStatus(idx, key) {
+  if (!G) return;
+  G.players[idx].statuses = G.players[idx].statuses || {};
+  G.players[idx].statuses[key] = !G.players[idx].statuses[key];
+  saveGame(); renderPlayers();
+  if (roomId) roomAction('toggle_status', {target: G.players[idx].name, key});
+}
+
+// Life modal
+let lifeModalIdx = null;
+function openLifeModal(idx) {
+  lifeModalIdx = idx;
+  const p = G.players[idx];
+  document.getElementById('life-ov-title').textContent = `Set Life — ${p.name}`;
+  document.getElementById('life-ov-inp').value = p.life;
+  openOv('life-ov');
+  setTimeout(() => document.getElementById('life-ov-inp').select(), 60);
+}
+function confirmSetLife() {
+  const v = parseInt(document.getElementById('life-ov-inp').value);
+  if (isNaN(v) || lifeModalIdx === null) return;
+  const target = G.players[lifeModalIdx].name;
+  G.players[lifeModalIdx].life = v;
+  logGlobal(`${target}: life set to ${v}`);
+  saveGame(); renderPlayers(); closeOv('life-ov');
+  if (roomId) roomAction('set_life', {target, value: v});
+}
+document.getElementById('life-ov-inp').addEventListener('keydown', e => { if(e.key==='Enter') confirmSetLife(); });
+
+// ════════════════════════════════════════
+// PHASE
+// ════════════════════════════════════════
+function setPhase(key) {
+  if (!G) return;
+  G.phase = key;
+  saveGame(); renderAll();
+  if (roomId) roomAction('set_phase', {phase: key});
+  // Show reminders for this phase
+  const phaseReminders = (G.reminders||[]).filter(r => r.phase === key);
+  if (phaseReminders.length) {
+    const names = phaseReminders.map(r=>r.text).join(', ');
+    logGlobal(`⏰ ${key}: ${names}`);
+  }
+}
+function advancePhase() {
+  if (!G) return;
+  const idx = PHASE_ORDER.indexOf(G.phase);
+  const next = PHASE_ORDER[(idx+1) % PHASE_ORDER.length];
+  if (idx === PHASE_ORDER.length-1) { doEndTurn(); return; }
+  setPhase(next);
+  closeOv('phase-ov');
+}
+function renderPhaseModal() {
+  const grid = document.getElementById('phase-grid');
+  grid.innerHTML = PHASES.map(p => `
+    <div class="phase-tile ${G.phase===p.key?'active':''}" onclick="setPhase('${p.key}');closeOv('phase-ov')">
+      <div class="pn">${p.label}</div>
+      <div class="pd">${p.key==='upkeep'?'Triggers fire':p.key==='draw'?'Draw a card':p.key==='combat'?'Attack phase':p.key==='end'?'EOT triggers':''}</div>
+    </div>`).join('');
+  const phaseReminders = (G.reminders||[]).filter(r => r.phase === G.phase);
+  document.getElementById('phase-reminder-head').textContent = `Reminders — ${G.phase || 'this phase'}`;
+  document.getElementById('phase-reminder-list').innerHTML = phaseReminders.length
+    ? phaseReminders.map(r=>`<div class="reminder-row">
+        <span class="reminder-text">${r.text}</span>
+        <span class="reminder-meta">T${r.created_turn}</span>
+        <button class="btn red sm" onclick="removeReminder('${r.id}');renderPhaseModal()">×</button>
+      </div>`).join('')
+    : '<div style="color:var(--tlo);font-size:.72rem;font-style:italic;">None for this phase.</div>';
+}
+
+// ════════════════════════════════════════
+// END TURN
+// ════════════════════════════════════════
+function doEndTurn() {
+  if (!G) return;
+  const prev = G.turn;
+  G.turn = (G.turn + 1) % G.players.length;
+  G.phase = 'untap';
+  if (G.turn === 0) {
+    G.turn_num++;
+    G.players.forEach(p => { if(p.counters) p.counters.storm = 0; });
+  }
+  // Expire one-turn reminders
+  G.reminders = (G.reminders||[]).filter(r => (r.expires_turn||9999) >= G.turn_num);
+  const ap = G.players[G.turn];
+  logGlobal(`Turn ${G.turn_num}: ${ap.name}'s turn`);
+  const oldEl = document.getElementById(`pp-${prev}`);
+  if (oldEl) { oldEl.style.opacity='0.5'; setTimeout(()=>{ const el=document.getElementById(`pp-${prev}`); if(el) el.style.opacity=''; },300); }
+  saveGame(); renderAll();
+  if (roomId) roomAction('end_turn', {});
+  const newEl = document.getElementById(`pp-${G.turn}`);
+  if (newEl) newEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+  closeOv('phase-ov');
+}
+
+// ════════════════════════════════════════
+// REMINDERS
+// ════════════════════════════════════════
+function addReminder() {
+  const text = document.getElementById('rem-text').value.trim();
+  if (!text) return;
+  const phase = document.getElementById('rem-phase').value || null;
+  const expireIn = parseInt(document.getElementById('rem-expire').value) || 1;
+  const reminder = {
+    id: Math.random().toString(36).slice(2,10),
+    text, player: myName, phase,
+    expires_turn: G.turn_num + expireIn,
+    created_turn: G.turn_num,
+  };
+  G.reminders = G.reminders || [];
+  G.reminders.push(reminder);
+  logGlobal(`${myName} added reminder: ${text}`);
+  document.getElementById('rem-text').value = '';
+  saveGame(); renderPlayers(); renderReminderList();
+  if (roomId) roomAction('add_reminder', {text, phase, expires_turn: reminder.expires_turn});
+}
+function quickRemind(text, phase=null, expireIn=999) {
+  document.getElementById('rem-text').value = text;
+  if (phase) document.getElementById('rem-phase').value = phase;
+  document.getElementById('rem-expire').value = expireIn;
+  addReminder();
+}
+function removeReminder(id) {
+  if (!G) return;
+  G.reminders = (G.reminders||[]).filter(r => r.id !== id);
+  saveGame(); renderPlayers(); renderReminderList();
+  if (roomId) roomAction('remove_reminder', {id});
+}
+function renderReminderList() {
+  const list = document.getElementById('remind-list');
+  const reminders = G?.reminders || [];
+  list.innerHTML = reminders.length
+    ? reminders.map(r => `<div class="reminder-row">
+        <div style="flex:1;">
+          <div class="reminder-text">${r.text}${r.phase?` <span style="color:var(--tlo);font-size:.6rem;">[${r.phase}]</span>`:''}</div>
+          <div class="reminder-meta">${r.player} · Turn ${r.created_turn} → expires T${r.expires_turn}</div>
+        </div>
+        <button class="btn red sm" onclick="removeReminder('${r.id}');renderReminderList()">×</button>
+      </div>`).join('')
+    : '<div style="color:var(--tlo);font-size:.72rem;font-style:italic;padding:8px 0;">No active reminders.</div>';
+}
+
+// ════════════════════════════════════════
+// STACK
+// ════════════════════════════════════════
+function pushStack() {
+  const text = document.getElementById('stack-text').value.trim();
+  if (!text || !G) return;
+  G.stack = G.stack || [];
+  G.stack.unshift({id: Math.random().toString(36).slice(2,10), text, player: myName});
+  document.getElementById('stack-text').value = '';
+  logGlobal(`Stack: ${myName} → ${text}`);
+  saveGame(); renderAll(); renderStackModal();
+  if (roomId) roomAction('push_stack', {text});
+}
+function popStack() {
+  if (!G || !G.stack?.length) return;
+  const item = G.stack.shift();
+  logGlobal(`Stack: resolved "${item.text}"`);
+  saveGame(); renderAll(); renderStackModal();
+  if (roomId) roomAction('pop_stack', {});
+}
+function clearStack() {
+  if (!G) return;
+  G.stack = [];
+  saveGame(); renderAll(); renderStackModal();
+  if (roomId) roomAction('clear_stack', {});
+}
+function renderStackModal() {
+  const list = document.getElementById('stack-list');
+  const stack = G?.stack || [];
+  list.innerHTML = stack.length
+    ? stack.map((s,i) => `<div style="padding:8px 12px;background:var(--s2);border:1px solid var(--bdr2);margin-bottom:5px;border-left:3px solid ${i===0?'#60d0d0':'var(--glo)'};display:flex;gap:8px;align-items:center;">
+        <span style="font-family:var(--ff1);font-size:.5rem;color:var(--tlo);flex-shrink:0;">${i===0?'TOP':i+1}</span>
+        <span style="flex:1;font-size:.75rem;color:var(--thi);">${s.text}</span>
+        <span style="font-size:.6rem;color:var(--tlo);">${s.player||''}</span>
+      </div>`).join('')
+    : '<div style="color:var(--tlo);font-style:italic;font-size:.72rem;padding:8px 0;">Stack is empty.</div>';
+}
+document.getElementById('stack-text').addEventListener('keydown', e => { if(e.key==='Enter') pushStack(); });
+
+// ════════════════════════════════════════
+// DICE
+// ════════════════════════════════════════
+function rollDice(sides, count=1) {
+  const results = Array.from({length:count}, () => Math.floor(Math.random()*sides)+1);
+  const total = results.reduce((a,b)=>a+b,0);
+  const res = document.getElementById('dice-result');
+  res.innerHTML = count > 1
+    ? `${results.join(' + ')} = <span style="color:var(--gold)">${total}</span>`
+    : `<span style="font-size:2.6rem">${results[0]}</span>`;
+  logGlobal(`${myName} rolled ${count}d${sides}: ${results.join(', ')} (${total})`);
+}
+function rollCustom() {
+  const sides = parseInt(document.getElementById('custom-sides').value) || 100;
+  rollDice(sides);
+}
+function flipCoin(count=1) {
+  const results = Array.from({length:count}, () => Math.random()>.5?'Heads':'Tails');
+  document.getElementById('coin-result').innerHTML = results.map(r=>`<div class="coin-result ${r==='Heads'?'coin-heads':'coin-tails'}">${r}</div>`).join('');
+  document.getElementById('dice-result').innerHTML = '';
+  logGlobal(`${myName} flipped: ${results.join(', ')}`);
+}
+function rollPlanar() {
+  const planar = ['Chaos','Chaos','Planeswalk','Planeswalk','Blank','Blank'];
+  const roll = planar[Math.floor(Math.random()*6)];
+  document.getElementById('dice-result').innerHTML = `<span style="font-size:1.4rem">${roll}</span>`;
+  logGlobal(`${myName} rolled planar die: ${roll}`);
+}
+function randomPlayer() {
+  if (!G?.players?.length) return;
+  const p = G.players[Math.floor(Math.random()*G.players.length)];
+  document.getElementById('dice-result').innerHTML = `<span style="font-size:1rem">${p.name}</span>`;
+  logGlobal(`Random player: ${p.name}`);
+}
+
+// ════════════════════════════════════════
+// RULES
+// ════════════════════════════════════════
+function searchRules() {
+  const q = document.getElementById('rules-inp').value.trim().toLowerCase();
+  if (!q) return;
+  const results = [];
+  for (const [keyword, rule] of Object.entries(RULES_LOCAL)) {
+    if (keyword.includes(q) || q.includes(keyword) || rule.toLowerCase().includes(q)) {
+      results.push({keyword, rule});
+    }
+  }
+  displayRules(results, q);
+}
+function quickRules(q) {
+  document.getElementById('rules-inp').value = q;
+  searchRules();
+}
+function displayRules(results, q) {
+  const el = document.getElementById('rules-results');
+  if (!results.length) {
+    el.innerHTML = `<div style="color:var(--tlo);font-style:italic;padding:8px 0;">No results for "${q}". Try: flying, deathtouch, commander damage, the stack, priority…</div>`;
+    return;
+  }
+  el.innerHTML = results.map(r => `
+    <div class="rule-result">
+      <div class="rule-keyword">${r.keyword}</div>
+      <div class="rule-text">${r.rule}</div>
+    </div>`).join('');
+}
+document.getElementById('rules-inp').addEventListener('keydown', e => { if(e.key==='Enter') searchRules(); });
+
+// ════════════════════════════════════════
+// LOG
+// ════════════════════════════════════════
+function renderLogModal() {
+  const log = G?.global_log || [];
+  document.getElementById('log-body').innerHTML = log.length
+    ? log.map(e => `<div class="log-entry">
+        <span class="log-turn">T${e.turn||'?'} ${e.phase||''}</span>
+        <span class="log-msg ${e.msg?.startsWith('⚠')||e.msg?.startsWith('☠')?'log-warn':''}">${e.msg}</span>
+      </div>`).join('')
+    : '<div style="color:var(--tlo);font-size:.75rem;font-style:italic;padding:12px 0;">No log entries yet.</div>';
+}
+
+// ════════════════════════════════════════
+// CAMERA SCAN
 // ════════════════════════════════════════
 let camStream = null;
 let tesseractWorker = null;
@@ -1106,12 +1557,8 @@ async function openCamera() {
   document.getElementById('cam-ov').classList.remove('hidden');
   document.getElementById('cam-results').classList.add('hidden');
   document.getElementById('cam-status').textContent = 'Starting camera...';
-
   try {
-    // Prefer back camera on mobile
-    camStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: {ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} }
-    });
+    camStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}});
     const video = document.getElementById('cam-video');
     video.srcObject = camStream;
     await video.play();
@@ -1120,243 +1567,343 @@ async function openCamera() {
     document.getElementById('cam-status').textContent = 'Camera access denied. Use manual search below.';
     showManualFallback();
   }
-
-  // Init Tesseract worker if not done
   if (!tesseractWorker) {
-    try {
-      tesseractWorker = await Tesseract.createWorker('eng');
-    } catch(e) {
-      console.warn('Tesseract init failed:', e);
-    }
+    try { tesseractWorker = await Tesseract.createWorker('eng'); } catch {}
   }
 }
-
 function closeCamera() {
-  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  if (camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
   document.getElementById('cam-ov').classList.add('hidden');
   document.getElementById('cam-guide').classList.remove('scanning');
 }
-
 async function captureAndScan() {
   const video = document.getElementById('cam-video');
   const guide = document.getElementById('cam-guide');
   const status = document.getElementById('cam-status');
-
   if (!video.srcObject) { showManualFallback(); return; }
-
-  // Start scan animation
   guide.classList.add('scanning');
   status.textContent = 'Capturing...';
   document.getElementById('cam-cap-btn').disabled = true;
-
   try {
-    // Draw current frame to canvas
     const canvas = document.getElementById('ocr-canvas');
-    canvas.width  = video.videoWidth  || 1280;
+    canvas.width = video.videoWidth || 1280;
     canvas.height = video.videoHeight || 720;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // Calculate the guide box region in video coordinates
-    // The guide box is centered horizontally, roughly 85% wide, and is a thin strip
-    // Guide covers the card name bar (top ~12% of card)
     const guideRect = guide.getBoundingClientRect();
     const videoRect = video.getBoundingClientRect();
-
-    const scaleX = canvas.width  / videoRect.width;
-    const scaleY = canvas.height / videoRect.height;
-
-    const cropX = (guideRect.left - videoRect.left) * scaleX;
-    const cropY = (guideRect.top  - videoRect.top)  * scaleY;
-    const cropW = guideRect.width  * scaleX;
-    const cropH = guideRect.height * scaleY;
-
-    // Extract the cropped region
+    const scaleX = canvas.width/videoRect.width;
+    const scaleY = canvas.height/videoRect.height;
+    const cropX = (guideRect.left-videoRect.left)*scaleX;
+    const cropY = (guideRect.top-videoRect.top)*scaleY;
+    const cropW = guideRect.width*scaleX;
+    const cropH = guideRect.height*scaleY;
     const cropCanvas = document.createElement('canvas');
-    cropCanvas.width  = Math.max(cropW, 1);
-    cropCanvas.height = Math.max(cropH, 1);
+    cropCanvas.width = Math.max(cropW,1);
+    cropCanvas.height = Math.max(cropH,1);
     const cropCtx = cropCanvas.getContext('2d');
-
-    // Process image for better OCR:
-    // 1. Grayscale
-    // 2. High contrast
     cropCtx.filter = 'grayscale(100%) contrast(180%) brightness(110%)';
     cropCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropCanvas.width, cropCanvas.height);
-
-    // Scale up for better OCR accuracy
     const bigCanvas = document.createElement('canvas');
-    bigCanvas.width  = cropCanvas.width  * 3;
-    bigCanvas.height = cropCanvas.height * 3;
+    bigCanvas.width = cropCanvas.width*3;
+    bigCanvas.height = cropCanvas.height*3;
     const bigCtx = bigCanvas.getContext('2d');
     bigCtx.imageSmoothingEnabled = false;
     bigCtx.drawImage(cropCanvas, 0, 0, bigCanvas.width, bigCanvas.height);
-
-    status.textContent = 'Reading card name...';
-
+    status.textContent = 'Reading...';
     let ocrText = '';
     if (tesseractWorker) {
       const result = await tesseractWorker.recognize(bigCanvas);
       ocrText = result.data.text.trim();
     }
-
     guide.classList.remove('scanning');
     document.getElementById('cam-cap-btn').disabled = false;
-
-    if (!ocrText || ocrText.length < 2) {
-      status.textContent = 'Could not read text — try again or use manual search';
-      showSearchResults([], '');
-      return;
-    }
-
-    // Clean OCR text — take first line, remove non-letter chars
-    const cleaned = ocrText.split('\n')[0]
-      .replace(/[^a-zA-Z0-9 ',\-]/g, '')
-      .trim()
-      .substring(0, 40);
-
+    if (!ocrText || ocrText.length < 2) { status.textContent = 'Could not read — try again'; showSearchResults([],''
+    ); return; }
+    const cleaned = ocrText.split('\n')[0].replace(/[^a-zA-Z0-9 ',\-]/g,'').trim().substring(0,40);
     status.textContent = `Read: "${cleaned}" — searching...`;
     await searchAndShowResults(cleaned);
-
   } catch(e) {
     guide.classList.remove('scanning');
     document.getElementById('cam-cap-btn').disabled = false;
     status.textContent = 'Error — try again or use manual search';
-    console.error('Scan error:', e);
     showManualFallback();
   }
 }
-
 function retryCapture() {
   document.getElementById('cam-results').classList.add('hidden');
   document.getElementById('cam-status').textContent = 'Ready — align card name in the box, then press Capture';
 }
-
 async function searchAndShowResults(query) {
   if (!query) { showSearchResults([], query); return; }
   try {
-    // Use Scryfall autocomplete then fetch each match
     const r = await fetch(`/autocomplete?q=${encodeURIComponent(query)}`);
     const data = await r.json();
-    const names = (data.names || []).slice(0, 5);
-
+    const names = (data.names||[]).slice(0,5);
     if (!names.length) {
-      // Try fuzzy via search endpoint
       const r2 = await fetch(`/search_cards?q=${encodeURIComponent(query)}`);
-      const d2  = await r2.json();
-      const cards = (d2.cards || []).slice(0, 5);
-      showSearchResults(cards, query);
+      const d2 = await r2.json();
+      showSearchResults((d2.cards||[]).slice(0,5), query);
       return;
     }
-
-    // Fetch each name for art
     const cards = await Promise.all(names.map(async name => {
       try {
         const rc = await fetch(`/resolve_card?name=${encodeURIComponent(name)}`);
         if (rc.ok) return await rc.json();
       } catch {}
-      return {name, type:'', text:'', art_url:'', power:null, toughness:null};
+      return {name, type:'', text:'', art_url:''};
     }));
     showSearchResults(cards.filter(Boolean), query);
-  } catch(e) {
-    showSearchResults([], query);
-  }
+  } catch { showSearchResults([], query); }
 }
-
 function showSearchResults(cards, query) {
   const res = document.getElementById('cam-results');
   const list = document.getElementById('cr-list');
   document.getElementById('cr-title').textContent = cards.length
     ? `Found ${cards.length} match${cards.length>1?'es':''} for "${query}"`
     : `No matches for "${query}"`;
-
-  list.innerHTML = cards.map(c => `
-    <div class="cr-match" data-cname="${encodeURIComponent(c.name)}">
-      ${c.art_url
-        ? `<img src="${c.art_url}" alt="" loading="lazy">`
-        : `<div class="cr-ph">${c.name[0]}</div>`}
+  list.innerHTML = cards.map(c=>`
+    <div class="cr-match" data-cname="${encodeURIComponent(JSON.stringify(c))}">
+      ${c.art_url?`<img src="${c.art_url}" alt="" loading="lazy">`:`<div class="cr-ph">${c.name?.[0]}</div>`}
       <div>
         <div class="cr-name">${c.name}</div>
-        <div class="cr-type">${c.type||''} ${c.mana_cost ? '&bull; '+c.mana_cost : ''}</div>
+        <div class="cr-type">${c.type||''}${c.mana_cost?' · '+c.mana_cost:''}</div>
         <div class="cr-text">${(c.text||'').substring(0,100)}${(c.text||'').length>100?'...':''}</div>
-        ${c.power!==null&&c.power!==undefined ? `<div style="margin-top:4px;font-family:var(--ff1);font-size:.6rem;color:var(--thi);">${c.power}/${c.toughness}</div>` : ''}
+        ${c.power!=null?`<div style="margin-top:4px;font-family:var(--ff1);font-size:.6rem;color:var(--thi);">${c.power}/${c.toughness}</div>`:''}
       </div>
     </div>`).join('');
-
-  // Clicking a result opens the card detail
-  list.querySelectorAll('.cr-match').forEach(el => {
-    el.addEventListener('click', () => {
-      const name = decodeURIComponent(el.dataset.cname);
-      const card = cards.find(c => c.name === name);
-      if (card) showCardDetail(card);
+  list.querySelectorAll('.cr-match').forEach(el=>{
+    el.addEventListener('click',()=>{
+      try { showCardDetail(JSON.parse(decodeURIComponent(el.dataset.cname))); } catch {}
     });
   });
-
   document.getElementById('cr-manual-inp').value = query;
   res.classList.remove('hidden');
 }
-
 function showManualFallback() {
   document.getElementById('cam-results').classList.remove('hidden');
   document.getElementById('cr-title').textContent = 'Manual Card Search';
   document.getElementById('cr-list').innerHTML = '';
   document.getElementById('cr-manual-inp').value = '';
-  setTimeout(() => document.getElementById('cr-manual-inp').focus(), 100);
+  setTimeout(()=>document.getElementById('cr-manual-inp').focus(),100);
 }
-
 async function manualSearch() {
   const q = document.getElementById('cr-manual-inp').value.trim();
   if (!q) return;
   document.getElementById('cr-title').textContent = `Searching "${q}"...`;
   await searchAndShowResults(q);
 }
-document.getElementById('cr-manual-inp').addEventListener('keydown', e => { if(e.key==='Enter') manualSearch(); });
+document.getElementById('cr-manual-inp').addEventListener('keydown', e=>{ if(e.key==='Enter') manualSearch(); });
 
-function showCardDetail(card) {
+async function showCardDetail(card) {
   closeCamera();
   document.getElementById('card-ov-title').textContent = card.name;
+
+  // Fetch rulings if we have a scryfall ID
+  let rulingsHtml = '';
+  if (card.scryfall_id) {
+    try {
+      const r = await fetch(`/card_rulings?scryfall_id=${card.scryfall_id}`);
+      if (r.ok) {
+        const d = await r.json();
+        if (d.rulings?.length) {
+          rulingsHtml = `<div class="sec-head" style="margin-top:14px;">Oracle Rulings</div>
+            ${d.rulings.slice(0,5).map(r=>`<div class="ruling-row">
+              <div class="ruling-date">${r.published_at||''}</div>
+              <div class="ruling-text">${r.comment||''}</div>
+            </div>`).join('')}`;
+        }
+      }
+    } catch {}
+  }
+
+  // Keywords
+  const kwHtml = (card.keywords||[]).length
+    ? `<div style="margin-top:8px;">${card.keywords.map(k=>`<span class="keyword-tag">${k}</span>`).join('')}</div>`
+    : '';
+
   document.getElementById('card-ov-body').innerHTML = `
     <div style="display:flex;gap:18px;flex-wrap:wrap;">
-      ${card.art_url ? `<img src="${card.art_url}" style="width:160px;border:1px solid var(--bdr2);flex-shrink:0;" alt="">` : ''}
+      ${card.art_url?`<img src="${card.art_url}" style="width:150px;border:1px solid var(--bdr2);flex-shrink:0;object-fit:cover;" alt="">`:''}
       <div style="flex:1;min-width:160px;">
-        <div style="font-family:var(--ff1);font-size:1rem;color:var(--gold);margin-bottom:5px;">${card.name}</div>
-        <div style="font-size:.72rem;color:var(--tlo);font-style:italic;margin-bottom:8px;">${card.type||''}</div>
-        ${card.mana_cost ? `<div style="font-size:.72rem;color:var(--thi);margin-bottom:8px;">Cost: ${card.mana_cost}</div>` : ''}
-        <div style="font-size:.8rem;color:var(--text);line-height:1.6;margin-bottom:10px;">${card.text||''}</div>
-        ${card.power!==null&&card.power!==undefined ? `<div style="font-family:var(--ff1);font-size:.85rem;color:var(--thi);">${card.power} / ${card.toughness}</div>` : ''}
-        ${card.set_name ? `<div style="font-size:.62rem;color:var(--tlo);margin-top:8px;">${card.set_name}</div>` : ''}
-        ${card.legalities ? buildLegality(card.legalities) : ''}
+        <div style="font-family:var(--ff1);font-size:1rem;color:var(--gold);margin-bottom:4px;">${card.name}</div>
+        <div style="font-size:.72rem;color:var(--tlo);font-style:italic;margin-bottom:6px;">${card.type||''}</div>
+        ${card.mana_cost?`<div style="font-size:.72rem;color:var(--thi);margin-bottom:6px;">Cost: ${card.mana_cost}</div>`:''}
+        ${card.power!=null?`<div style="font-family:var(--ff1);font-size:.85rem;color:var(--thi);margin-bottom:6px;">${card.power} / ${card.toughness}</div>`:''}
+        <div style="font-size:.8rem;color:var(--text);line-height:1.6;margin-bottom:8px;">${card.text||''}</div>
+        ${kwHtml}
+        ${card.set_name?`<div style="font-size:.62rem;color:var(--tlo);margin-top:6px;">${card.set_name}</div>`:''}
+        ${card.legalities?buildLegality(card.legalities):''}
       </div>
-    </div>`;
+    </div>
+    ${rulingsHtml}`;
+
+  // Footer: check for auto-tracker suggestions
+  const autoSuggest = getAutoSuggest(card);
+  const foot = document.getElementById('card-ov-foot');
+  foot.innerHTML = `<button class="btn" onclick="closeOv('card-ov')">Close</button>`;
+  if (autoSuggest) {
+    foot.innerHTML = `<div style="flex:1;font-size:.7rem;color:#60d0d0;background:var(--s2);border:1px solid #105050;padding:8px 12px;border-radius:2px;">${autoSuggest}</div>` + foot.innerHTML;
+  }
+
   openOv('card-ov');
 }
 
+function getAutoSuggest(card) {
+  const text = (card.text||'').toLowerCase() + ' ' + (card.name||'').toLowerCase();
+  const kw = (card.keywords||[]).map(k=>k.toLowerCase());
+  const suggestions = [];
+  if (text.includes('poison') || kw.includes('toxic') || kw.includes('infect')) suggestions.push('💡 This card uses Poison — track with counter on player panel');
+  if (text.includes('energy') || text.includes('{e}')) suggestions.push('💡 This card uses Energy — track with counter');
+  if (text.includes('experience counter')) suggestions.push('💡 This card uses Experience counters');
+  if (text.includes('storm count')) suggestions.push('💡 This card uses Storm — track storm count');
+  if (text.includes('the ring tempts you')) suggestions.push('💡 The Ring mechanic detected — consider adding reminder');
+  if (text.includes('day') && text.includes('night')) suggestions.push('💡 Day/Night mechanic — track in Phase panel');
+  if (text.includes('rhystic')) suggestions.push('💡 Rhystic Study — add a reminder for triggers');
+  if (text.includes('smothering tithe') || text.includes('treasure')) suggestions.push('💡 Treasure generation — track with counters');
+  return suggestions[0] || '';
+}
+
 function buildLegality(leg) {
-  const show = ['standard','historic','pioneer','modern','legacy','commander','pauper'];
-  const rows = show.map(f => {
+  const show = ['standard','pioneer','modern','legacy','commander','pauper','vintage'];
+  const rows = show.map(f=>{
     const v = leg[f];
     if (!v) return '';
-    const legal = v === 'legal';
-    const color = legal ? '#50c870' : '#f07060';
+    const legal = v==='legal';
+    const color = legal?'#50c870':'#f07060';
     return `<span style="font-family:var(--ff1);font-size:.5rem;letter-spacing:.06em;padding:2px 6px;border-radius:2px;background:var(--s2);border:1px solid var(--bdr);color:${color};display:inline-block;margin:2px;">${f.replace('_',' ')}</span>`;
   }).join('');
-  return rows ? `<div style="margin-top:8px;">${rows}</div>` : '';
+  return rows?`<div style="margin-top:8px;">${rows}</div>`:'';
+}
+
+// ════════════════════════════════════════
+// NEW GAME
+// ════════════════════════════════════════
+let ngMode = 'commander';
+let ngPlayers = [];
+
+function openNewGame() {
+  ngMode = G?.mode || 'commander';
+  ngPlayers = G ? G.players.map(p=>p.name) : [myName, 'Player 2'];
+  if (!ngPlayers.includes(myName)) ngPlayers.unshift(myName);
+  buildNgModeGrid();
+  buildNgPlayersList();
+  document.getElementById('ng-life').value = MODES[ngMode]?.life || 20;
+  openOv('ng-ov');
+}
+
+function buildNgModeGrid() {
+  const cont = document.getElementById('ng-mode-cont');
+  cont.innerHTML = MODE_CATS.map(cat=>`
+    <div class="mc ${cat.c}">${cat.l}</div>
+    <div class="mgrid">
+      ${cat.k.map(k=>{const m=MODES[k];return`
+        <div class="mt ${k===ngMode?'sel':''}" data-ngm="${k}">
+          <div class="mn">${m.name}</div>
+          <div class="ml">${m.life} life</div>
+          <div class="md">${m.deck} cards${m.cmd?' · Cmdr':''}</div>
+        </div>`;}).join('')}
+    </div>`).join('');
+  cont.querySelectorAll('[data-ngm]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      ngMode = el.dataset.ngm;
+      cont.querySelectorAll('.mt').forEach(t=>t.classList.toggle('sel',t.dataset.ngm===ngMode));
+      document.getElementById('ng-life').value = MODES[ngMode]?.life||20;
+    });
+  });
+}
+
+function buildNgPlayersList() {
+  const el = document.getElementById('ng-players-list');
+  el.innerHTML = ngPlayers.map((name,i)=>`
+    <div class="player-row">
+      <span class="pnum">P${i+1}</span>
+      <input class="inp" style="flex:1;" value="${name}" data-pidx="${i}" placeholder="Player name..." maxlength="24">
+      ${i>1?`<button class="player-row-rm" data-rmidx="${i}">&times;</button>`:''}
+    </div>`).join('');
+  el.querySelectorAll('[data-pidx]').forEach(inp=>{
+    inp.addEventListener('input',()=>{ ngPlayers[parseInt(inp.dataset.pidx)]=inp.value.trim(); });
+  });
+  el.querySelectorAll('[data-rmidx]').forEach(btn=>{
+    btn.addEventListener('click',()=>{ ngPlayers.splice(parseInt(btn.dataset.rmidx),1); buildNgPlayersList(); });
+  });
+}
+function addNgPlayer() { ngPlayers.push(`Player ${ngPlayers.length+1}`); buildNgPlayersList(); }
+
+async function startGame() {
+  const players = ngPlayers.filter(p=>p.trim());
+  if (!players.length) return alert('Add at least one player.');
+  const life = parseInt(document.getElementById('ng-life').value) || MODES[ngMode].life;
+  const createRoom = document.getElementById('ng-create-room').checked;
+
+  G = defaultGame(ngMode, players, life);
+  saveGame();
+
+  if (createRoom) {
+    try {
+      const r = await fetch('/create_room', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({mode: ngMode, players, life}),
+      });
+      if (r.ok) {
+        const d = await r.json();
+        roomId = d.room_id;
+        G = d.game;
+        G.room_id = roomId;
+        saveGame();
+        connectWs(roomId);
+      }
+    } catch { roomId = null; }
+  } else {
+    roomId = null;
+    ws = null;
+  }
+
+  closeOv('ng-ov');
+  renderAll();
+}
+
+// ════════════════════════════════════════
+// MODE MODAL
+// ════════════════════════════════════════
+let selMode = 'commander';
+function buildModeGrid(containerId) {
+  selMode = G?.mode || 'commander';
+  const cont = document.getElementById(containerId);
+  cont.innerHTML = MODE_CATS.map(cat=>`
+    <div class="mc ${cat.c}">${cat.l}</div>
+    <div class="mgrid">
+      ${cat.k.map(k=>{const m=MODES[k];return`
+        <div class="mt ${k===selMode?'sel':''}" data-sm="${k}">
+          <div class="mn">${m.name}</div>
+          <div class="ml">${m.life} life</div>
+          <div class="md">${m.deck} cards${m.cmd?' · Cmdr':''}</div>
+        </div>`;}).join('')}
+    </div>`).join('');
+  cont.querySelectorAll('[data-sm]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      selMode=el.dataset.sm;
+      cont.querySelectorAll('.mt').forEach(t=>t.classList.toggle('sel',t.dataset.sm===selMode));
+    });
+  });
+}
+function confirmMode() {
+  if (!G||selMode===G.mode){closeOv('mode-ov');return;}
+  const m = MODES[selMode];
+  if (!confirm(`Switch to ${m.name}? Life resets to ${m.life}.`)){closeOv('mode-ov');return;}
+  G.mode = selMode;
+  G.players.forEach(p=>{p.life=m.life;});
+  saveGame(); renderAll(); closeOv('mode-ov');
 }
 
 // ════════════════════════════════════════
 // OVERLAY HELPERS
 // ════════════════════════════════════════
-function openOv(id)  { document.getElementById(id)?.classList.remove('hidden'); }
+function openOv(id) { document.getElementById(id)?.classList.remove('hidden'); }
 function closeOv(id) { document.getElementById(id)?.classList.add('hidden'); }
-
-document.querySelectorAll('.ov').forEach(el => {
-  el.addEventListener('click', e => { if(e.target===el) closeOv(el.id); });
+document.querySelectorAll('.ov').forEach(el=>{
+  el.addEventListener('click', e=>{ if(e.target===el) closeOv(el.id); });
 });
-
-// ════════════════════════════════════════
-// INIT — start default game if no saved
-// ════════════════════════════════════════
-// Login enter key
-document.getElementById('l-name').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 </script>
 </body>
 </html>
